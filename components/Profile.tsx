@@ -46,9 +46,9 @@ export const Profile: React.FC<ProfileProps> = ({ role, onUpdatePhoto, onUpdateN
             bio: data.bio || '',
             linkedin: data.linkedin || '',
             instagram: data.instagram || '',
-            razao_social: data.razao_social || 'Instituto Escola Jovens de Negócios',
-            cnpj: data.cnpj || '51.708.193/0001-70',
-            endereco: data.endereco || 'São Paulo, SP',
+            razao_social: data.razao_social || '',
+            cnpj: data.cnpj || '',
+            endereco: data.endereco || '',
             cargo: data.cargo || role
           });
         }
@@ -67,7 +67,7 @@ export const Profile: React.FC<ProfileProps> = ({ role, onUpdatePhoto, onUpdateN
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Sessão expirada. Faça login novamente.");
 
-      // Removido 'updated_at' para evitar erro de coluna inexistente
+      // Payload Básico (Sempre existe no banco)
       const payload: any = {
         nome: formData.nome,
         bio: formData.bio,
@@ -76,26 +76,28 @@ export const Profile: React.FC<ProfileProps> = ({ role, onUpdatePhoto, onUpdateN
         foto_url: currentPhoto
       };
 
-      // Se for gestor, salvar campos específicos do instituto
+      // Só incluímos os dados institucionais se o usuário for gestor
+      // E enviamos apenas se houver conteúdo para evitar erros de constraint
       if (formData.cargo === 'gestor') {
-        payload.razao_social = formData.razao_social;
-        payload.cnpj = formData.cnpj;
-        payload.endereco = formData.endereco;
+        if (formData.razao_social) payload.razao_social = formData.razao_social;
+        if (formData.cnpj) payload.cnpj = formData.cnpj;
+        if (formData.endereco) payload.endereco = formData.endereco;
       }
 
       const { error } = await supabase.from('perfis').update(payload).eq('id', user.id);
 
       if (error) {
+        // Erro 42703 é "Undefined Column" - O banco não tem cnpj/razao_social/endereco
         if (error.code === '42703') {
-          throw new Error("Erro de Coluna: O banco de dados não possui um dos campos enviados. Contate o suporte.");
+          throw new Error("Erro de Configuração: As colunas de 'CNPJ' ou 'Razão Social' ainda não foram criadas na sua tabela de perfis no Supabase. Por favor, rode o script SQL fornecido para habilitar esses campos.");
         }
         throw error;
       }
       
       if (formData.nome) onUpdateName(formData.nome);
-      alert('Perfil sincronizado com sucesso!');
+      alert('Perfil e dados institucionais sincronizados!');
     } catch (err: any) {
-      alert(`Erro ao salvar perfil: ${err.message}`);
+      alert(err.message);
     } finally {
       setIsSaving(false);
     }
@@ -144,7 +146,7 @@ export const Profile: React.FC<ProfileProps> = ({ role, onUpdatePhoto, onUpdateN
             {isGestor ? 'Instituto Escola Jovens de Negócios' : 'Parceiro da Educação Brasileira'}
           </p>
           <p className="text-gray-600 italic max-w-2xl leading-relaxed">
-            "{formData.bio || (isGestor ? 'Presidente e Fundador.' : 'Contribuindo para o futuro de jovens talentos.')}"
+            "{formData.bio || (isGestor ? 'Liderando a transformação social através da educação.' : 'Contribuindo para o futuro de jovens talentos.')}"
           </p>
         </div>
       </div>
@@ -162,21 +164,21 @@ export const Profile: React.FC<ProfileProps> = ({ role, onUpdatePhoto, onUpdateN
                   <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1">Razão Social</label>
                   <div className="relative">
                     <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                    <input value={formData.razao_social} onChange={e => setFormData({...formData, razao_social: e.target.value})} type="text" className="w-full pl-11 pr-5 py-4 bg-apple-gray rounded-apple-lg outline-none border focus:border-ejn-teal transition-all" />
+                    <input value={formData.razao_social} onChange={e => setFormData({...formData, razao_social: e.target.value})} type="text" className="w-full pl-11 pr-5 py-4 bg-apple-gray rounded-apple-lg outline-none border focus:border-ejn-teal transition-all" placeholder="Nome da instituição" />
                   </div>
                 </div>
                 <div>
                   <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1">CNPJ</label>
                   <div className="relative">
                     <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                    <input value={formData.cnpj} onChange={e => setFormData({...formData, cnpj: e.target.value})} type="text" className="w-full pl-11 pr-5 py-4 bg-apple-gray rounded-apple-lg border" />
+                    <input value={formData.cnpj} onChange={e => setFormData({...formData, cnpj: e.target.value})} type="text" className="w-full pl-11 pr-5 py-4 bg-apple-gray rounded-apple-lg border" placeholder="00.000.000/0001-00" />
                   </div>
                 </div>
                 <div className="md:col-span-2">
                   <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1">Endereço Sede</label>
                   <div className="relative">
                     <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                    <input value={formData.endereco} onChange={e => setFormData({...formData, endereco: e.target.value})} type="text" className="w-full pl-11 pr-5 py-4 bg-apple-gray rounded-apple-lg outline-none border focus:border-ejn-teal transition-all" />
+                    <input value={formData.endereco} onChange={e => setFormData({...formData, endereco: e.target.value})} type="text" className="w-full pl-11 pr-5 py-4 bg-apple-gray rounded-apple-lg outline-none border focus:border-ejn-teal transition-all" placeholder="Rua, Número, Cidade - UF" />
                   </div>
                 </div>
               </div>
@@ -210,8 +212,8 @@ export const Profile: React.FC<ProfileProps> = ({ role, onUpdatePhoto, onUpdateN
               Conexões
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <input value={formData.linkedin} onChange={e => setFormData({...formData, linkedin: e.target.value})} type="text" className="w-full px-5 py-4 bg-apple-gray rounded-apple-lg border" placeholder="URL do LinkedIn" />
-              <input value={formData.instagram} onChange={e => setFormData({...formData, instagram: e.target.value})} type="text" className="w-full px-5 py-4 bg-apple-gray rounded-apple-lg border" placeholder="@ seu_instagram" />
+              <input value={formData.linkedin} onChange={e => setFormData({...formData, linkedin: e.target.value})} type="text" className="w-full px-5 py-4 bg-apple-gray rounded-apple-lg border focus:border-ejn-teal outline-none transition-all" placeholder="URL do LinkedIn" />
+              <input value={formData.instagram} onChange={e => setFormData({...formData, instagram: e.target.value})} type="text" className="w-full px-5 py-4 bg-apple-gray rounded-apple-lg border focus:border-ejn-teal outline-none transition-all" placeholder="@ seu_instagram" />
             </div>
           </div>
         </div>
