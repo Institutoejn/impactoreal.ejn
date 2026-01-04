@@ -198,7 +198,7 @@ const App: React.FC = () => {
           )}
           {activeTab === 'investments' && role === 'doador' && <MyInvestments transactions={userTransactions} totalInvested={totalInvested} />}
           {activeTab === 'projects' && role === 'doador' && <Projects projects={projetos} transactions={transacoes} onDonate={(pid, amt) => handleAddTransaction({ descricao: 'Doação Realizada', valor: amt, tipo: 'entrada', categoria: 'Doação', projeto_id: pid, status: 'pendente' })} />}
-          {activeTab === 'transparency' && role === 'doador' && <Transparency transactions={transacoes} />}
+          {activeTab === 'transparency' && role === 'doador' && <Transparency transactions={transacoes} impactCount={impactCount} totalInvested={totalInvested} />}
           
           {activeTab === 'profile' && (
             <Profile 
