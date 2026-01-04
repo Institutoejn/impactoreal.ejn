@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200&family=Poppins:wght@700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -20,7 +20,8 @@
                         'apple-text-secondary': '#86868b'
                     },
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Montserrat', 'sans-serif'], // Montserrat como padrão para corpo
+                        poppins: ['Poppins', 'sans-serif'], // Poppins para títulos e destaques
                     },
                     borderRadius: {
                         'apple-lg': '1.25rem',
@@ -36,12 +37,38 @@
             background-color: #F5F5F7;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 200;
+            letter-spacing: 0.5px;
+            color: #1F2937;
         }
+
+        /* Aplicação Global da Poppins Bold em Títulos e Botões */
+        h1, h2, h3, h4, h5, h6, 
+        button, 
+        .font-poppins, 
+        .title-highlight {
+            font-family: 'Poppins', sans-serif !important;
+            font-weight: 700 !important;
+        }
+
+        /* Ajuste de Montserrat em inputs e parágrafos */
+        p, span, input, textarea, select, td, th {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 200;
+            letter-spacing: 0.5px;
+        }
+
         /* Custom scrollbar for a cleaner Apple-like look */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 10px; border: 2px solid #F5F5F7; }
         ::-webkit-scrollbar-thumb:hover { background: #8e8e93; }
+
+        /* Melhoria de contraste para Montserrat Thin */
+        .text-apple-text-secondary {
+            color: #636366; /* Um pouco mais escuro para legibilidade com peso 200 */
+        }
     </style>
 <script type="importmap">
 {
@@ -58,7 +85,6 @@
 </head>
 <body>
     <div id="root"></div>
-    <!-- Importação crucial do motor da aplicação (React) -->
     <script type="module" src="./index.tsx"></script>
 </body>
 </html>

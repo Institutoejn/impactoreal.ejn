@@ -176,10 +176,10 @@ const App: React.FC = () => {
         <header className="flex flex-col md:flex-row md:justify-between md:items-start mb-8 gap-6">
           <div className="lg:hidden"><button onClick={() => setIsSidebarOpen(true)} className="p-2 text-ejn-teal bg-white rounded-lg shadow-sm"><Menu /></button></div>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-ejn-teal">
+            <h1 className="text-3xl font-bold text-ejn-teal font-poppins">
               {role === 'gestor' ? `Painel do Presidente` : `Olá, ${profileData.nome?.split(' ')[0]}`}
             </h1>
-            <p className="text-apple-text-secondary">{role === 'gestor' ? "Gestão estratégica do Instituto EJN." : "Seu investimento social transformando vidas."}</p>
+            <p className="text-apple-text-secondary font-light">{role === 'gestor' ? "Gestão estratégica do Instituto EJN." : "Seu investimento social transformando vidas."}</p>
           </div>
         </header>
 
