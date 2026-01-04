@@ -183,11 +183,12 @@ const App: React.FC = () => {
       
       if (error) {
         if (error.code === '42501') {
-          throw new Error("Permissão de Banco (RLS): Doadores precisam de permissão explícita para registrar transações pendentes no Supabase Dashboard.");
+          const userType = role === 'gestor' ? 'Presidente' : 'Doador';
+          throw new Error(`Permissão Negada (RLS): O banco de dados bloqueou esta operação para o nível '${userType}'. Verifique as políticas SQL de 'INSERT' no Supabase Dashboard.`);
         }
         throw error;
       }
-      showSuccessFeedback("Operação realizada!");
+      showSuccessFeedback("Fluxo registrado!");
       fetchData(true);
       return true;
     } catch (err: any) {
