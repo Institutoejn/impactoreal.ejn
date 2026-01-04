@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ImpactHero } from './components/ImpactHero';
 import { TransparencyCard } from './components/TransparencyCard';
@@ -16,7 +16,7 @@ import { MyInvestments } from './components/MyInvestments';
 import { Projects } from './components/Projects';
 import { Transparency } from './components/Transparency';
 import { Profile } from './components/Profile';
-import { Bell, Search, Heart, Menu, Loader2 } from 'lucide-react';
+import { Bell, Search, Heart, Menu, Loader2, WifiOff } from 'lucide-react';
 import { UserRole, Student, Transaction, Project } from './types';
 import { supabase } from './supabase';
 
@@ -26,7 +26,11 @@ const App: React.FC = () => {
   const [role, setRole] = useState<UserRole>('donor');
   const [activeTab, setActiveTab] = useState('overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  // States de Carregamento e Erro
   const [isLoading, setIsLoading] = useState(true);
+  const [connectionError, setConnectionError] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   
   // App Data States
   const [students, setStudents] = useState<Student[]>([]);
@@ -37,45 +41,81 @@ const App: React.FC = () => {
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [userName, setUserName] = useState("Carregando...");
 
-  // Initial Data Fetch from Supabase
+  // 1. Verificação de Conexão e Busca de Dados
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    setConnectionError(false);
+    try {
+      // Validar conexão básica
+      const { error: connCheck } = await supabase.from('projects').select('id').limit(1);
+      if (connCheck) throw connCheck;
+
+      const [stRes, trRes, prRes] = await Promise.all([
+        supabase.from('students').select('*').order('name'),
+        supabase.from('transactions').select('*').order('date', { ascending: false }),
+        supabase.from('projects').select('*').order('created_at', { ascending: false })
+      ]);
+
+      if (stRes.error) throw stRes.error;
+      if (trRes.error) throw trRes.error;
+      if (prRes.error) throw prRes.error;
+
+      // Mapeamento de Snake Case para Camel Case
+      setStudents(stRes.data.map(s => ({
+        id: s.id,
+        name: s.name,
+        age: s.age,
+        neighborhood: s.neighborhood,
+        course: s.course,
+        status: s.status,
+        history: s.history,
+        image: s.image
+      })));
+
+      setTransactions(trRes.data.map(t => ({
+        id: t.id,
+        date: t.date,
+        description: t.description,
+        category: t.category,
+        type: t.type,
+        amount: t.amount,
+        projectId: t.project_id,
+        status: t.status,
+        proofImage: t.proof_image
+      })));
+
+      setProjects(prRes.data.map(p => ({
+        id: p.id,
+        title: p.title,
+        description: p.description,
+        goal: p.goal,
+        status: p.status,
+        image: p.image
+      })));
+
+    } catch (err) {
+      console.error("Erro de sincronização Supabase:", err);
+      setConnectionError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const [
-          { data: stData },
-          { data: trData },
-          { data: prData }
-        ] = await Promise.all([
-          supabase.from('students').select('*').order('name'),
-          supabase.from('transactions').select('*').order('date', { ascending: false }),
-          supabase.from('projects').select('*').order('status')
-        ]);
-
-        if (stData) setStudents(stData);
-        if (trData) setTransactions(trData);
-        if (prData) setProjects(prData);
-      } catch (err) {
-        console.error("Erro ao buscar dados do Supabase:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     if (isLoggedIn) fetchData();
-  }, [isLoggedIn]);
+  }, [isLoggedIn, fetchData]);
 
-  // Sync Profile on Login/Role Switch
+  // 2. Sync Profile
   useEffect(() => {
     const fetchProfile = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('role', role)
-        .single();
+        .maybeSingle();
 
       if (data) {
-        setUserName(data.name);
+        setUserName(data.name || (role === 'manager' ? "Paulo Presidente" : "Carlos Eduardo"));
         setProfilePhoto(data.profile_photo);
       } else {
         setUserName(role === 'manager' ? "Paulo Presidente" : "Carlos Eduardo");
@@ -90,54 +130,163 @@ const App: React.FC = () => {
     setActiveTab('overview');
   };
 
+  // 3. Handlers de Dados (Supabase CRUD)
+  
   const handleAddStudent = async (newStudent: Omit<Student, 'id' | 'status'>) => {
-    const { data, error } = await supabase
-      .from('students')
-      .insert([{ ...newStudent, status: 'active' }])
-      .select()
-      .single();
+    setIsSyncing(true);
+    try {
+      const { data, error } = await supabase
+        .from('students')
+        .insert([{ 
+          name: newStudent.name,
+          age: newStudent.age,
+          neighborhood: newStudent.neighborhood,
+          course: newStudent.course,
+          history: newStudent.history,
+          image: newStudent.image,
+          status: 'active' 
+        }])
+        .select()
+        .single();
 
-    if (data) setStudents([data, ...students]);
+      if (error) throw error;
+      fetchData(); // Atualiza lista
+    } catch (err) {
+      alert("Erro ao salvar aluno. Verifique sua conexão.");
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const handleUpdateStudent = async (updatedStudent: Student) => {
-    const { error } = await supabase
-      .from('students')
-      .update(updatedStudent)
-      .eq('id', updatedStudent.id);
+    setIsSyncing(true);
+    try {
+      const { error } = await supabase
+        .from('students')
+        .update({
+          name: updatedStudent.name,
+          age: updatedStudent.age,
+          neighborhood: updatedStudent.neighborhood,
+          course: updatedStudent.course,
+          history: updatedStudent.history,
+          image: updatedStudent.image,
+          status: updatedStudent.status
+        })
+        .eq('id', updatedStudent.id);
 
-    if (!error) setStudents(students.map(s => s.id === updatedStudent.id ? updatedStudent : s));
+      if (error) throw error;
+      fetchData();
+    } catch (err) {
+      alert("Erro ao atualizar aluno.");
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const handleDeleteStudent = async (id: string) => {
-    const { error } = await supabase.from('students').delete().eq('id', id);
-    if (!error) setStudents(students.filter(s => s.id !== id));
+    if (!window.confirm("Deseja realmente excluir este registro?")) return;
+    setIsSyncing(true);
+    try {
+      const { error } = await supabase.from('students').delete().eq('id', id);
+      if (error) throw error;
+      setStudents(prev => prev.filter(s => s.id !== id));
+    } catch (err) {
+      alert("Não foi possível excluir o aluno.");
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
-  const handleAddTransaction = async (newTransaction: Omit<Transaction, 'id'>) => {
-    const { data, error } = await supabase
-      .from('transactions')
-      .insert([{ ...newTransaction, status: newTransaction.status || 'confirmed' }])
-      .select()
-      .single();
+  const handleAddTransaction = async (newTr: Omit<Transaction, 'id'>) => {
+    setIsSyncing(true);
+    try {
+      const { data, error } = await supabase
+        .from('transactions')
+        .insert([{
+          description: newTr.description,
+          amount: newTr.amount,
+          type: newTr.type,
+          category: newTr.category,
+          project_id: newTr.projectId,
+          date: newTr.date,
+          status: newTr.status || 'confirmed',
+          proof_image: newTr.proofImage
+        }])
+        .select()
+        .single();
 
-    if (data) setTransactions([data, ...transactions]);
+      if (error) throw error;
+      fetchData(); // Atualiza para recalcular progresso dos projetos
+    } catch (err) {
+      alert("Erro ao registrar transação financeira.");
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const handleUpdateTransactionStatus = async (id: string, status: 'confirmed' | 'pending') => {
-    const { error } = await supabase.from('transactions').update({ status }).eq('id', id);
-    if (!error) setTransactions(transactions.map(t => t.id === id ? { ...t, status } : t));
+    setIsSyncing(true);
+    try {
+      const { error } = await supabase.from('transactions').update({ status }).eq('id', id);
+      if (error) throw error;
+      fetchData();
+    } catch (err) {
+      alert("Erro ao alterar status da transação.");
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const handleDeleteTransaction = async (id: string) => {
-    const { error } = await supabase.from('transactions').delete().eq('id', id);
-    if (!error) setTransactions(transactions.filter(t => t.id !== id));
+    setIsSyncing(true);
+    try {
+      const { error } = await supabase.from('transactions').delete().eq('id', id);
+      if (error) throw error;
+      fetchData();
+    } catch (err) {
+      alert("Erro ao excluir transação.");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const handleAddProject = async (newProj: Omit<Project, 'id'>) => {
+    setIsSyncing(true);
+    try {
+      const { error } = await supabase.from('projects').insert([{
+        title: newProj.title,
+        description: newProj.description,
+        goal: newProj.goal,
+        status: newProj.status,
+        image: newProj.image
+      }]);
+      if (error) throw error;
+      fetchData();
+    } catch (err) {
+      alert("Erro ao criar projeto.");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const handleDeleteProject = async (id: string) => {
+    if (!window.confirm("Isso afetará os registros financeiros vinculados. Confirmar?")) return;
+    setIsSyncing(true);
+    try {
+      const { error } = await supabase.from('projects').delete().eq('id', id);
+      if (error) throw error;
+      fetchData();
+    } catch (err) {
+      alert("Erro ao excluir projeto.");
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const handleDonate = (projectId: string, amount: number) => {
     const project = projects.find(p => p.id === projectId);
     handleAddTransaction({
-      description: `Doação via Pix: ${project?.title || 'Projeto'}`,
+      description: `Investimento: ${project?.title || 'Projeto Impacto'}`,
       amount,
       type: 'in',
       category: 'Doação',
@@ -145,16 +294,6 @@ const App: React.FC = () => {
       date: new Date().toISOString().split('T')[0],
       status: 'pending'
     });
-  };
-
-  const handleAddProject = async (newProj: Omit<Project, 'id'>) => {
-    const { data, error } = await supabase.from('projects').insert([newProj]).select().single();
-    if (data) setProjects([data, ...projects]);
-  };
-
-  const handleDeleteProject = async (id: string) => {
-    const { error } = await supabase.from('projects').delete().eq('id', id);
-    if (!error) setProjects(projects.filter(p => p.id !== id));
   };
 
   const handleLogin = (userRole: UserRole) => {
@@ -172,16 +311,38 @@ const App: React.FC = () => {
     );
   }
 
+  if (connectionError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-apple-gray p-8 text-center">
+        <div className="bg-white p-12 rounded-apple-2xl shadow-xl max-w-md">
+          <WifiOff className="w-16 h-16 text-red-400 mx-auto mb-6" />
+          <h2 className="text-2xl font-bold text-ejn-teal mb-4">Falha na Sincronização</h2>
+          <p className="text-apple-text-secondary mb-8">Não conseguimos conectar ao banco de dados do Instituto. Verifique sua conexão com a internet.</p>
+          <button onClick={fetchData} className="w-full bg-ejn-teal text-white py-4 rounded-apple-lg font-bold hover:bg-[#004d45] transition-all">Tentar Novamente</button>
+        </div>
+      </div>
+    );
+  }
+
   const donor = {
     name: userName,
-    impactCount: students.filter(s => s.status === 'active').length,
-    totalInvested: transactions.filter(t => t.type === 'in' && t.status !== 'pending').reduce((acc, t) => acc + t.amount, 0)
+    impactCount: students.length,
+    totalInvested: transactions
+      .filter(t => t.type === 'in' && t.status === 'confirmed')
+      .reduce((acc, t) => acc + t.amount, 0)
   };
 
   return (
     <div className="min-h-screen flex font-sans text-gray-900 bg-apple-gray">
       {isSidebarOpen && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
+      )}
+
+      {isSyncing && (
+        <div className="fixed top-6 right-6 z-[100] bg-white px-4 py-2 rounded-full shadow-lg border border-ejn-teal/10 flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+          <Loader2 className="w-4 h-4 text-ejn-teal animate-spin" />
+          <span className="text-[10px] font-black text-ejn-teal uppercase tracking-widest">Sincronizando...</span>
+        </div>
       )}
 
       <Sidebar 
@@ -196,9 +357,9 @@ const App: React.FC = () => {
 
       <main className={`flex-1 min-w-0 lg:ml-72 p-6 md:p-12 overflow-y-auto`}>
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center h-full text-ejn-teal">
+          <div className="flex flex-col items-center justify-center h-[60vh] text-ejn-teal">
             <Loader2 className="w-12 h-12 animate-spin mb-4" />
-            <p className="font-bold uppercase tracking-widest text-xs">Sincronizando com Supabase...</p>
+            <p className="font-black uppercase tracking-widest text-[10px]">Acessando Servidores EJN...</p>
           </div>
         ) : (
           <>
@@ -241,7 +402,7 @@ const App: React.FC = () => {
                 <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
                   <div className="text-right">
                     <button onClick={() => setIsLoggedIn(false)} className="text-xs font-bold text-red-400 hover:text-red-500 block mb-1">Sair</button>
-                    <p className="text-sm font-bold text-gray-800">{role === 'donor' ? 'Doador Prata' : 'Gestor Master'}</p>
+                    <p className="text-sm font-bold text-gray-800">{role === 'donor' ? 'Investidor EJN' : 'Gestor Master'}</p>
                   </div>
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-md text-white overflow-hidden shrink-0 ${role === 'donor' ? 'bg-ejn-gold' : 'bg-ejn-teal'}`}>
                     {profilePhoto ? <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" /> : (role === 'donor' ? 'CE' : 'PP')}
@@ -250,7 +411,7 @@ const App: React.FC = () => {
               </div>
             </header>
 
-            <div className="max-w-6xl mx-auto">
+            <div className="max-w-6xl mx-auto pb-20">
               {activeTab === 'overview' && role === 'donor' && (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
                   <ImpactHero impactCount={donor.impactCount} totalInvested={donor.totalInvested} />
@@ -264,6 +425,7 @@ const App: React.FC = () => {
               {activeTab === 'projects' && role === 'donor' && <Projects projects={projects} transactions={transactions} onDonate={handleDonate} />}
               {activeTab === 'transparency' && role === 'donor' && <Transparency transactions={transactions} />}
               {activeTab === 'profile' && <Profile role={role} onUpdatePhoto={setProfilePhoto} onUpdateName={setUserName} currentPhoto={profilePhoto} totalInvested={donor.totalInvested} />}
+              
               {activeTab === 'overview' && role === 'manager' && <ManagerDashboard students={students} transactions={transactions} onAddStudent={handleAddStudent} onNavigate={setActiveTab} />}
               {activeTab === 'students' && role === 'manager' && <StudentManagement students={students} onAddStudent={handleAddStudent} onUpdateStudent={handleUpdateStudent} onDeleteStudent={handleDeleteStudent} />}
               {activeTab === 'project-management' && role === 'manager' && <ProjectManagement projects={projects} onAddProject={handleAddProject} onDeleteProject={handleDeleteProject} />}
@@ -277,7 +439,6 @@ const App: React.FC = () => {
         {role === 'donor' && (
           <button className="fixed bottom-6 right-6 md:bottom-10 md:right-10 w-14 h-14 md:w-16 md:h-16 bg-ejn-teal text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all group z-30">
             <Heart className="w-6 h-6 group-hover:fill-white" />
-            <span className="absolute right-16 md:right-20 bg-white text-ejn-teal px-4 py-2 rounded-xl text-sm font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Precisa de ajuda?</span>
           </button>
         )}
       </main>
