@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ImpactHero } from './components/ImpactHero';
@@ -133,15 +134,26 @@ const App: React.FC = () => {
         valor: newTr.valor,
         projeto_id: newTr.projeto_id || null,
         status: newTr.status,
-        doador_email: session.user.email,
+        doador_email: newTr.doador_email || session.user.email,
         comprovante_url: newTr.comprovante_url || null
       }]);
       if (error) throw error;
-      alert('Seu impulsionamento foi registrado.');
       fetchData(true);
       return true;
     } catch (err: any) {
       alert(`Falha técnica: ${err.message}`);
+      return false;
+    }
+  };
+
+  const handleUpdateTransaction = async (id: string, updates: Partial<Transacao>): Promise<boolean> => {
+    try {
+      const { error } = await supabase.from('transacoes').update(updates).eq('id', id);
+      if (error) throw error;
+      fetchData(true);
+      return true;
+    } catch (err: any) {
+      alert(`Erro ao atualizar: ${err.message}`);
       return false;
     }
   };
@@ -235,7 +247,16 @@ const App: React.FC = () => {
           {activeTab === 'overview' && role === 'gestor' && <ManagerDashboard students={alunos} transactions={transacoes} onAddStudent={async (s) => { await supabase.from('alunos').insert([s]); fetchData(true); }} onNavigate={setActiveTab} />}
           {activeTab === 'students' && role === 'gestor' && <StudentManagement students={alunos} onAddStudent={async (s) => { await supabase.from('alunos').insert([s]); fetchData(true); }} onUpdateStudent={async (s) => { await supabase.from('alunos').update(s).eq('id', s.id); fetchData(true); }} onDeleteStudent={async (id) => { await supabase.from('alunos').delete().eq('id', id); fetchData(true); }} />}
           {activeTab === 'project-management' && role === 'gestor' && <ProjectManagement projects={projetos} onAddProject={async (p) => { await supabase.from('projetos').insert([p]); fetchData(true); }} onDeleteProject={async (id) => { await supabase.from('projetos').delete().eq('id', id); fetchData(true); }} />}
-          {activeTab === 'treasury' && role === 'gestor' && <Treasury transactions={transacoes} projects={projetos} onAddTransaction={handleAddTransaction} onUpdateStatus={async (id, st) => { await supabase.from('transacoes').update({ status: st }).eq('id', id); fetchData(true); }} onDeleteTransaction={async (id) => { await supabase.from('transacoes').delete().eq('id', id); fetchData(true); }} />}
+          {activeTab === 'treasury' && role === 'gestor' && (
+            <Treasury 
+              transactions={transacoes} 
+              projects={projetos} 
+              onAddTransaction={handleAddTransaction} 
+              onUpdateStatus={async (id, st) => { await supabase.from('transacoes').update({ status: st }).eq('id', id); fetchData(true); }} 
+              onUpdateTransaction={handleUpdateTransaction}
+              onDeleteTransaction={async (id) => { await supabase.from('transacoes').delete().eq('id', id); fetchData(true); }} 
+            />
+          )}
           {activeTab === 'esg' && role === 'gestor' && <ESGReports transactions={transacoes} studentCount={alunos.length} profileData={profileData} />}
           {activeTab === 'settings' && role === 'gestor' && (
             <Settings 
