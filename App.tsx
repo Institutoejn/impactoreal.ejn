@@ -48,12 +48,21 @@ const App: React.FC = () => {
 
   const syncMasterRole = async (userId: string) => {
     try {
-      const { data } = await supabase.from('perfis').select('cargo').eq('id', userId).single();
-      if (data && data.cargo !== 'gestor') {
+      // Força a atualização do cargo no banco para garantir que o RLS funcione
+      const { data, error } = await supabase.from('perfis').select('cargo').eq('id', userId).single();
+      if (error && error.code === 'PGRST116') {
+        // Se o perfil não existe, cria como gestor (já que é o e-mail mestre)
+        await supabase.from('perfis').insert([{ 
+          id: userId, 
+          email: MASTER_MANAGER_EMAIL, 
+          cargo: 'gestor', 
+          nome: 'Presidente EJN' 
+        }]);
+      } else if (data && data.cargo !== 'gestor') {
         await supabase.from('perfis').update({ cargo: 'gestor' }).eq('id', userId);
       }
     } catch (e) {
-      console.error("Erro sync role:", e);
+      console.error("Erro Crítico no Sync do Cargo:", e);
     }
   };
 
@@ -61,7 +70,7 @@ const App: React.FC = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session?.user) {
-        const isMaster = session.user.email === MASTER_MANAGER_EMAIL;
+        const isMaster = session.user.email?.toLowerCase() === MASTER_MANAGER_EMAIL.toLowerCase();
         setRole(isMaster ? 'gestor' : 'doador');
         if (isMaster) syncMasterRole(session.user.id);
       }
@@ -71,7 +80,7 @@ const App: React.FC = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session?.user) {
-        const isMaster = session.user.email === MASTER_MANAGER_EMAIL;
+        const isMaster = session.user.email?.toLowerCase() === MASTER_MANAGER_EMAIL.toLowerCase();
         setRole(isMaster ? 'gestor' : 'doador');
         if (isMaster) syncMasterRole(session.user.id);
       } else {
@@ -102,7 +111,7 @@ const App: React.FC = () => {
       if (profRes.data) {
         setUserName(profRes.data.nome || "Membro EJN");
         setProfilePhoto(profRes.data.foto_url);
-        if (session.user.email !== MASTER_MANAGER_EMAIL) {
+        if (session.user.email?.toLowerCase() !== MASTER_MANAGER_EMAIL.toLowerCase()) {
           setRole(profRes.data.cargo || 'doador');
         }
       }
@@ -183,16 +192,16 @@ const App: React.FC = () => {
       
       if (error) {
         if (error.code === '42501') {
-          const userType = role === 'gestor' ? 'Presidente' : 'Doador';
-          throw new Error(`Permissão Negada (RLS): O banco de dados bloqueou esta operação para o nível '${userType}'. Verifique as políticas SQL de 'INSERT' no Supabase Dashboard.`);
+          const userType = role === 'gestor' ? 'Presidente (Gestor)' : 'Doador';
+          throw new Error(`Permissão Negada: O banco de dados bloqueou a gravação para o perfil '${userType}'. Isso ocorre quando o SQL de segurança (RLS) no Supabase não reconhece seu cargo ou está incompleto. Verifique o painel SQL do Supabase.`);
         }
         throw error;
       }
-      showSuccessFeedback("Fluxo registrado!");
+      showSuccessFeedback("Fluxo registrado com sucesso!");
       fetchData(true);
       return true;
     } catch (err: any) {
-      alert(`Erro no Registro: ${err.message}`);
+      alert(`Erro Crítico de Segurança: ${err.message}`);
       return false;
     } finally {
       setIsSyncing(false);
