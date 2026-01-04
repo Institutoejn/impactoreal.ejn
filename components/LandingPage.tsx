@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { ShieldCheck, GraduationCap, Coins, ArrowRight, Heart } from 'lucide-react';
+import { ShieldCheck, GraduationCap, Coins, ArrowRight } from 'lucide-react';
 import { Footer } from './Footer';
 
 interface LandingPageProps {
@@ -13,12 +12,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-ejn-teal rounded-xl flex items-center justify-center shadow-lg shadow-ejn-teal/10">
-              <Heart className="text-white w-5 h-5" fill="white" />
-            </div>
-            <span className="text-xl font-bold text-ejn-teal tracking-tight">Instituto <span className="font-extrabold">EJN</span></span>
-          </div>
+          <button 
+            onClick={() => window.location.reload()}
+            className="flex items-center gap-3 transition-opacity hover:opacity-80"
+          >
+            <span className="text-xl md:text-2xl font-bold tracking-tighter font-poppins">
+              <span className="text-ejn-gold">Impacto Real</span> <span className="text-ejn-teal">IEJN</span>
+            </span>
+          </button>
           <button 
             onClick={onStart}
             className="bg-ejn-teal text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-[#004d45] transition-all transform active:scale-95"

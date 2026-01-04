@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { FileBarChart, Download, Sparkles, Heart, Globe, Printer, Share2, X } from 'lucide-react';
+import { FileBarChart, Download, Sparkles, Globe, Printer, Share2, X } from 'lucide-react';
 import { Transacao } from '../types';
 
 interface ESGReportsProps {
@@ -12,7 +11,6 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
   const [showPreview, setShowPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Filtra apenas entradas confirmadas para o relatório de investimento acumulado
   const totalIn = transactions
     .filter(t => t.tipo === 'entrada' && t.status === 'confirmado')
     .reduce((acc, t) => acc + t.valor, 0);
@@ -69,7 +67,6 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowPreview(false)} />
           
           <div className="relative bg-white w-full max-w-4xl max-h-[90vh] rounded-apple-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-500">
-            {/* Toolbar */}
             <div className="flex items-center justify-between p-6 bg-apple-gray border-b border-gray-200">
               <div className="flex items-center gap-4">
                 <span className="text-xs font-black text-gray-400 uppercase tracking-widest bg-white px-3 py-1 rounded-full border border-gray-200">Impacto_Relatorio_2024.pdf</span>
@@ -96,13 +93,9 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
               <div className="max-w-3xl mx-auto bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] rounded-sm p-16 min-h-[1000px] text-gray-800 font-serif">
                 <div className="flex justify-between items-start border-b-2 border-ejn-teal pb-10 mb-12 font-sans">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-ejn-teal rounded-xl flex items-center justify-center">
-                      <Heart className="text-white w-8 h-8" fill="white" />
-                    </div>
-                    <div>
-                      <h1 className="text-2xl font-black text-ejn-teal">Instituto EJN</h1>
-                      <p className="text-[10px] uppercase font-bold text-apple-text-secondary tracking-widest">Impacto Real • Relatório ESG</p>
-                    </div>
+                    <span className="text-2xl font-bold tracking-tighter font-poppins">
+                      <span className="text-ejn-gold">Impacto Real</span> <span className="text-ejn-teal">IEJN</span>
+                    </span>
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-sm">Data de Emissão</p>
@@ -137,7 +130,7 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
                       Impacto Social e Educacional
                     </h3>
                     <p className="text-gray-700 leading-relaxed mb-6 italic">
-                      "O Instituto EJN utiliza métricas auditáveis baseadas na tabela de transações para garantir que 100% da captação seja destinada aos programas de formação técnica. 
+                      "O Instituto IEJN utiliza métricas auditáveis baseadas na tabela de transações para garantir que 100% da captação seja destinada aos programas de formação técnica. 
                       Atualmente gerenciamos recursos que possibilitam a inclusão social através do ODS 4 (Educação de Qualidade)."
                     </p>
                     <div className="w-full h-1 bg-white rounded-full overflow-hidden">
@@ -147,10 +140,10 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
                 </div>
 
                 <div className="mt-32 pt-8 border-t border-gray-100 text-center">
-                  <p className="text-[10px] uppercase font-bold text-gray-300 tracking-[0.2em] mb-4">Documento Sincronizado com Banco de Dados EJN</p>
+                  <p className="text-[10px] uppercase font-bold text-gray-300 tracking-[0.2em] mb-4">Documento Sincronizado com Banco de Dados IEJN</p>
                   <div className="flex justify-center">
                     <div className="w-16 h-16 bg-apple-gray border border-gray-200 rounded-sm flex items-center justify-center opacity-50">
-                      <span className="text-[8px] font-mono text-gray-400">EJN DATA VERIFIED</span>
+                      <span className="text-[8px] font-mono text-gray-400">IEJN DATA VERIFIED</span>
                     </div>
                   </div>
                 </div>

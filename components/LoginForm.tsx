@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Heart, Mail, Lock, ArrowRight, X, User, Loader2 } from 'lucide-react';
+import { Mail, Lock, ArrowRight, X, User, Loader2 } from 'lucide-react';
 import { supabase } from '../supabase';
 
 interface LoginFormProps {
@@ -25,7 +24,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
 
     try {
       if (isSignUp) {
-        // Fluxo de Cadastro
         const { data, error } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
@@ -36,7 +34,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
 
         if (error) throw error;
 
-        // Criar Perfil na tabela perfis
         if (data.user) {
           const { error: profileError } = await supabase.from('perfis').insert([{
             id: data.user.id,
@@ -51,7 +48,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
         alert("Cadastro realizado! Verifique seu e-mail ou faça login.");
         setIsSignUp(false);
       } else {
-        // Fluxo de Login
         const { error } = await supabase.auth.signInWithPassword({
           email: formData.email,
           password: formData.password,
@@ -80,10 +76,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
         </button>
 
         <div className="text-center mb-10">
-          <div className="w-14 h-14 bg-ejn-teal rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-ejn-teal/20">
-            <Heart className="text-white w-8 h-8" fill="white" />
+          <div className="mb-6">
+            <span className="text-3xl font-bold tracking-tighter font-poppins">
+              <span className="text-ejn-gold">Impacto Real</span> <span className="text-ejn-teal">IEJN</span>
+            </span>
           </div>
-          <h2 className="text-3xl font-black text-ejn-teal tracking-tight">Impacto Real</h2>
           <p className="text-apple-text-secondary mt-2">
             {isSignUp ? "Crie sua conta de investidor social." : "Acesse sua conta para ver o impacto."}
           </p>

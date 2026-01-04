@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Heart, Instagram, Linkedin, Globe } from 'lucide-react';
+import { Instagram, Linkedin, Globe } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
@@ -8,10 +7,9 @@ export const Footer: React.FC = () => {
       <div className="max-w-6xl mx-auto px-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-ejn-teal rounded-lg flex items-center justify-center">
-              <Heart className="text-white w-5 h-5" fill="white" />
-            </div>
-            <span className="text-xl font-bold text-ejn-teal tracking-tight">Instituto EJN</span>
+            <span className="text-xl font-bold tracking-tighter font-poppins">
+              <span className="text-ejn-gold">Impacto Real</span> <span className="text-ejn-teal">IEJN</span>
+            </span>
           </div>
           
           <div className="flex gap-8 text-apple-text-secondary text-sm font-medium">
@@ -36,7 +34,7 @@ export const Footer: React.FC = () => {
         
         <div className="mt-12 pt-8 border-t border-gray-50 text-center">
           <p className="text-xs text-apple-text-secondary">
-            © 2024 Instituto EJN. Todos os direitos reservados. Feito com impacto real.
+            © 2024 Impacto Real IEJN. Todos os direitos reservados. Feito com impacto real.
           </p>
         </div>
       </div>

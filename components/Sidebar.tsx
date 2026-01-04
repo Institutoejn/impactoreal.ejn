@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   LayoutDashboard, 
@@ -6,7 +5,6 @@ import {
   Target, 
   FileText, 
   User,
-  Heart,
   Users,
   Wallet,
   BarChart3,
@@ -50,14 +48,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, pr
   return (
     <aside className={`fixed left-0 top-0 h-screen w-72 bg-white border-r border-gray-100 flex flex-col z-50 transition-transform duration-300 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <div className="p-8 pb-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-ejn-teal rounded-xl flex items-center justify-center shadow-lg shadow-ejn-teal/10">
-            <Heart className="text-white w-6 h-6" fill="white" />
-          </div>
-          <h1 className="text-2xl font-bold text-ejn-teal tracking-tight font-poppins">
-            Instituto <span className="font-bold">EJN</span>
-          </h1>
-        </div>
+        <button 
+          onClick={() => onNavigate('overview')}
+          className="flex items-center gap-3 transition-opacity hover:opacity-80 text-left"
+        >
+          <span className="text-xl font-bold tracking-tighter font-poppins leading-tight">
+            <span className="text-ejn-gold">Impacto Real</span> <span className="text-ejn-teal">IEJN</span>
+          </span>
+        </button>
         <button 
           onClick={onClose}
           className="lg:hidden p-2 text-gray-400 hover:text-ejn-teal transition-colors"
