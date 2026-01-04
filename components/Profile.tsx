@@ -32,26 +32,31 @@ export const Profile: React.FC<ProfileProps> = ({ role, onUpdatePhoto, onUpdateN
   useEffect(() => {
     const fetchProfile = async () => {
       setIsLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return setIsLoading(false);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return setIsLoading(false);
 
-      const { data, error } = await supabase.from('perfis').select('*').eq('id', user.id).single();
-      
-      if (data) {
-        setFormData({
-          ...data,
-          nome: data.nome || '',
-          email: data.email || '',
-          bio: data.bio || '',
-          linkedin: data.linkedin || '',
-          instagram: data.instagram || '',
-          razao_social: data.razao_social || 'Instituto Escola Jovens de Negócios',
-          cnpj: data.cnpj || '51.708.193/0001-70',
-          endereco: data.endereco || 'São Paulo, SP',
-          cargo: data.cargo || role
-        });
+        const { data, error } = await supabase.from('perfis').select('*').eq('id', user.id).single();
+        
+        if (data) {
+          setFormData({
+            ...data,
+            nome: data.nome || '',
+            email: data.email || '',
+            bio: data.bio || '',
+            linkedin: data.linkedin || '',
+            instagram: data.instagram || '',
+            razao_social: data.razao_social || 'Instituto Escola Jovens de Negócios',
+            cnpj: data.cnpj || '51.708.193/0001-70',
+            endereco: data.endereco || 'São Paulo, SP',
+            cargo: data.cargo || role
+          });
+        }
+      } catch (err) {
+        console.error("Erro ao carregar perfil:", err);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
     fetchProfile();
   }, [role]);
@@ -60,18 +65,18 @@ export const Profile: React.FC<ProfileProps> = ({ role, onUpdatePhoto, onUpdateN
     setIsSaving(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Sessão expirada.");
+      if (!user) throw new Error("Sessão expirada. Faça login novamente.");
 
+      // Removido 'updated_at' para evitar erro de coluna inexistente
       const payload: any = {
         nome: formData.nome,
         bio: formData.bio,
         linkedin: formData.linkedin,
         instagram: formData.instagram,
-        foto_url: currentPhoto,
-        updated_at: new Date().toISOString()
+        foto_url: currentPhoto
       };
 
-      // Se for gestor, salvar campos do instituto
+      // Se for gestor, salvar campos específicos do instituto
       if (formData.cargo === 'gestor') {
         payload.razao_social = formData.razao_social;
         payload.cnpj = formData.cnpj;
@@ -80,10 +85,15 @@ export const Profile: React.FC<ProfileProps> = ({ role, onUpdatePhoto, onUpdateN
 
       const { error } = await supabase.from('perfis').update(payload).eq('id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === '42703') {
+          throw new Error("Erro de Coluna: O banco de dados não possui um dos campos enviados. Contate o suporte.");
+        }
+        throw error;
+      }
       
       if (formData.nome) onUpdateName(formData.nome);
-      alert('Seu perfil foi sincronizado com o banco de dados EJN!');
+      alert('Perfil sincronizado com sucesso!');
     } catch (err: any) {
       alert(`Erro ao salvar perfil: ${err.message}`);
     } finally {
@@ -100,7 +110,12 @@ export const Profile: React.FC<ProfileProps> = ({ role, onUpdatePhoto, onUpdateN
     }
   };
 
-  if (isLoading) return <div className="flex flex-col items-center justify-center py-32"><Loader2 className="animate-spin text-ejn-teal w-10 h-10 mb-4" /><p className="text-sm font-bold text-ejn-teal uppercase tracking-widest">Carregando Perfil...</p></div>;
+  if (isLoading) return (
+    <div className="flex flex-col items-center justify-center py-32 animate-pulse">
+      <Loader2 className="animate-spin text-ejn-teal w-10 h-10 mb-4" />
+      <p className="text-sm font-bold text-ejn-teal uppercase tracking-widest">Acessando Banco de Dados...</p>
+    </div>
+  );
 
   const isGestor = formData.cargo === 'gestor';
 
@@ -136,7 +151,6 @@ export const Profile: React.FC<ProfileProps> = ({ role, onUpdatePhoto, onUpdateN
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          {/* Sessão Gestor (Visível apenas para o Presidente) */}
           {isGestor && (
             <div className="bg-white p-10 rounded-apple-2xl shadow-sm border border-ejn-teal/10 space-y-8 animate-in slide-in-from-left duration-500">
               <div className="flex items-center gap-3 border-b border-gray-50 pb-4">
@@ -169,7 +183,6 @@ export const Profile: React.FC<ProfileProps> = ({ role, onUpdatePhoto, onUpdateN
             </div>
           )}
 
-          {/* Dados Pessoais */}
           <div className="bg-white p-10 rounded-apple-2xl shadow-sm border border-gray-50 space-y-6">
             <h3 className="text-xl font-bold text-ejn-teal mb-4 flex items-center gap-2">
               <User className="w-5 h-5" />
@@ -191,7 +204,6 @@ export const Profile: React.FC<ProfileProps> = ({ role, onUpdatePhoto, onUpdateN
             </div>
           </div>
 
-          {/* Social */}
           <div className="bg-white p-10 rounded-apple-2xl shadow-sm border border-gray-50 space-y-6">
             <h3 className="text-xl font-bold text-ejn-teal mb-4 flex items-center gap-2">
               <Linkedin className="w-5 h-5" />
@@ -204,7 +216,6 @@ export const Profile: React.FC<ProfileProps> = ({ role, onUpdatePhoto, onUpdateN
           </div>
         </div>
 
-        {/* Sidebar Status */}
         <div className="space-y-8">
           <div className="bg-ejn-teal p-8 rounded-apple-2xl text-white shadow-xl relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
