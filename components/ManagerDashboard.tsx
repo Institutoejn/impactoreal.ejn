@@ -17,9 +17,9 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ students, tr
   const confirmedTransactions = transactions.filter(t => t.status !== 'pending');
   const pendingTransactions = transactions.filter(t => t.status === 'pending');
 
-  // Propriedade corrigida de amount para valor
-  const totalIn = confirmedTransactions.filter(t => t.type === 'in').reduce((acc, t) => acc + t.valor, 0);
-  const totalOut = confirmedTransactions.filter(t => t.type === 'out').reduce((acc, t) => acc + t.valor, 0);
+  // Corrigido: usando 'tipo' em vez de 'type' conforme definido em types.ts
+  const totalIn = confirmedTransactions.filter(t => t.tipo === 'in').reduce((acc, t) => acc + t.valor, 0);
+  const totalOut = confirmedTransactions.filter(t => t.tipo === 'out').reduce((acc, t) => acc + t.valor, 0);
   const balance = totalIn - totalOut;
 
   const handleQuickRegister = (e: React.FormEvent) => {

@@ -18,7 +18,8 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions }) => {
   // Calculate monthly stats based on real transactions
   const monthlyOuts = transactions.filter(t => {
     const d = new Date(t.date);
-    return t.type === 'out' && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    // Corrigido: usando 'tipo' em vez de 'type' conforme definido em types.ts
+    return t.tipo === 'out' && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
   });
 
   // Propriedade corrigida de amount para valor
@@ -36,7 +37,8 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions }) => {
 
   // Verification Feed (Show real proof images from transactions)
   const verifiedTransactions = transactions
-    .filter(t => t.type === 'out' && t.status === 'confirmed')
+    // Corrigido: usando 'tipo' em vez de 'type' conforme definido em types.ts
+    .filter(t => t.tipo === 'out' && t.status === 'confirmed')
     .slice(0, 8); 
 
   return (

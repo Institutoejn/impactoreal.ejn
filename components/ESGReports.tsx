@@ -13,8 +13,8 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
   const [showPreview, setShowPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Propriedade corrigida de amount para valor
-  const totalIn = transactions.filter(t => t.type === 'in').reduce((acc, t) => acc + t.valor, 0);
+  // Corrigido: usando 'tipo' em vez de 'type' conforme definido em types.ts
+  const totalIn = transactions.filter(t => t.tipo === 'in').reduce((acc, t) => acc + t.valor, 0);
 
   const generateReport = () => {
     setIsGenerating(true);

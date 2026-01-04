@@ -10,8 +10,9 @@ interface FeaturedProjectProps {
 
 export const FeaturedProject: React.FC<FeaturedProjectProps> = ({ transactions }) => {
   const goal = 50000;
+  // Corrigido: usando 'tipo' em vez de 'type' conforme definido em types.ts
   const reached = transactions
-    .filter(t => t.type === 'in' && (t.categoria === 'Doação' || t.descricao.includes('Líderes')))
+    .filter(t => t.tipo === 'in' && (t.categoria === 'Doação' || t.descricao.includes('Líderes')))
     // Propriedade corrigida de amount para valor
     .reduce((acc, t) => acc + t.valor, 0);
   

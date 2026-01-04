@@ -10,9 +10,10 @@ interface TransparencyCardProps {
 }
 
 export const TransparencyCard: React.FC<TransparencyCardProps> = ({ transactions, onNavigate }) => {
-  const lastOut = transactions.filter(t => t.type === 'out')[0];
+  // Corrigido: usando 'tipo' em vez de 'type' conforme definido em types.ts
+  const lastOut = transactions.filter(t => t.tipo === 'out')[0];
   const monthlyOut = transactions
-    .filter(t => t.type === 'out')
+    .filter(t => t.tipo === 'out')
     // Propriedade corrigida de amount para valor
     .reduce((acc, t) => acc + t.valor, 0);
 
