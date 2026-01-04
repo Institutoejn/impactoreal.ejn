@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { X, Search, MoreHorizontal, GraduationCap, MapPin, UserPlus, Edit2, Trash2, History, Camera, User } from 'lucide-react';
+import { X, Search, MoreHorizontal, GraduationCap, MapPin, UserPlus, Edit2, Trash2, History, Camera, Briefcase, Rocket } from 'lucide-react';
 import { Aluno } from '../types';
 
 interface StudentManagementProps {
@@ -68,6 +68,13 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
     setActiveMenuId(null);
   };
 
+  const handleToggleStatus = (s: Aluno, field: 'esta_empregado' | 'esta_emprendendo') => {
+    onUpdateStudent({
+      ...s,
+      [field]: !s[field]
+    });
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -94,7 +101,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
         </div>
         <button 
           onClick={() => { resetForm(); setIsModalOpen(true); }}
-          className="flex items-center justify-center gap-3 bg-ejn-teal text-white px-8 py-4 rounded-apple-xl font-bold shadow-lg shadow-ejn-teal/10 hover:bg-[#004d45] transition-all"
+          className="flex items-center justify-center gap-3 bg-ejn-teal text-white px-8 py-4 rounded-apple-xl font-bold shadow-lg shadow-ejn-teal/20 hover:bg-[#004d45] transition-all"
         >
           <UserPlus className="w-5 h-5" />
           Registrar líder
@@ -107,8 +114,8 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
             <thead className="bg-apple-gray">
               <tr>
                 <th className="px-10 py-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Líder</th>
+                <th className="px-10 py-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Sucesso Profissional</th>
                 <th className="px-10 py-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Trilha</th>
-                <th className="px-10 py-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Região</th>
                 <th className="px-10 py-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-right">Ações</th>
               </tr>
             </thead>
@@ -117,29 +124,43 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
                 <tr key={s.id} className="hover:bg-apple-gray/20 transition-colors group">
                   <td className="px-10 py-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-ejn-teal/5 rounded-full overflow-hidden border border-gray-100 flex items-center justify-center text-ejn-teal font-bold shadow-sm">
+                      <div className="w-10 h-10 bg-ejn-teal/5 rounded-full overflow-hidden border border-gray-100 flex items-center justify-center text-ejn-teal font-bold shadow-sm shrink-0">
                         {s.foto_url ? <img src={s.foto_url} className="w-full h-full object-cover" /> : s.nome.charAt(0)}
                       </div>
-                      <div>
-                        <p className="font-bold text-ejn-teal text-lg">{s.nome}</p>
-                        <p className="text-xs text-apple-text-secondary font-extralight uppercase font-bold tracking-widest">{s.idade} anos</p>
+                      <div className="min-w-0">
+                        <p className="font-bold text-ejn-teal text-[15px] truncate">{s.nome}</p>
+                        <p className="text-[10px] text-apple-text-secondary font-extralight uppercase font-bold tracking-widest">{s.idade} anos</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-10 py-6">
-                    <div className="flex items-center gap-2 text-sm text-gray-700 font-bold">
-                      <GraduationCap className="w-4 h-4 text-ejn-gold" />
+                    <div className="flex items-center gap-3">
+                      <button 
+                        onClick={() => handleToggleStatus(s, 'esta_empregado')}
+                        className={`p-2 rounded-lg transition-all flex items-center gap-1.5 border ${s.esta_empregado ? 'bg-green-50 border-green-100 text-green-600 shadow-sm' : 'bg-apple-gray border-transparent text-gray-300 hover:text-gray-400'}`}
+                        title="Empregado"
+                      >
+                        <Briefcase className="w-4 h-4" />
+                        {s.esta_empregado && <span className="text-[9px] font-bold uppercase tracking-tighter">No Mercado</span>}
+                      </button>
+                      <button 
+                        onClick={() => handleToggleStatus(s, 'esta_emprendendo')}
+                        className={`p-2 rounded-lg transition-all flex items-center gap-1.5 border ${s.esta_emprendendo ? 'bg-ejn-gold/10 border-ejn-gold/20 text-ejn-gold shadow-sm' : 'bg-apple-gray border-transparent text-gray-300 hover:text-gray-400'}`}
+                        title="Empreendedor"
+                      >
+                        <Rocket className="w-4 h-4" />
+                        {s.esta_emprendendo && <span className="text-[9px] font-bold uppercase tracking-tighter">Novo Negócio</span>}
+                      </button>
+                    </div>
+                  </td>
+                  <td className="px-10 py-6">
+                    <div className="flex items-center gap-2 text-[13px] text-gray-700 font-bold">
+                      <GraduationCap className="w-3.5 h-3.5 text-ejn-gold" />
                       {s.curso}
                     </div>
                   </td>
-                  <td className="px-10 py-6">
-                    <div className="flex items-center gap-2 text-sm text-gray-500 font-extralight">
-                      <MapPin className="w-4 h-4 text-gray-300" />
-                      {s.bairro}
-                    </div>
-                  </td>
                   <td className="px-10 py-6 text-right relative">
-                    <button onClick={() => setActiveMenuId(activeMenuId === s.id ? null : s.id)} className="p-3 text-gray-300 hover:text-ejn-teal transition-colors"><MoreHorizontal className="w-6 h-6" /></button>
+                    <button onClick={() => setActiveMenuId(activeMenuId === s.id ? null : s.id)} className="p-3 text-gray-300 hover:text-ejn-teal transition-colors"><MoreHorizontal className="w-5 h-5" /></button>
                     {activeMenuId === s.id && (
                       <div className="absolute right-10 top-16 w-56 bg-white rounded-apple-xl shadow-2xl border border-gray-100 py-3 z-30 animate-in fade-in zoom-in-95 duration-200">
                         <button onClick={() => { setHistoryStudent(s); setIsHistoryModalOpen(true); setActiveMenuId(null); }} className="w-full flex items-center gap-4 px-6 py-4 text-sm font-bold text-gray-600 hover:bg-apple-gray transition-colors"><History className="w-4 h-4 text-ejn-teal" />Sua Jornada</button>

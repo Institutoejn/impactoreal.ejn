@@ -18,6 +18,8 @@ export interface Aluno {
   status: 'active' | 'pending';
   observacoes: string;
   foto_url?: string;
+  esta_empregado?: boolean;
+  esta_empreendendo?: boolean;
 }
 
 export interface Projeto {

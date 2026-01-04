@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ImpactHero } from './components/ImpactHero';
@@ -170,6 +171,8 @@ const App: React.FC = () => {
     .reduce((acc, t) => acc + t.valor, 0);
 
   const impactCount = (role === 'doador' && totalInvested === 0) ? 0 : alunos.length;
+  const marketCount = (role === 'doador' && totalInvested === 0) ? 0 : alunos.filter(a => a.esta_empregado).length;
+  const businessCount = (role === 'doador' && totalInvested === 0) ? 0 : alunos.filter(a => a.esta_emprendendo).length;
 
   return (
     <div className="min-h-screen flex font-sans text-gray-900 bg-apple-gray">
@@ -200,7 +203,12 @@ const App: React.FC = () => {
         <div className="max-w-5xl mx-auto pb-32">
           {activeTab === 'overview' && role === 'doador' && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <ImpactHero impactCount={impactCount} totalInvested={totalInvested} />
+              <ImpactHero 
+                impactCount={impactCount} 
+                totalInvested={totalInvested} 
+                marketCount={marketCount}
+                businessCount={businessCount}
+              />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
                 <TransparencyCard transactions={transacoes} onNavigate={setActiveTab} />
                 <FeaturedProject 

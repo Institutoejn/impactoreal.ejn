@@ -1,14 +1,22 @@
+
 import React from 'react';
-import { TrendingUp, Sparkles } from 'lucide-react';
+import { TrendingUp, Sparkles, Briefcase, Rocket, Users, Wallet } from 'lucide-react';
 
 interface ImpactHeroProps {
   impactCount: number;
   totalInvested: number;
+  marketCount: number;
+  businessCount: number;
 }
 
-export const ImpactHero: React.FC<ImpactHeroProps> = ({ impactCount, totalInvested }) => {
+export const ImpactHero: React.FC<ImpactHeroProps> = ({ 
+  impactCount, 
+  totalInvested, 
+  marketCount, 
+  businessCount 
+}) => {
   return (
-    <div className="bg-white p-10 md:p-14 rounded-apple-2xl shadow-[0_4px_20px_-12px_rgba(0,0,0,0.05)] mb-12 transition-all hover:shadow-[0_8px_30px_-10px_rgba(0,0,0,0.08)] relative overflow-hidden group">
+    <div className="bg-white p-10 md:p-12 rounded-apple-2xl shadow-[0_4px_20px_-12px_rgba(0,0,0,0.05)] mb-12 transition-all hover:shadow-[0_8px_30px_-10px_rgba(0,0,0,0.08)] relative overflow-hidden group border border-gray-50">
       <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-700 pointer-events-none">
         <Sparkles className="w-24 h-24 text-ejn-gold" />
       </div>
@@ -16,29 +24,44 @@ export const ImpactHero: React.FC<ImpactHeroProps> = ({ impactCount, totalInvest
       <div className="relative z-10">
         <div className="flex items-center gap-2 mb-10">
           <TrendingUp className="w-4 h-4 text-ejn-teal" />
-          <h2 className="font-poppins text-xs font-bold text-ejn-teal uppercase tracking-widest opacity-60">
-            Seu impacto
+          <h2 className="font-poppins text-[10px] font-bold text-ejn-teal uppercase tracking-widest opacity-60">
+            Painel de Realização Social
           </h2>
         </div>
         
-        <div className="flex flex-col md:flex-row md:items-end gap-10 md:gap-16">
-          <div className="flex-1">
-            <div className="text-3xl md:text-4xl font-bold text-ejn-gold mb-2 flex items-baseline gap-3 flex-wrap font-poppins tracking-tighter">
-              {impactCount}
-              <span className="text-xl md:text-2xl font-bold text-ejn-teal uppercase tracking-tight">Líderes formados</span>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 divide-x-0 md:divide-x divide-gray-50">
+          <div className="flex flex-col items-center md:items-start md:px-6">
+            <div className="w-8 h-8 bg-apple-gray rounded-lg flex items-center justify-center mb-3">
+              <Wallet className="w-4 h-4 text-ejn-teal" />
             </div>
-            <p className="text-lg md:text-xl font-extralight text-ejn-teal opacity-80 leading-tight">
-              Amanhãs despertados hoje.
+            <p className="text-2xl font-bold text-gray-900 font-poppins tracking-tight">
+              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(totalInvested)}
             </p>
+            <p className="text-[10px] font-extralight text-apple-text-secondary uppercase tracking-widest mt-1">Investimento</p>
           </div>
-          
-          <div className="md:border-l border-gray-100 md:pl-16 mt-6 md:mt-0 flex flex-col justify-end pb-2">
-            <p className="text-apple-text-secondary text-[10px] font-bold mb-1 tracking-widest uppercase opacity-60">
-              Total investido
-            </p>
-            <p className="text-2xl md:text-3xl font-bold text-gray-900 font-poppins tracking-tight">
-              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalInvested)}
-            </p>
+
+          <div className="flex flex-col items-center md:items-start md:px-6">
+            <div className="w-8 h-8 bg-apple-gray rounded-lg flex items-center justify-center mb-3">
+              <Users className="w-4 h-4 text-ejn-teal" />
+            </div>
+            <p className="text-2xl font-bold text-gray-900 font-poppins tracking-tight">{impactCount}</p>
+            <p className="text-[10px] font-extralight text-apple-text-secondary uppercase tracking-widest mt-1">Líderes Formados</p>
+          </div>
+
+          <div className="flex flex-col items-center md:items-start md:px-6">
+            <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center mb-3">
+              <Briefcase className="w-4 h-4 text-green-600" />
+            </div>
+            <p className="text-2xl font-bold text-gray-900 font-poppins tracking-tight">{marketCount}</p>
+            <p className="text-[10px] font-extralight text-apple-text-secondary uppercase tracking-widest mt-1">No Mercado</p>
+          </div>
+
+          <div className="flex flex-col items-center md:items-start md:px-6">
+            <div className="w-8 h-8 bg-ejn-gold/5 rounded-lg flex items-center justify-center mb-3">
+              <Rocket className="w-4 h-4 text-ejn-gold" />
+            </div>
+            <p className="text-2xl font-bold text-gray-900 font-poppins tracking-tight">{businessCount}</p>
+            <p className="text-[10px] font-extralight text-apple-text-secondary uppercase tracking-widest mt-1">Novos Negócios</p>
           </div>
         </div>
       </div>
