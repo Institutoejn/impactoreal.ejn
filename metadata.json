@@ -1,0 +1,7 @@
+{
+  "name": "Impacto Real - Instituto EJN",
+  "description": "Dashboard de impacto social para doadores do Instituto EJN, seguindo os princípios de design da Apple.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
