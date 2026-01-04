@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { User, Building2, Bell, Camera, Save, Loader2, CheckCircle2 } from 'lucide-react';
+import { User, Building2, Camera, Save, Loader2, CheckCircle2, Linkedin, Instagram } from 'lucide-react';
 import { Perfil } from '../types';
 import { supabase } from '../supabase';
 
@@ -19,7 +19,9 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
     bio: '',
     razao_social: '',
     cnpj: '',
-    endereco: ''
+    endereco: '',
+    linkedin: '',
+    instagram: ''
   });
 
   useEffect(() => {
@@ -29,7 +31,9 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
         bio: profileData.bio || '',
         razao_social: profileData.razao_social || '',
         cnpj: profileData.cnpj || '',
-        endereco: profileData.endereco || ''
+        endereco: profileData.endereco || '',
+        linkedin: profileData.linkedin || '',
+        instagram: profileData.instagram || ''
       });
     }
   }, [profileData]);
@@ -37,21 +41,40 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
   const handleSave = async () => {
     setIsSaving(true);
     setSuccess(false);
+    
     try {
-      const { error } = await supabase.from('perfis').update({
+      // 1. Captura do ID e Usuário Autenticado para garantir vínculo correto
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Sessão expirada ou usuário não autenticado.");
+
+      // 2. Lógica de Upsert: Insere se não existir, atualiza se existir
+      const { error } = await supabase.from('perfis').upsert({
+        id: user.id, // Chave Primária UUID
+        email: user.email,
         nome: form.nome,
         bio: form.bio,
+        cargo: 'gestor', // Forçado para este painel
+        linkedin: form.linkedin,
+        instagram: form.instagram,
         razao_social: form.razao_social,
         cnpj: form.cnpj,
-        endereco: form.endereco
-      }).eq('id', profileData.id);
+        endereco: form.endereco,
+        foto_url: profileData.foto_url // Mantém a foto atual no upsert
+      });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erro Supabase:", error);
+        throw new Error(`[Supabase Error] ${error.message} - Detalhes: ${error.details || 'Sem detalhes'}`);
+      }
+
       setSuccess(true);
+      
+      // 3. Atualização em tempo real (Refresh do App state)
       onRefresh();
+      
       setTimeout(() => setSuccess(false), 3000);
     } catch (e: any) {
-      alert(`Erro ao salvar: ${e.message}`);
+      alert(`FALHA NA SINCRONIZAÇÃO:\n${e.message}`);
     } finally {
       setIsSaving(false);
     }
@@ -63,8 +86,14 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
       const reader = new FileReader();
       reader.onloadend = async () => {
         setIsSaving(true);
-        await supabase.from('perfis').update({ foto_url: reader.result as string }).eq('id', profileData.id);
-        onRefresh();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.from('perfis').upsert({ 
+            id: user.id,
+            foto_url: reader.result as string 
+          });
+          onRefresh();
+        }
         setIsSaving(false);
       };
       reader.readAsDataURL(file);
@@ -72,7 +101,7 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
   };
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8 max-w-4xl">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8 max-w-4xl pb-12">
       <div className="bg-white p-10 rounded-apple-2xl shadow-sm border border-gray-50">
         <div className="flex items-center gap-3 mb-10">
           <User className="w-6 h-6 text-ejn-teal" />
@@ -92,27 +121,41 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
               <div className="absolute inset-0 bg-black/20 rounded-full opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center"><Camera className="text-white w-8 h-8" /></div>
               <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
             </div>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Clique para alterar foto</p>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Alterar foto oficial</p>
           </div>
           
           <div className="flex-1 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Nome de Exibição</label>
-                <input value={form.nome} onChange={e => setForm({...form, nome: e.target.value})} type="text" className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border outline-none focus:border-ejn-teal transition-all" />
+                <input value={form.nome} onChange={e => setForm({...form, nome: e.target.value})} type="text" className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border outline-none focus:border-ejn-teal transition-all" placeholder="Ex: Paulo Ricardo" />
               </div>
               <div>
                 <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Cargo</label>
                 <input value="Presidente" disabled className="w-full px-5 py-3 bg-gray-50 text-gray-400 rounded-apple-lg border cursor-not-allowed" />
               </div>
             </div>
-            <div>
-              <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">E-mail do Gestor</label>
-              <input value={profileData.email} disabled className="w-full px-5 py-3 bg-gray-50 text-gray-400 rounded-apple-lg border cursor-not-allowed" />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">LinkedIn (URL)</label>
+                <div className="relative">
+                  <Linkedin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input value={form.linkedin} onChange={e => setForm({...form, linkedin: e.target.value})} type="text" className="w-full pl-12 pr-5 py-3 bg-apple-gray rounded-apple-lg border outline-none focus:border-ejn-teal transition-all" placeholder="linkedin.com/in/perfil" />
+                </div>
+              </div>
+              <div>
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Instagram (@)</label>
+                <div className="relative">
+                  <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input value={form.instagram} onChange={e => setForm({...form, instagram: e.target.value})} type="text" className="w-full pl-12 pr-5 py-3 bg-apple-gray rounded-apple-lg border outline-none focus:border-ejn-teal transition-all" placeholder="@usuario" />
+                </div>
+              </div>
             </div>
+
             <div>
               <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Bio Institucional</label>
-              <textarea value={form.bio} onChange={e => setForm({...form, bio: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border outline-none focus:border-ejn-teal transition-all h-24 resize-none" />
+              <textarea value={form.bio} onChange={e => setForm({...form, bio: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border outline-none focus:border-ejn-teal transition-all h-24 resize-none" placeholder="Conte sua missão no Instituto..." />
             </div>
           </div>
         </div>
@@ -151,7 +194,7 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
           }`}
         >
           {isSaving ? <Loader2 className="animate-spin w-5 h-5" /> : success ? <CheckCircle2 className="w-5 h-5" /> : <Save className="w-5 h-5" />}
-          {success ? 'Sincronizado!' : 'Salvar Alterações'}
+          {success ? 'Dados Sincronizados!' : 'Salvar Alterações'}
         </button>
       </div>
     </div>
