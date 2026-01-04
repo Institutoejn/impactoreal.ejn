@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ImpactHero } from './components/ImpactHero';
@@ -45,14 +44,14 @@ const App: React.FC = () => {
         const newProfile = {
           id: userId,
           email: email,
-          nome: isMaster ? 'Paulo Ricardo' : 'Novo Usuário',
+          nome: isMaster ? 'Paulo Ricardo' : 'Novo Impulsionador',
           cargo: isMaster ? 'gestor' : 'doador',
-          bio: isMaster ? 'Presidente do Instituto Escola Jovens de Negócios.' : ''
+          bio: isMaster ? 'Presidente do Instituto Escola Jovens de Negócios.' : 'Acreditando no poder da educação transformadora.'
         };
         await supabase.from('perfis').insert([newProfile]);
         setProfileData(newProfile);
       } else if (data) {
-        if (isMaster && (data.nome === 'Novo Usuário' || !data.nome)) {
+        if (isMaster && (data.nome === 'Novo Impulsionador' || !data.nome)) {
           const update = { nome: 'Paulo Ricardo', cargo: 'gestor' };
           await supabase.from('perfis').update(update).eq('id', userId);
           setProfileData({ ...data, ...update });
@@ -138,11 +137,11 @@ const App: React.FC = () => {
         comprovante_url: newTr.comprovante_url || null
       }]);
       if (error) throw error;
-      alert('Dados sincronizados com sucesso com o Instituto EJN');
+      alert('Sua intenção de investimento foi registrada com sucesso.');
       fetchData(true);
       return true;
     } catch (err: any) {
-      alert(`Falha técnica: ${err.message}`);
+      alert(`Falha técnica no registro: ${err.message}`);
       return false;
     }
   };
@@ -151,7 +150,6 @@ const App: React.FC = () => {
 
   if (!session) return <><LandingPage onStart={() => setShowLogin(true)} />{showLogin && <LoginForm onClose={() => setShowLogin(false)} />}</>;
 
-  // --- CORREÇÃO DE PRIVACIDADE: FILTRO POR USUÁRIO ---
   const userTransactions = transacoes.filter(t => 
     role === 'gestor' ? true : t.doador_email === session.user.email
   );
@@ -160,7 +158,6 @@ const App: React.FC = () => {
     .filter(t => t.tipo === 'entrada' && t.status === 'confirmado')
     .reduce((acc, t) => acc + t.valor, 0);
 
-  // Se o doador não tem doações confirmadas, o impacto é 0
   const impactCount = (role === 'doador' && totalInvested === 0) ? 0 : alunos.length;
 
   return (
@@ -181,9 +178,11 @@ const App: React.FC = () => {
           <div className="lg:hidden"><button onClick={() => setIsSidebarOpen(true)} className="p-2 text-ejn-teal bg-white rounded-lg shadow-sm"><Menu /></button></div>
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-ejn-teal font-poppins">
-              {role === 'gestor' ? `Painel do Presidente` : `Olá, ${profileData.nome?.split(' ')[0]}`}
+              {role === 'gestor' ? `Painel de Comando: Liderando a Transformação` : `Bem-vindo, ${profileData.nome?.split(' ')[0]}`}
             </h1>
-            <p className="text-apple-text-secondary font-extralight tracking-wide">{role === 'gestor' ? "Gestão estratégica do Instituto EJN." : "Seu investimento social transformando vidas."}</p>
+            <p className="text-apple-text-secondary font-extralight tracking-wide">
+              {role === 'gestor' ? "Estratégia e legado em movimento para o Instituto EJN." : "Seu capital social transformando o amanhã hoje."}
+            </p>
           </div>
         </header>
 
@@ -204,7 +203,20 @@ const App: React.FC = () => {
               profileData={profileData}
             />
           )}
-          {activeTab === 'projects' && role === 'doador' && <Projects projects={projetos} transactions={transacoes} onDonate={(pid, amt) => handleAddTransaction({ descricao: 'Doação Realizada', valor: amt, tipo: 'entrada', categoria: 'Doação', projeto_id: pid, status: 'pendente' })} />}
+          {activeTab === 'projects' && role === 'doador' && (
+            <Projects 
+              projects={projetos} 
+              transactions={transacoes} 
+              onDonate={(pid, amt) => handleAddTransaction({ 
+                descricao: 'Investimento em Futuro Líder', 
+                valor: amt, 
+                tipo: 'entrada', 
+                categoria: 'Doação', 
+                projeto_id: pid, 
+                status: 'pendente' 
+              })} 
+            />
+          )}
           {activeTab === 'transparency' && role === 'doador' && <Transparency transactions={transacoes} impactCount={impactCount} totalInvested={totalInvested} />}
           
           {activeTab === 'profile' && (

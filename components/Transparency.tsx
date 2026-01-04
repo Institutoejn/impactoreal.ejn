@@ -43,13 +43,11 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
         format: 'a4'
       });
 
-      // Cores do Instituto
-      const ejnTeal = [0, 95, 85]; // #005F55
-      const ejnGold = [232, 171, 0]; // #E8AB00
-      const ejnDark = [31, 41, 55]; // #1F2937
+      const ejnTeal = [0, 95, 85];
+      const ejnGold = [232, 171, 0];
+      const ejnDark = [31, 41, 55];
 
-      // Cabeçalho
-      doc.setFillColor(245, 245, 247); // Apple Gray
+      doc.setFillColor(245, 245, 247);
       doc.rect(0, 0, 210, 40, 'F');
       
       doc.setTextColor(ejnTeal[0], ejnTeal[1], ejnTeal[2]);
@@ -59,44 +57,41 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
       
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text('Relatório de Transparência e Impacto Social', 20, 28);
+      doc.text('Transparência Radical: Onde cada centavo encontra um sonho', 20, 28);
 
-      // Selo de Autenticidade
       doc.setDrawColor(ejnGold[0], ejnGold[1], ejnGold[2]);
       doc.setLineWidth(0.5);
       doc.line(140, 15, 190, 15);
       doc.line(140, 25, 190, 25);
       doc.setFontSize(8);
       doc.setTextColor(ejnGold[0], ejnGold[1], ejnGold[2]);
-      doc.text('PERFIL AUDITADO', 165, 20, { align: 'center' });
-      doc.text('Dados em Tempo Real via Supabase', 165, 23, { align: 'center' });
+      doc.text('DADOS AUDITADOS', 165, 20, { align: 'center' });
+      doc.text('Sincronização em Tempo Real', 165, 23, { align: 'center' });
 
-      // Resumo Executivo
       doc.setTextColor(ejnDark[0], ejnDark[1], ejnDark[2]);
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
-      doc.text('Resumo Executivo', 20, 55);
+      doc.text('Panorama de Transformação', 20, 55);
 
       const summaryY = 65;
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text('Total de Jovens Impactados:', 20, summaryY);
+      doc.text('Líderes Despertados no Ciclo:', 20, summaryY);
       doc.setFont('helvetica', 'bold');
-      doc.text(`${impactCount} Jovens`, 75, summaryY);
+      doc.text(`${impactCount} Talentos`, 85, summaryY);
 
       doc.setFont('helvetica', 'normal');
-      doc.text('Total Investido (Social):', 20, summaryY + 8);
+      doc.text('Capital Estratégico Investido:', 20, summaryY + 8);
       doc.setFont('helvetica', 'bold');
-      doc.text(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalInvested), 75, summaryY + 8);
+      doc.text(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalInvested), 85, summaryY + 8);
 
       doc.setFont('helvetica', 'normal');
-      doc.text('Data do Relatório:', 20, summaryY + 16);
+      doc.text('Data de Extração:', 20, summaryY + 16);
       doc.setFont('helvetica', 'bold');
-      doc.text(new Date().toLocaleDateString('pt-BR'), 75, summaryY + 16);
+      doc.text(new Date().toLocaleDateString('pt-BR'), 85, summaryY + 16);
 
-      // Tabela de Movimentações
       doc.setFontSize(14);
-      doc.text('Histórico de Destinação de Recursos', 20, summaryY + 35);
+      doc.text('Evidências de Destinação de Recursos', 20, summaryY + 35);
 
       const tableData = confirmedOuts.map(t => [
         new Date(t.created_at).toLocaleDateString('pt-BR'),
@@ -108,7 +103,7 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
       if (tableData.length === 0) {
         doc.setFontSize(10);
         doc.setFont('helvetica', 'italic');
-        doc.text('Nenhuma movimentação confirmada registrada no período.', 20, summaryY + 45);
+        doc.text('Nenhuma evidência confirmada registrada no período.', 20, summaryY + 45);
       } else {
         autoTable(doc, {
           startY: summaryY + 40,
@@ -131,10 +126,9 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
         });
       }
 
-      // Distribuição por Categoria (Gráfico textual/mini-tabela)
       const finalY = (doc as any).lastAutoTable.finalY || 150;
       doc.setFontSize(14);
-      doc.text('Distribuição por Categoria (Mês Atual)', 20, finalY + 20);
+      doc.text('Distribuição por Eixo de Impacto (Mês Atual)', 20, finalY + 20);
 
       catData.forEach((d, i) => {
         const itemY = finalY + 30 + (i * 8);
@@ -143,27 +137,25 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
         doc.text(d.label, 25, itemY);
         doc.text(`${d.pct}%`, 80, itemY);
         
-        // Mini barra de progresso
         doc.setFillColor(240, 240, 240);
         doc.rect(95, itemY - 3, 50, 2, 'F');
         doc.setFillColor(ejnTeal[0], ejnTeal[1], ejnTeal[2]);
         doc.rect(95, itemY - 3, d.pct / 2, 2, 'F');
       });
 
-      // Rodapé
       const pageCount = doc.internal.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
         doc.setFontSize(8);
         doc.setTextColor(150, 150, 150);
-        doc.text('Instituto EJN - Educação e Impacto Social Sincronizado', 105, 285, { align: 'center' });
-        doc.text(`Página ${i} de ${pageCount}`, 190, 285, { align: 'right' });
+        doc.text('Instituto EJN - Transparência Radical e Legado Sincronizado', 105, 285, { align: 'center' });
+        doc.text(`Folha ${i} de ${pageCount}`, 190, 285, { align: 'right' });
       }
 
-      doc.save(`Relatorio_Transparencia_EJN_${new Date().toISOString().split('T')[0]}.pdf`);
+      doc.save(`Transparencia_Radical_EJN_${new Date().toISOString().split('T')[0]}.pdf`);
     } catch (error) {
-      console.error('Falha ao gerar PDF:', error);
-      alert('Houve um erro técnico ao processar seu documento. Tente novamente em instantes.');
+      console.error('Falha técnica:', error);
+      alert('Houve uma falha técnica ao processar as evidências. Tente novamente.');
     } finally {
       setIsGenerating(false);
     }
@@ -193,8 +185,8 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
         <div className="flex-1 space-y-8">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="text-2xl font-bold text-ejn-teal flex items-center gap-2"><PieChart className="w-6 h-6" />Impacto Mensal</h3>
-              <p className="text-apple-text-secondary">Rastreamento real de investimentos educacionais.</p>
+              <h3 className="text-2xl font-bold text-ejn-teal flex items-center gap-2"><PieChart className="w-6 h-6" />Transparência Radical</h3>
+              <p className="text-apple-text-secondary font-extralight">Onde cada centavo encontra um sonho de futuro.</p>
             </div>
             <button 
               onClick={handleGeneratePDF}
@@ -204,12 +196,12 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
               {isGenerating ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Gerando PDF...
+                  Gerando Documento...
                 </>
               ) : (
                 <>
                   <Download className="w-4 h-4" />
-                  Relatório Completo
+                  Evidência Completa (PDF)
                 </>
               )}
             </button>
@@ -226,7 +218,7 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
       </div>
 
       <div className="space-y-6">
-        <h3 className="text-xl font-bold text-ejn-teal flex items-center gap-3"><ShieldCheck className="w-6 h-6" />Feed de Evidências</h3>
+        <h3 className="text-xl font-bold text-ejn-teal flex items-center gap-3"><ShieldCheck className="w-6 h-6" />Linha do Tempo de Evidências</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {verifiedTransactions.map((item) => (
             <div key={item.id} className="bg-white rounded-apple-2xl shadow-sm border border-gray-50 overflow-hidden group">
@@ -237,7 +229,7 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
                   <div className="w-full h-full flex items-center justify-center"><FileText className="w-10 h-10 text-gray-300" /></div>
                 )}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
-                  <button onClick={() => item.comprovante_url && setLightboxImage(item.comprovante_url)} className="text-white text-xs font-bold bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">Ver Comprovante</button>
+                  <button onClick={() => item.comprovante_url && setLightboxImage(item.comprovante_url)} className="text-white text-xs font-bold bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">Ver Evidência</button>
                 </div>
               </div>
               <div className="p-5">
@@ -259,8 +251,8 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
             <img src={lightboxImage} alt="Doc" className="w-full h-auto max-h-[80vh] object-contain" />
             <div className="p-8 border-t flex justify-between items-center">
               <div>
-                <h3 className="text-lg font-bold text-ejn-teal">Comprovação Fiscal EJN</h3>
-                <p className="text-xs text-apple-text-secondary">Evidência validada pelo comitê de transparência.</p>
+                <h3 className="text-lg font-bold text-ejn-teal">Comprovação Fiscal de Impacto</h3>
+                <p className="text-xs text-apple-text-secondary">Evidência validada pelo conselho estratégico do Instituto.</p>
               </div>
               <button onClick={() => setLightboxImage(null)} className="p-4 bg-apple-gray rounded-full"><X /></button>
             </div>
