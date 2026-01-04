@@ -236,7 +236,7 @@ const App: React.FC = () => {
           {activeTab === 'students' && role === 'gestor' && <StudentManagement students={alunos} onAddStudent={async (s) => { await supabase.from('alunos').insert([s]); fetchData(true); }} onUpdateStudent={async (s) => { await supabase.from('alunos').update(s).eq('id', s.id); fetchData(true); }} onDeleteStudent={async (id) => { await supabase.from('alunos').delete().eq('id', id); fetchData(true); }} />}
           {activeTab === 'project-management' && role === 'gestor' && <ProjectManagement projects={projetos} onAddProject={async (p) => { await supabase.from('projetos').insert([p]); fetchData(true); }} onDeleteProject={async (id) => { await supabase.from('projetos').delete().eq('id', id); fetchData(true); }} />}
           {activeTab === 'treasury' && role === 'gestor' && <Treasury transactions={transacoes} projects={projetos} onAddTransaction={handleAddTransaction} onUpdateStatus={async (id, st) => { await supabase.from('transacoes').update({ status: st }).eq('id', id); fetchData(true); }} onDeleteTransaction={async (id) => { await supabase.from('transacoes').delete().eq('id', id); fetchData(true); }} />}
-          {activeTab === 'esg' && role === 'gestor' && <ESGReports transactions={transacoes} studentCount={alunos.length} />}
+          {activeTab === 'esg' && role === 'gestor' && <ESGReports transactions={transacoes} studentCount={alunos.length} profileData={profileData} />}
           {activeTab === 'settings' && role === 'gestor' && (
             <Settings 
               profileData={profileData} 
