@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ImpactHero } from './components/ImpactHero';
@@ -196,7 +197,13 @@ const App: React.FC = () => {
               </div>
             </div>
           )}
-          {activeTab === 'investments' && role === 'doador' && <MyInvestments transactions={userTransactions} totalInvested={totalInvested} />}
+          {activeTab === 'investments' && role === 'doador' && (
+            <MyInvestments 
+              transactions={userTransactions} 
+              totalInvested={totalInvested} 
+              profileData={profileData}
+            />
+          )}
           {activeTab === 'projects' && role === 'doador' && <Projects projects={projetos} transactions={transacoes} onDonate={(pid, amt) => handleAddTransaction({ descricao: 'Doação Realizada', valor: amt, tipo: 'entrada', categoria: 'Doação', projeto_id: pid, status: 'pendente' })} />}
           {activeTab === 'transparency' && role === 'doador' && <Transparency transactions={transacoes} impactCount={impactCount} totalInvested={totalInvested} />}
           
