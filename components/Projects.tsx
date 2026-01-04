@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Target, ArrowRight, X, QrCode, Copy, CheckCircle2, Info } from 'lucide-react';
+import { Target, ArrowRight, X, QrCode, Copy, CheckCircle2, Info, Loader2 } from 'lucide-react';
 import { Projeto, Transacao } from '../types';
 import QRious from 'qrious';
 
@@ -9,10 +9,10 @@ import QRious from 'qrious';
 interface ProjectsProps {
   projects: Projeto[];
   transactions: Transacao[];
-  onDonate: (projectId: string, amount: number) => void;
+  onDonate: (projectId: string, amount: number) => Promise<boolean>; // Mudou para Promise
 }
 
-// --- UTILITÁRIOS PIX (Engenharia de Pagamentos) ---
+// --- UTILITÁRIOS PIX ---
 
 const crc16 = (str: string): string => {
   let crc = 0xFFFF;
@@ -23,7 +23,6 @@ const crc16 = (str: string): string => {
       let bit = ((b >> (7 - j) & 1) === 1);
       let c15 = ((crc >> 15 & 1) === 1);
       crc <<= 1;
-      // Corrigido: usando '!==' para XOR lógico entre booleanos em TypeScript
       if (c15 !== bit) crc ^= polynomial;
     }
   }
@@ -37,8 +36,8 @@ const genField = (id: string, value: string): string => {
 };
 
 const generatePixPayload = (amount: number | null): string => {
-  const PIX_KEY = "51708193000170"; // CNPJ limpo
-  const MERCHANT_NAME = "INSTITUTO ESCOLA JOVENS"; // Max 25 chars
+  const PIX_KEY = "51708193000170";
+  const MERCHANT_NAME = "INSTITUTO ESCOLA JOVENS";
   const MERCHANT_CITY = "SAO PAULO";
 
   const accountInfo = [
@@ -68,6 +67,7 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
   const [selectedProject, setSelectedProject] = useState<Projeto | null>(null);
   const [donationAmount, setDonationAmount] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [pixCode, setPixCode] = useState('');
   const [isCopied, setIsCopied] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -87,7 +87,6 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
   const getAmountReached = (project: Projeto) => {
     return transactions
       .filter(t => 
-        // Corrigido: usando 'tipo' em vez de 'type' conforme definido em types.ts
         t.tipo === 'in' && 
         t.status !== 'pending' &&
         (t.projeto_id === project.id || t.descricao.toLowerCase().includes(project.nome.toLowerCase()))
@@ -95,7 +94,6 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
       .reduce((acc, t) => acc + t.valor, 0);
   };
 
-  // Atualiza o Payload Pix sempre que o valor ou projeto muda
   useEffect(() => {
     if (selectedProject) {
       const amount = parseFloat(donationAmount) || null;
@@ -105,7 +103,6 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
     }
   }, [selectedProject, donationAmount]);
 
-  // Renderiza o QR Code no Canvas via QRious
   useEffect(() => {
     if (selectedProject && canvasRef.current && pixCode) {
       new QRious({
@@ -123,16 +120,21 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
     setTimeout(() => setIsCopied(false), 2000);
   };
 
-  const handleDonateSubmit = (e: React.FormEvent) => {
+  const handleDonateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedProject) {
-      onDonate(selectedProject.id, parseFloat(donationAmount) || 0);
-      setShowSuccess(true);
-      setTimeout(() => {
-        setShowSuccess(false);
-        setSelectedProject(null);
-        setDonationAmount('');
-      }, 3000);
+      setIsSubmitting(true);
+      const success = await onDonate(selectedProject.id, parseFloat(donationAmount) || 0);
+      
+      if (success) {
+        setShowSuccess(true);
+        setTimeout(() => {
+          setShowSuccess(false);
+          setSelectedProject(null);
+          setDonationAmount('');
+        }, 3000);
+      }
+      setIsSubmitting(false);
     }
   };
 
@@ -209,10 +211,10 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
         </div>
       )}
 
-      {/* Donation Modal - PIX Engine Active */}
+      {/* Donation Modal */}
       {selectedProject && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-300">
-          <div className="absolute inset-0 bg-white/40 backdrop-blur-xl fixed" onClick={() => !showSuccess && setSelectedProject(null)} />
+          <div className="absolute inset-0 bg-white/40 backdrop-blur-xl fixed" onClick={() => !showSuccess && !isSubmitting && setSelectedProject(null)} />
           
           <div className="relative bg-white w-full max-w-md rounded-apple-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500 my-auto">
             {showSuccess ? (
@@ -230,14 +232,13 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
                     <h3 className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Investimento Social via Pix</h3>
                     <h2 className="text-lg md:text-xl font-bold text-ejn-teal truncate">{selectedProject.nome}</h2>
                   </div>
-                  <button onClick={() => setSelectedProject(null)} className="p-2 hover:bg-apple-gray rounded-full transition-colors shrink-0">
+                  <button onClick={() => !isSubmitting && setSelectedProject(null)} className="p-2 hover:bg-apple-gray rounded-full transition-colors shrink-0">
                     <X className="w-6 h-6 text-gray-300" />
                   </button>
                 </div>
 
                 <div className="p-6 md:p-8 space-y-6 md:space-y-8 max-h-[75vh] overflow-y-auto">
                   
-                  {/* Pix Amount Input */}
                   <div>
                     <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Quanto você deseja investir?</label>
                     <div className="relative">
@@ -247,19 +248,13 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
                         step="0.01"
                         value={donationAmount}
                         onChange={(e) => setDonationAmount(e.target.value)}
-                        className="w-full pl-10 pr-4 py-4 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all border text-lg font-bold text-ejn-teal"
+                        disabled={isSubmitting}
+                        className="w-full pl-10 pr-4 py-4 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all border text-lg font-bold text-ejn-teal disabled:opacity-50"
                         placeholder="0,00"
                       />
                     </div>
-                    {!donationAmount && (
-                      <div className="flex items-center gap-1 mt-2 text-[10px] text-ejn-gold font-bold uppercase tracking-wide px-1">
-                        <Info className="w-3 h-3" />
-                        Dica: Digite o valor para facilitar o pagamento
-                      </div>
-                    )}
                   </div>
 
-                  {/* QR Code Canvas */}
                   <div className="flex flex-col items-center text-center">
                     <div className="p-4 bg-white rounded-apple-xl mb-4 border-2 border-ejn-teal/5 shadow-sm">
                       <canvas ref={canvasRef} className="max-w-full" />
@@ -269,10 +264,10 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
                     </p>
                   </div>
 
-                  {/* Pix Copy Action */}
                   <div className="space-y-3">
                     <button 
                       onClick={handleCopyPix}
+                      disabled={isSubmitting}
                       className={`w-full flex items-center justify-center gap-2 py-4 rounded-apple-xl font-bold text-sm transition-all border-2 ${
                         isCopied 
                           ? 'bg-green-50 border-green-500 text-green-700' 
@@ -284,10 +279,18 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
                     </button>
 
                     <button 
-                      onClick={handleDonateSubmit} 
-                      className="w-full bg-ejn-teal text-white py-5 rounded-apple-xl font-black text-lg shadow-xl shadow-ejn-teal/20 hover:bg-[#004d45] transition-all transform active:scale-[0.98]"
+                      onClick={handleDonateSubmit}
+                      disabled={isSubmitting}
+                      className="w-full bg-ejn-teal text-white py-5 rounded-apple-xl font-black text-lg shadow-xl shadow-ejn-teal/20 hover:bg-[#004d45] transition-all transform active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-70"
                     >
-                      Já realizei a transferência
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-6 h-6 animate-spin" />
+                          Processando...
+                        </>
+                      ) : (
+                        'Já realizei a transferência'
+                      )}
                     </button>
                   </div>
                 </div>

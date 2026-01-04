@@ -167,10 +167,9 @@ const App: React.FC = () => {
     }
   };
 
-  const handleAddTransaction = async (newTr: Omit<Transacao, 'id' | 'created_at'>) => {
+  const handleAddTransaction = async (newTr: Omit<Transacao, 'id' | 'created_at'>): Promise<boolean> => {
     setIsSyncing(true);
     try {
-      // Importante: Não enviamos a coluna 'date', deixamos o Supabase usar 'created_at'
       const { error } = await supabase.from('transacoes').insert([{
         descricao: newTr.descricao,
         valor: newTr.valor,
@@ -182,11 +181,18 @@ const App: React.FC = () => {
         doador_email: session.user.email
       }]);
       
-      if (error) throw error;
+      if (error) {
+        if (error.code === '42501') {
+          throw new Error("Permissão de Banco (RLS): Doadores precisam de permissão explícita para registrar transações pendentes no Supabase Dashboard.");
+        }
+        throw error;
+      }
       showSuccessFeedback("Operação realizada!");
       fetchData(true);
+      return true;
     } catch (err: any) {
-      alert(`Erro Supabase: ${err.message}`);
+      alert(`Erro no Registro: ${err.message}`);
+      return false;
     } finally {
       setIsSyncing(false);
     }
