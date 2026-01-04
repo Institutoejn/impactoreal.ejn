@@ -42,19 +42,16 @@ const App: React.FC = () => {
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [userName, setUserName] = useState("Carregando...");
 
-  // Handler de Sucesso (QA Feedback)
   const showSuccessFeedback = (msg: string) => {
     setSuccessMessage(msg);
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
-  // 1. Lógica de Leitura (Read Global)
   const fetchData = useCallback(async (isSilent = false) => {
     if (!isSilent) setIsLoading(true);
     setConnectionError(false);
     
     try {
-      // Busca paralela otimizada
       const [stRes, trRes, prRes] = await Promise.all([
         supabase.from('students').select('*').order('name'),
         supabase.from('transactions').select('*').order('date', { ascending: false }),
@@ -65,7 +62,6 @@ const App: React.FC = () => {
       if (trRes.error) throw trRes.error;
       if (prRes.error) throw prRes.error;
 
-      // Sincronização de Alunos
       setStudents(stRes.data.map(s => ({
         id: s.id,
         name: s.name,
@@ -77,7 +73,6 @@ const App: React.FC = () => {
         image: s.image
       })));
 
-      // Sincronização de Transações (Tesouraria)
       const mappedTransactions: Transaction[] = trRes.data.map(t => ({
         id: t.id,
         date: t.date,
@@ -91,7 +86,6 @@ const App: React.FC = () => {
       }));
       setTransactions(mappedTransactions);
 
-      // Sincronização de Projetos
       setProjects(prRes.data.map(p => ({
         id: p.id,
         title: p.title,
@@ -101,7 +95,15 @@ const App: React.FC = () => {
         image: p.image
       })));
 
-      console.log("%c✓ Sincronização Real-Time Concluída", "color: #005F55; font-weight: bold;");
+      // Fetch Profile for the current logged in state
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        if (prof) {
+          setUserName(prof.name || "Membro EJN");
+          setProfilePhoto(prof.profile_photo);
+        }
+      }
 
     } catch (err) {
       console.error("Falha na comunicação com Supabase:", err);
@@ -112,13 +114,10 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // 2. Inicialização
   useEffect(() => {
     if (isLoggedIn) fetchData();
   }, [isLoggedIn, fetchData]);
 
-  // 3. Handlers de Escrita (Create/Update com Instant Update)
-  
   const handleAddStudent = async (newStudent: Omit<Student, 'id' | 'status'>) => {
     setIsSyncing(true);
     try {
@@ -134,9 +133,9 @@ const App: React.FC = () => {
 
       if (error) throw error;
       showSuccessFeedback("Dados salvos com sucesso no Instituto EJN!");
-      await fetchData(true); // Sync silencioso para atualizar lista
+      await fetchData(true);
     } catch (err) {
-      alert("Falha ao salvar no servidor. Verifique as chaves do Supabase.");
+      alert("Erro ao salvar no banco de dados.");
     } finally {
       setIsSyncing(false);
     }
@@ -158,9 +157,9 @@ const App: React.FC = () => {
 
       if (error) throw error;
       showSuccessFeedback("Movimentação financeira registrada!");
-      await fetchData(true); // Atualiza barra de progresso instantaneamente
+      await fetchData(true);
     } catch (err) {
-      alert("Erro ao processar transação financeira.");
+      alert("Erro ao registrar transação.");
     } finally {
       setIsSyncing(false);
     }
@@ -174,13 +173,12 @@ const App: React.FC = () => {
       showSuccessFeedback("Status de doação validado!");
       await fetchData(true);
     } catch (err) {
-      alert("Erro ao validar doação.");
+      alert("Erro ao validar status.");
     } finally {
       setIsSyncing(false);
     }
   };
 
-  // Demais handlers simplificados para manter performance...
   const handleUpdateStudent = async (s: Student) => {
     setIsSyncing(true);
     await supabase.from('students').update(s).eq('id', s.id);
@@ -216,13 +214,11 @@ const App: React.FC = () => {
     setShowLogin(false);
   };
 
-  // Fix: Definition for handleRoleSwitch used in the Sidebar component.
   const handleRoleSwitch = (newRole: UserRole) => {
     setRole(newRole);
-    setActiveTab('overview'); // Ensure consistency when switching between Doador and Gestor views
+    setActiveTab('overview');
   };
 
-  // View de Carregamento / Erro
   if (!isLoggedIn) {
     return (
       <>
@@ -232,7 +228,6 @@ const App: React.FC = () => {
     );
   }
 
-  // Métricas do Doador (Baseadas em Select Global)
   const donor = {
     name: userName,
     impactCount: students.length,
@@ -243,18 +238,16 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex font-sans text-gray-900 bg-apple-gray">
-      {/* Banner de Status de Conexão (DevOps Feedback) */}
       {isLoading && (
-        <div className="fixed top-0 left-0 right-0 z-[100] bg-ejn-teal text-white py-2 flex items-center justify-center gap-2 animate-in slide-in-from-top duration-300">
+        <div className="fixed top-0 left-0 right-0 z-[100] bg-ejn-teal text-white py-2 flex items-center justify-center gap-2 shadow-md">
           <Loader2 className="w-4 h-4 animate-spin" />
-          <span className="text-[10px] font-bold uppercase tracking-widest">Conectando ao banco de dados do Instituto EJN...</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest">Conectando ao banco de dados...</span>
         </div>
       )}
 
-      {/* Alertas de Sucesso (QA Feedback) */}
       <div className="fixed top-6 right-6 z-[100] flex flex-col items-end gap-3 pointer-events-none">
         {isSyncing && (
-          <div className="bg-white/80 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-ejn-teal/10 flex items-center gap-2 animate-pulse">
+          <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-ejn-teal/10 flex items-center gap-2 animate-pulse">
             <CloudLightning className="w-4 h-4 text-ejn-teal" />
             <span className="text-[9px] font-black text-ejn-teal uppercase tracking-widest">Sincronizando...</span>
           </div>
@@ -277,7 +270,7 @@ const App: React.FC = () => {
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <main className={`flex-1 min-w-0 lg:ml-72 p-6 md:p-12 overflow-y-auto ${isLoading ? 'opacity-40 pointer-events-none' : 'opacity-100'} transition-opacity duration-500`}>
+      <main className={`flex-1 min-w-0 lg:ml-72 p-6 md:p-12 overflow-y-auto ${isLoading ? 'opacity-50' : 'opacity-100'} transition-opacity duration-300`}>
         <header className="flex flex-col md:flex-row md:justify-between md:items-start mb-8 md:mb-12 gap-6">
           <div className="flex items-center justify-between w-full md:w-auto">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 -ml-2 text-ejn-teal lg:hidden bg-white rounded-apple-lg shadow-sm">
