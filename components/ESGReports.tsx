@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileBarChart, Download, Sparkles, Globe, Printer, Share2, X, CheckCircle2 } from 'lucide-react';
+import { FileBarChart, Download, Sparkles, Globe, Printer, Share2, X, CheckCircle2, Briefcase, Rocket } from 'lucide-react';
 import { Transacao, Perfil } from '../types';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -7,10 +7,12 @@ import autoTable from 'jspdf-autotable';
 interface ESGReportsProps {
   transactions: Transacao[];
   studentCount: number;
+  marketCount: number;
+  businessCount: number;
   profileData: Partial<Perfil>;
 }
 
-export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCount, profileData }) => {
+export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCount, marketCount, businessCount, profileData }) => {
   const [showPreview, setShowPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -26,15 +28,8 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
 
   const balance = totalIn - totalOut;
 
-  // Cálculo de Eficiência por Categoria
-  const categories = ['Educação', 'Infraestrutura', 'Alimentação', 'Outros'];
-  const outputs = confirmedTransactions.filter(t => t.tipo === 'saida');
-  
-  const stats = categories.map(cat => {
-    const amount = outputs.filter(t => t.categoria === cat).reduce((acc, t) => acc + t.valor, 0);
-    const pct = totalOut > 0 ? (amount / totalOut) * 100 : 0;
-    return { cat, amount, pct };
-  });
+  // Cálculo de Empregabilidade
+  const employabilityRate = studentCount > 0 ? ((marketCount / studentCount) * 100).toFixed(1) : "0.0";
 
   const generatePDF = () => {
     setIsGenerating(true);
@@ -56,7 +51,6 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
         doc.setFillColor(245, 245, 247); // Apple Gray
         doc.rect(0, 0, 210, 40, 'F');
         
-        // Logo Customizado
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(18);
         doc.setTextColor(ejnGold[0], ejnGold[1], ejnGold[2]);
@@ -72,11 +66,11 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
         doc.setFont('helvetica', 'bold');
         doc.text(`EMITIDO EM: ${new Date().toLocaleDateString('pt-BR')}`, 190, 22, { align: 'right' });
 
-        // --- SEÇÃO 1: IMPACTO SOCIAL ---
+        // --- SEÇÃO 1: IMPACTO SOCIAL E CARREIRA ---
         let currentY = 55;
         doc.setFontSize(14);
         doc.setTextColor(ejnTeal[0], ejnTeal[1], ejnTeal[2]);
-        doc.text('01. IMPACTO SOCIAL (ODS 4)', 20, currentY);
+        doc.text('01. IMPACTO SOCIAL E SUCESSO DE CARREIRA', 20, currentY);
         
         currentY += 12;
         doc.setFillColor(255, 255, 255);
@@ -86,25 +80,58 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
         doc.roundedRect(20, currentY, 80, 25, 3, 3, 'FD');
         doc.setFontSize(8);
         doc.setTextColor(textGray[0], textGray[1], textGray[2]);
-        doc.text('TALENTOS EM FORMAÇÃO', 25, currentY + 8);
+        doc.text('JOVENS EM FORMAÇÃO', 25, currentY + 8);
         doc.setFontSize(16);
         doc.setTextColor(ejnGold[0], ejnGold[1], ejnGold[2]);
-        doc.text(`${studentCount} Jovens`, 25, currentY + 18);
+        doc.text(`${studentCount} Líderes`, 25, currentY + 18);
 
         // Card de Vidas
         doc.roundedRect(110, currentY, 80, 25, 3, 3, 'FD');
         doc.setFontSize(8);
         doc.setTextColor(textGray[0], textGray[1], textGray[2]);
-        doc.text('VIDAS DESPERTADAS (INDIRETOS)', 115, currentY + 8);
+        doc.text('VIDAS IMPACTADAS (INDIRETOS)', 115, currentY + 8);
         doc.setFontSize(16);
         doc.setTextColor(ejnTeal[0], ejnTeal[1], ejnTeal[2]);
         doc.text(`${studentCount * 4} Pessoas`, 115, currentY + 18);
 
-        // --- SEÇÃO 2: GOVERNANÇA FINANCEIRA ---
+        // --- SEÇÃO: IMPACTO NO MERCADO DE TRABALHO ---
         currentY += 40;
+        doc.setFontSize(12);
+        doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+        doc.text('Impacto no Mercado de Trabalho', 20, currentY);
+
+        currentY += 8;
+        doc.setFillColor(245, 245, 247);
+        doc.roundedRect(20, currentY, 170, 35, 3, 3, 'F');
+        
+        // Selo de Sucesso Profissional
+        doc.setFillColor(ejnGold[0], ejnGold[1], ejnGold[2]);
+        doc.roundedRect(145, currentY + 5, 40, 10, 2, 2, 'F');
+        doc.setFontSize(7);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.text('SUCESSO PROFISSIONAL', 165, currentY + 11.5, { align: 'center' });
+
+        doc.setFontSize(9);
+        doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Taxa de Empregabilidade:', 28, currentY + 12);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(ejnTeal[0], ejnTeal[1], ejnTeal[2]);
+        doc.text(`${employabilityRate}%`, 68, currentY + 12);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+        doc.text('Fomentação de Negócios:', 28, currentY + 22);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(ejnGold[0], ejnGold[1], ejnGold[2]);
+        doc.text(`${businessCount} Novos Empreendedores`, 68, currentY + 22);
+
+        // --- SEÇÃO 2: GOVERNANÇA FINANCEIRA ---
+        currentY += 50;
         doc.setFontSize(14);
         doc.setTextColor(ejnTeal[0], ejnTeal[1], ejnTeal[2]);
-        doc.text('02. GOVERNANÇA E TRANSPARÊNCIA', 20, currentY);
+        doc.text('02. GOVERNANÇA E TRANSPARÊNCIA FINANCEIRA', 20, currentY);
 
         currentY += 8;
         autoTable(doc, {
@@ -122,46 +149,10 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
           margin: { left: 20, right: 20 }
         });
 
-        // --- SEÇÃO 3: EFICIÊNCIA OPERACIONAL ---
-        currentY = (doc as any).lastAutoTable.finalY + 20;
-        doc.setFontSize(12);
-        doc.setTextColor(textDark[0], textDark[1], textDark[2]);
-        doc.text('Alocação por Eixo de Impacto (%)', 20, currentY);
-
-        currentY += 8;
-        stats.forEach((s, i) => {
-          doc.setFillColor(245, 245, 247);
-          doc.roundedRect(20, currentY, 170, 10, 2, 2, 'F');
-          doc.setFillColor(ejnGold[0], ejnGold[1], ejnGold[2]);
-          doc.rect(20, currentY, (170 * s.pct) / 100, 10, 'F');
-          
-          doc.setFontSize(8);
-          doc.setTextColor(textDark[0], textDark[1], textDark[2]);
-          doc.text(`${s.cat}: ${s.pct.toFixed(1)}%`, 22, currentY + 6);
-          currentY += 14;
-        });
-
-        // --- SEÇÃO 4: DADOS INSTITUCIONAIS ---
-        currentY += 10;
-        doc.setDrawColor(230, 230, 230);
-        doc.line(20, currentY, 190, currentY);
-        
-        currentY += 10;
-        doc.setFontSize(12);
-        doc.setTextColor(ejnTeal[0], ejnTeal[1], ejnTeal[2]);
-        doc.text('03. INFRAESTRUTURA LEGAL', 20, currentY);
-
-        currentY += 10;
-        doc.setFontSize(9);
-        doc.setTextColor(textGray[0], textGray[1], textGray[2]);
-        doc.text(`Razão Social: ${profileData.razao_social || 'Instituto Escola Jovens de Negócios'}`, 20, currentY);
-        doc.text(`CNPJ: ${profileData.cnpj || '51.708.193/0001-70'}`, 20, currentY + 6);
-        doc.text(`Sede: ${profileData.endereco || 'São Paulo - Brasil'}`, 20, currentY + 12);
-
         // --- FOOTER ---
         doc.setFontSize(7);
         doc.setTextColor(180, 180, 180);
-        doc.text('Documento gerado automaticamente pela plataforma Impacto Real. Dados sincronizados com o banco de dados oficial do Instituto EJN.', 105, 285, { align: 'center' });
+        doc.text('Documento gerado pela Inteligência de Dados Impacto Real. IEJN - Inovação em Capital Social.', 105, 285, { align: 'center' });
 
         doc.save(`Relatorio_Impacto_ESG_EJN_${new Date().getFullYear()}.pdf`);
         setIsGenerating(false);
@@ -184,16 +175,29 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
           </div>
         </div>
         
-        <h2 className="text-2xl font-bold text-ejn-teal mb-4 tracking-tight">Gerador de Relatório ESG de Elite</h2>
+        <h2 className="text-2xl font-bold text-ejn-teal mb-4 tracking-tight">Gerador de Relatório ESG 3.0</h2>
         <p className="text-apple-text-secondary text-base mb-10 leading-relaxed font-extralight">
-          Consolide o impacto social do Instituto em um documento oficial. Perfeito para prestação de contas com patrocinadores e investidores institucionais.
+          Consolide o impacto social do Instituto em um documento oficial. Agora com métricas de empregabilidade e novos negócios para investidores de elite.
         </p>
         
-        <div className="flex gap-4">
+        <div className="grid grid-cols-2 gap-6 w-full mb-10">
+          <div className="bg-apple-gray p-6 rounded-apple-xl">
+            <Briefcase className="w-5 h-5 text-ejn-teal mb-2 mx-auto" />
+            <p className="text-xl font-bold text-ejn-teal">{marketCount}</p>
+            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Empregados</p>
+          </div>
+          <div className="bg-apple-gray p-6 rounded-apple-xl">
+            <Rocket className="w-5 h-5 text-ejn-gold mb-2 mx-auto" />
+            <p className="text-xl font-bold text-ejn-gold">{businessCount}</p>
+            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Empreendendo</p>
+          </div>
+        </div>
+        
+        <div className="flex gap-4 w-full">
           <button 
             onClick={generatePDF}
             disabled={isGenerating}
-            className={`group flex items-center justify-center gap-3 px-8 py-4 rounded-apple-xl font-bold text-base transition-all transform active:scale-95 shadow-xl ${
+            className={`w-full group flex items-center justify-center gap-3 px-8 py-5 rounded-apple-xl font-bold text-base transition-all transform active:scale-95 shadow-xl ${
               isGenerating 
                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
                 : 'bg-ejn-teal text-white hover:bg-[#004d45] shadow-ejn-teal/20'
@@ -202,12 +206,12 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
             {isGenerating ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Auditando Dados...
+                Sincronizando Impacto...
               </>
             ) : (
               <>
                 <Download className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                Baixar Relatório ESG
+                Exportar ESG Oficial
               </>
             )}
           </button>
@@ -222,13 +226,13 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
             <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-6">
               <CheckCircle2 className="w-10 h-10 text-green-500" />
             </div>
-            <h3 className="text-2xl font-bold text-ejn-teal mb-2">Relatório Gerado!</h3>
-            <p className="text-apple-text-secondary font-extralight mb-8">O documento foi processado e o download deve ter iniciado automaticamente.</p>
+            <h3 className="text-2xl font-bold text-ejn-teal mb-2">Impacto Consolidado!</h3>
+            <p className="text-apple-text-secondary font-extralight mb-8">O relatório 3.0 foi processado com sucesso e enviado para o seu dispositivo.</p>
             <button 
               onClick={() => setShowPreview(false)}
               className="w-full bg-apple-gray text-ejn-teal py-4 rounded-apple-lg font-bold hover:bg-gray-100 transition-colors"
             >
-              Fechar
+              Concluído
             </button>
           </div>
         </div>

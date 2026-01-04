@@ -1,16 +1,17 @@
-
 import React, { useState } from 'react';
-import { Wallet, Users, AlertCircle, FileUp, UserCheck, PlusCircle, X, Clock, ArrowRight } from 'lucide-react';
+import { Wallet, Users, AlertCircle, FileUp, UserCheck, PlusCircle, X, Clock, ArrowRight, HeartHandshake } from 'lucide-react';
 import { Aluno, Transacao } from '../types';
 
 interface ManagerDashboardProps {
   students: Aluno[];
   transactions: Transacao[];
+  investorCount: number;
+  avgLoyalty: number;
   onAddStudent: (student: Omit<Aluno, 'id' | 'status'>) => void;
   onNavigate: (id: string) => void;
 }
 
-export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ students, transactions, onAddStudent, onNavigate }) => {
+export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ students, transactions, investorCount, avgLoyalty, onAddStudent, onNavigate }) => {
   const [formData, setFormData] = useState({ name: '', course: '', history: '' });
   
   const confirmedTransactions = transactions.filter(t => t.status === 'confirmado');
@@ -106,6 +107,32 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ students, tr
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="bg-white p-8 rounded-apple-2xl shadow-sm border border-gray-50">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 bg-ejn-teal/5 rounded-xl flex items-center justify-center">
+              <HeartHandshake className="w-5 h-5 text-ejn-teal" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-ejn-teal">Base de Investidores</h3>
+              <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Analytics de Retenção</p>
+            </div>
+          </div>
+          
+          <div className="space-y-6">
+            <div className="flex justify-between items-center border-b border-gray-50 pb-4">
+              <p className="text-sm text-apple-text-secondary font-extralight uppercase tracking-widest">Total Únicos</p>
+              <p className="text-2xl font-bold text-ejn-teal font-poppins">{investorCount}</p>
+            </div>
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-apple-text-secondary font-extralight uppercase tracking-widest">Fidelidade Média</p>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-ejn-gold font-poppins">{avgLoyalty}</p>
+                <p className="text-[9px] font-black text-ejn-gold uppercase tracking-tighter">Dias de Apoio</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-8 rounded-apple-2xl shadow-sm border border-gray-50">
           <div className="flex items-center gap-2 mb-6 text-ejn-gold">
             <Clock className="w-5 h-5" />
             <h3 className="text-xl font-bold text-ejn-teal">Notificações</h3>
@@ -137,17 +164,12 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ students, tr
           </div>
         </div>
 
-        <div className="lg:col-span-2 bg-white p-8 rounded-apple-2xl shadow-sm border border-gray-50">
-          <h3 className="text-xl font-bold text-ejn-teal mb-8">Cadastro Rápido de Jovem</h3>
-          <form onSubmit={handleQuickRegister} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:border-ejn-teal focus:ring-0 transition-all outline-none" placeholder="Nome Completo" required />
-              <input type="text" value={formData.course} onChange={e => setFormData({...formData, course: e.target.value})} className="w-full px-4 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:border-ejn-teal focus:ring-0 transition-all outline-none" placeholder="Curso / Trilha" required />
-            </div>
-            <textarea value={formData.history} onChange={e => setFormData({...formData, history: e.target.value})} className="w-full px-4 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:border-ejn-teal focus:ring-0 transition-all outline-none h-[110px] resize-none" placeholder="Breve histórico..."></textarea>
-            <div className="md:col-span-2 flex justify-end">
-              <button type="submit" className="bg-ejn-teal text-white px-8 py-3 rounded-apple-lg font-bold hover:bg-[#004d45] transition-all transform active:scale-95">Cadastrar Aluno</button>
-            </div>
+        <div className="lg:col-span-1 bg-white p-8 rounded-apple-2xl shadow-sm border border-gray-50">
+          <h3 className="text-xl font-bold text-ejn-teal mb-8">Cadastro Rápido</h3>
+          <form onSubmit={handleQuickRegister} className="space-y-4">
+            <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:border-ejn-teal focus:ring-0 transition-all outline-none text-sm font-bold" placeholder="Nome Completo" required />
+            <input type="text" value={formData.course} onChange={e => setFormData({...formData, course: e.target.value})} className="w-full px-4 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:border-ejn-teal focus:ring-0 transition-all outline-none text-sm font-bold" placeholder="Trilha / Curso" required />
+            <button type="submit" className="w-full bg-ejn-teal text-white py-3 rounded-apple-lg font-bold hover:bg-[#004d45] transition-all transform active:scale-95 text-xs uppercase tracking-widest">Registrar Líder</button>
           </form>
         </div>
       </div>

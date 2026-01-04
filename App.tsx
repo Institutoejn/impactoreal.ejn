@@ -168,8 +168,34 @@ const App: React.FC = () => {
 
   const totalInvested = userTransactions
     .filter(t => t.tipo === 'entrada' && t.status === 'confirmado')
-    .reduce((acc, t) => acc + t.valor, 0);
+    // Fix: Adding explicit type to reduce to avoid unknown accumulator error and allow arithmetic operations
+    .reduce<number>((acc, t) => acc + t.valor, 0);
 
+  // Analytics de Doador/Investidor
+  const investorEntries = transacoes.filter(t => t.tipo === 'entrada' && t.doador_email);
+  const uniqueInvestors = Array.from(new Set(investorEntries.map(t => t.doador_email).filter((email): email is string => !!email)));
+  const investorCount = uniqueInvestors.length;
+
+  // Cálculo de Fidelidade Média (em dias)
+  const calculateLoyalty = () => {
+    if (investorCount === 0) return 0;
+    const now = new Date();
+    // Fix: Explicitly typing the reduce to number to prevent "unknown" error and ensure arithmetic safety
+    const totalDays = uniqueInvestors.reduce<number>((acc, email) => {
+      const firstTr = investorEntries
+        .filter(t => t.doador_email === email)
+        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())[0];
+      
+      if (!firstTr) return acc;
+      const diffTime = Math.abs(now.getTime() - new Date(firstTr.created_at).getTime());
+      return acc + Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }, 0);
+    return Math.round(totalDays / investorCount);
+  };
+
+  const avgLoyalty = calculateLoyalty();
+
+  // Métricas de Impacto Social
   const impactCount = (role === 'doador' && totalInvested === 0) ? 0 : alunos.length;
   const marketCount = (role === 'doador' && totalInvested === 0) ? 0 : alunos.filter(a => a.esta_empregado).length;
   const businessCount = (role === 'doador' && totalInvested === 0) ? 0 : alunos.filter(a => a.esta_emprendendo).length;
@@ -251,7 +277,16 @@ const App: React.FC = () => {
             />
           )}
           
-          {activeTab === 'overview' && role === 'gestor' && <ManagerDashboard students={alunos} transactions={transacoes} onAddStudent={async (s) => { await supabase.from('alunos').insert([s]); fetchData(true); }} onNavigate={setActiveTab} />}
+          {activeTab === 'overview' && role === 'gestor' && (
+            <ManagerDashboard 
+              students={alunos} 
+              transactions={transacoes} 
+              investorCount={investorCount}
+              avgLoyalty={avgLoyalty}
+              onAddStudent={async (s) => { await supabase.from('alunos').insert([s]); fetchData(true); }} 
+              onNavigate={setActiveTab} 
+            />
+          )}
           {activeTab === 'students' && role === 'gestor' && <StudentManagement students={alunos} onAddStudent={async (s) => { await supabase.from('alunos').insert([s]); fetchData(true); }} onUpdateStudent={async (s) => { await supabase.from('alunos').update(s).eq('id', s.id); fetchData(true); }} onDeleteStudent={async (id) => { await supabase.from('alunos').delete().eq('id', id); fetchData(true); }} />}
           {activeTab === 'project-management' && role === 'gestor' && <ProjectManagement projects={projetos} onAddProject={async (p) => { await supabase.from('projetos').insert([p]); fetchData(true); }} onDeleteProject={async (id) => { await supabase.from('projetos').delete().eq('id', id); fetchData(true); }} />}
           {activeTab === 'treasury' && role === 'gestor' && (
@@ -264,7 +299,7 @@ const App: React.FC = () => {
               onDeleteTransaction={async (id) => { await supabase.from('transacoes').delete().eq('id', id); fetchData(true); }} 
             />
           )}
-          {activeTab === 'esg' && role === 'gestor' && <ESGReports transactions={transacoes} studentCount={alunos.length} profileData={profileData} />}
+          {activeTab === 'esg' && role === 'gestor' && <ESGReports transactions={transacoes} studentCount={alunos.length} marketCount={marketCount} businessCount={businessCount} profileData={profileData} />}
           {activeTab === 'settings' && role === 'gestor' && (
             <Settings 
               profileData={profileData} 
