@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TrendingUp, Sparkles, Briefcase, Rocket, Users, Wallet } from 'lucide-react';
 
@@ -45,7 +44,7 @@ export const ImpactHero: React.FC<ImpactHeroProps> = ({
               <Users className="w-4 h-4 text-ejn-teal" />
             </div>
             <p className="text-2xl font-bold text-gray-900 font-poppins tracking-tight">{impactCount}</p>
-            <p className="text-[10px] font-extralight text-apple-text-secondary uppercase tracking-widest mt-1">Líderes Formados</p>
+            <p className="text-[10px] font-extralight text-apple-text-secondary uppercase tracking-widest mt-1">Jovens Formados</p>
           </div>
 
           <div className="flex flex-col items-center md:items-start md:px-6">
@@ -53,7 +52,7 @@ export const ImpactHero: React.FC<ImpactHeroProps> = ({
               <Briefcase className="w-4 h-4 text-green-600" />
             </div>
             <p className="text-2xl font-bold text-gray-900 font-poppins tracking-tight">{marketCount}</p>
-            <p className="text-[10px] font-extralight text-apple-text-secondary uppercase tracking-widest mt-1">No Mercado</p>
+            <p className="text-[10px] font-extralight text-apple-text-secondary uppercase tracking-widest mt-1">Jovens Empregados</p>
           </div>
 
           <div className="flex flex-col items-center md:items-start md:px-6">
@@ -61,7 +60,7 @@ export const ImpactHero: React.FC<ImpactHeroProps> = ({
               <Rocket className="w-4 h-4 text-ejn-gold" />
             </div>
             <p className="text-2xl font-bold text-gray-900 font-poppins tracking-tight">{businessCount}</p>
-            <p className="text-[10px] font-extralight text-apple-text-secondary uppercase tracking-widest mt-1">Novos Negócios</p>
+            <p className="text-[10px] font-extralight text-apple-text-secondary uppercase tracking-widest mt-1">Jovens Empreendendo</p>
           </div>
         </div>
       </div>
