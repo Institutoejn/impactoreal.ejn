@@ -1,39 +1,45 @@
 
 import React, { useState } from 'react';
 import { Target, Users, Building2, ArrowRight, X, QrCode, Copy, CheckCircle2 } from 'lucide-react';
-import { Project, Transaction } from '../types';
+// Importações corrigidas para Projeto e Transacao
+import { Projeto, Transacao } from '../types';
 
 interface ProjectsProps {
-  projects: Project[];
-  transactions: Transaction[];
+  projects: Projeto[];
+  transactions: Transacao[];
   onDonate: (projectId: string, amount: number) => void;
 }
 
 export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDonate }) => {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedProject, setSelectedProject] = useState<Projeto | null>(null);
   const [donationAmount, setDonationAmount] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const getProgressForProject = (project: Project) => {
+  const getProgressForProject = (project: Projeto) => {
     const reached = transactions
       .filter(t => 
         t.type === 'in' && 
         t.status !== 'pending' &&
-        (t.projectId === project.id || t.description.toLowerCase().includes(project.title.toLowerCase()))
+        // Propriedades corrigidas: projeto_id e nome
+        (t.projeto_id === project.id || t.descricao.toLowerCase().includes(project.nome.toLowerCase()))
       )
-      .reduce((acc, t) => acc + t.amount, 0);
+      // Propriedade corrigida: valor
+      .reduce((acc, t) => acc + t.valor, 0);
     
-    return Math.min(Math.round((reached / project.goal) * 100), 100);
+    // Propriedade corrigida: meta_financeira
+    return Math.min(Math.round((reached / project.meta_financeira) * 100), 100);
   };
 
-  const getAmountReached = (project: Project) => {
+  const getAmountReached = (project: Projeto) => {
     return transactions
       .filter(t => 
         t.type === 'in' && 
         t.status !== 'pending' &&
-        (t.projectId === project.id || t.description.toLowerCase().includes(project.title.toLowerCase()))
+        // Propriedades corrigidas: projeto_id e nome
+        (t.projeto_id === project.id || t.descricao.toLowerCase().includes(project.nome.toLowerCase()))
       )
-      .reduce((acc, t) => acc + t.amount, 0);
+      // Propriedade corrigida: valor
+      .reduce((acc, t) => acc + t.valor, 0);
   };
 
   const handleDonateSubmit = (e: React.FormEvent) => {
@@ -61,8 +67,9 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
               <div key={project.id} className="bg-white rounded-apple-2xl shadow-sm border border-gray-50 overflow-hidden flex flex-col group hover:shadow-xl transition-all duration-500">
                 <div className="relative h-48 md:h-56 overflow-hidden">
                   <img 
-                    src={project.image || 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800'} 
-                    alt={project.title} 
+                    // Propriedade corrigida: capa_url
+                    src={project.capa_url || 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800'} 
+                    alt={project.nome} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
                   />
                   <div className="absolute top-4 left-4">
@@ -74,13 +81,14 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
 
                 <div className="p-6 md:p-8 flex flex-col flex-1">
                   <div className="flex justify-between items-start mb-3 gap-2">
-                    <h3 className="text-lg md:text-xl font-bold text-ejn-teal line-clamp-2 leading-tight">{project.title}</h3>
+                    {/* Propriedade corrigida: nome */}
+                    <h3 className="text-lg md:text-xl font-bold text-ejn-teal line-clamp-2 leading-tight">{project.nome}</h3>
                     <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter shrink-0 ${project.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
                       {project.status === 'active' ? 'Ativo' : 'Concluído'}
                     </span>
                   </div>
                   <p className="text-apple-text-secondary text-sm mb-6 md:mb-8 leading-relaxed line-clamp-3">
-                    {project.description}
+                    {project.descricao}
                   </p>
 
                   <div className="mt-auto space-y-4">
@@ -141,7 +149,8 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
                 <div className="p-6 md:p-8 border-b border-gray-100 flex items-center justify-between">
                   <div className="min-w-0">
                     <h3 className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Apoiar Projeto</h3>
-                    <h2 className="text-lg md:text-xl font-bold text-ejn-teal truncate">{selectedProject.title}</h2>
+                    {/* Propriedade corrigida: nome */}
+                    <h2 className="text-lg md:text-xl font-bold text-ejn-teal truncate">{selectedProject.nome}</h2>
                   </div>
                   <button onClick={() => setSelectedProject(null)} className="p-2 hover:bg-apple-gray rounded-full transition-colors shrink-0">
                     <X className="w-6 h-6 text-gray-300" />

@@ -1,16 +1,17 @@
 
 import React from 'react';
 import { Award, Download, Calendar, ArrowUpRight } from 'lucide-react';
-import { Transaction } from '../types';
+// Importação corrigida para Transacao
+import { Transacao } from '../types';
 
 interface MyInvestmentsProps {
-  transactions: Transaction[];
+  transactions: Transacao[];
   totalInvested: number;
 }
 
 export const MyInvestments: React.FC<MyInvestmentsProps> = ({ transactions, totalInvested }) => {
   // Mock filter for donor specific investments (In this demo, all 'in' transactions for donor)
-  const myInvestments = transactions.filter(t => t.type === 'in');
+  const myInvestments = transactions.filter(t => t.tipo === 'in');
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -63,11 +64,12 @@ export const MyInvestments: React.FC<MyInvestmentsProps> = ({ transactions, tota
                     </div>
                   </td>
                   <td className="px-8 py-5">
-                    <p className="font-semibold text-gray-800">{inv.description}</p>
-                    <p className="text-[10px] text-ejn-teal font-bold uppercase tracking-wider">{inv.category}</p>
+                    <p className="font-semibold text-gray-800">{inv.descricao}</p>
+                    <p className="text-[10px] text-ejn-teal font-bold uppercase tracking-wider">{inv.categoria}</p>
                   </td>
                   <td className="px-8 py-5 text-right font-bold text-lg text-ejn-teal">
-                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(inv.amount)}
+                    {/* Propriedade corrigida de amount para valor */}
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(inv.valor)}
                   </td>
                   <td className="px-8 py-5 text-right">
                     <button className="text-gray-300 group-hover:text-ejn-gold transition-colors">

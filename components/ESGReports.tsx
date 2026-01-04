@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
 import { FileBarChart, Download, Sparkles, Heart, Globe, Printer, Share2, X } from 'lucide-react';
-import { Transaction } from '../types';
+// Importação corrigida para Transacao
+import { Transacao } from '../types';
 
 interface ESGReportsProps {
-  transactions: Transaction[];
+  transactions: Transacao[];
   studentCount: number;
 }
 
@@ -12,7 +13,8 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
   const [showPreview, setShowPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const totalIn = transactions.filter(t => t.type === 'in').reduce((acc, t) => acc + t.amount, 0);
+  // Propriedade corrigida de amount para valor
+  const totalIn = transactions.filter(t => t.type === 'in').reduce((acc, t) => acc + t.valor, 0);
 
   const generateReport = () => {
     setIsGenerating(true);

@@ -1,10 +1,11 @@
 
 import React from 'react';
 import { BookOpen, CheckCircle2 } from 'lucide-react';
-import { Transaction } from '../types';
+// Importação corrigida para Transacao
+import { Transacao } from '../types';
 
 interface TransparencyCardProps {
-  transactions: Transaction[];
+  transactions: Transacao[];
   onNavigate: (id: string) => void;
 }
 
@@ -12,7 +13,8 @@ export const TransparencyCard: React.FC<TransparencyCardProps> = ({ transactions
   const lastOut = transactions.filter(t => t.type === 'out')[0];
   const monthlyOut = transactions
     .filter(t => t.type === 'out')
-    .reduce((acc, t) => acc + t.amount, 0);
+    // Propriedade corrigida de amount para valor
+    .reduce((acc, t) => acc + t.valor, 0);
 
   return (
     <div className="bg-white p-8 rounded-apple-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] h-full flex flex-col">
@@ -32,12 +34,13 @@ export const TransparencyCard: React.FC<TransparencyCardProps> = ({ transactions
             </div>
             <div className="flex-1">
               <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Última Destinação</p>
-              <p className="font-semibold text-gray-800 text-lg">{lastOut.description}</p>
-              <p className="text-apple-text-secondary text-sm">{lastOut.category}</p>
+              <p className="font-semibold text-gray-800 text-lg">{lastOut.descricao}</p>
+              <p className="text-apple-text-secondary text-sm">{lastOut.categoria}</p>
             </div>
             <div className="text-right">
               <p className="text-xl font-bold text-ejn-teal">
-                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lastOut.amount)}
+                {/* Propriedade corrigida de amount para valor */}
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lastOut.valor)}
               </p>
               <p className="text-xs text-apple-text-secondary">
                 {new Date(lastOut.date).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}

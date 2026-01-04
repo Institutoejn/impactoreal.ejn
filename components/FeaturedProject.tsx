@@ -1,17 +1,19 @@
 
 import React from 'react';
 import { ArrowRight, Star } from 'lucide-react';
-import { Transaction } from '../types';
+// Importação corrigida para Transacao
+import { Transacao } from '../types';
 
 interface FeaturedProjectProps {
-  transactions: Transaction[];
+  transactions: Transacao[];
 }
 
 export const FeaturedProject: React.FC<FeaturedProjectProps> = ({ transactions }) => {
   const goal = 50000;
   const reached = transactions
-    .filter(t => t.type === 'in' && (t.category === 'Doação' || t.description.includes('Líderes')))
-    .reduce((acc, t) => acc + t.amount, 0);
+    .filter(t => t.type === 'in' && (t.categoria === 'Doação' || t.descricao.includes('Líderes')))
+    // Propriedade corrigida de amount para valor
+    .reduce((acc, t) => acc + t.valor, 0);
   
   const progress = Math.min(Math.round((reached / goal) * 100), 100);
 

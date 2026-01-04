@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
 import { Wallet, Users, AlertCircle, FileUp, UserCheck, PlusCircle, X, Clock, ArrowRight } from 'lucide-react';
-import { Student, Transaction } from '../types';
+// Importações corrigidas para Aluno e Transacao
+import { Aluno, Transacao } from '../types';
 
 interface ManagerDashboardProps {
-  students: Student[];
-  transactions: Transaction[];
-  onAddStudent: (student: Omit<Student, 'id' | 'status'>) => void;
+  students: Aluno[];
+  transactions: Transacao[];
+  onAddStudent: (student: Omit<Aluno, 'id' | 'status'>) => void;
   onNavigate: (id: string) => void;
 }
 
@@ -16,18 +17,19 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ students, tr
   const confirmedTransactions = transactions.filter(t => t.status !== 'pending');
   const pendingTransactions = transactions.filter(t => t.status === 'pending');
 
-  const totalIn = confirmedTransactions.filter(t => t.type === 'in').reduce((acc, t) => acc + t.amount, 0);
-  const totalOut = confirmedTransactions.filter(t => t.type === 'out').reduce((acc, t) => acc + t.amount, 0);
+  // Propriedade corrigida de amount para valor
+  const totalIn = confirmedTransactions.filter(t => t.type === 'in').reduce((acc, t) => acc + t.valor, 0);
+  const totalOut = confirmedTransactions.filter(t => t.type === 'out').reduce((acc, t) => acc + t.valor, 0);
   const balance = totalIn - totalOut;
 
   const handleQuickRegister = (e: React.FormEvent) => {
     e.preventDefault();
     onAddStudent({
-      name: formData.name,
-      course: formData.course,
-      history: formData.history,
-      age: 18,
-      neighborhood: 'Pendente'
+      nome: formData.name,
+      curso: formData.course,
+      observacoes: formData.history,
+      idade: 18,
+      bairro: 'Pendente'
     });
     setFormData({ name: '', course: '', history: '' });
   };

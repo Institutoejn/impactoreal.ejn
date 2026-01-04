@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
 import { PieChart, FileText, CheckCircle2, ShieldCheck, Download, Calendar, Image as ImageIcon, Camera, X } from 'lucide-react';
-import { Transaction } from '../types';
+// Importação corrigida para Transacao
+import { Transacao } from '../types';
 
 interface TransparencyProps {
-  transactions: Transaction[];
+  transactions: Transacao[];
 }
 
 export const Transparency: React.FC<TransparencyProps> = ({ transactions }) => {
@@ -20,13 +21,15 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions }) => {
     return t.type === 'out' && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
   });
 
-  const totalMonthlyOut = monthlyOuts.reduce((acc, t) => acc + t.amount, 0);
+  // Propriedade corrigida de amount para valor
+  const totalMonthlyOut = monthlyOuts.reduce((acc, t) => acc + t.valor, 0);
 
   const categories = ['Educação', 'Infraestrutura', 'Alimentação', 'Outros'];
   const catData = categories.map(cat => {
     const amount = monthlyOuts
-      .filter(t => t.category === cat)
-      .reduce((acc, t) => acc + t.amount, 0);
+      .filter(t => t.categoria === cat)
+      // Propriedade corrigida de amount para valor
+      .reduce((acc, t) => acc + t.valor, 0);
     const pct = totalMonthlyOut > 0 ? Math.round((amount / totalMonthlyOut) * 100) : 0;
     return { label: cat, amount, pct };
   });
@@ -123,8 +126,9 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions }) => {
           {verifiedTransactions.map((item) => (
             <div key={item.id} className="bg-white rounded-apple-2xl shadow-sm border border-gray-50 overflow-hidden group hover:shadow-xl transition-all duration-500">
               <div className="relative h-40 md:h-48 overflow-hidden bg-gray-100">
-                {item.proofImage ? (
-                  <img src={item.proofImage} alt={item.description} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                {/* Propriedade corrigida de proofImage para comprovante_url */}
+                {item.comprovante_url ? (
+                  <img src={item.comprovante_url} alt={item.descricao} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <FileText className="w-10 h-10 md:w-12 md:h-12 text-gray-300" />
@@ -132,7 +136,7 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions }) => {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4 md:p-6 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                   <button 
-                    onClick={() => item.proofImage && setLightboxImage(item.proofImage)}
+                    onClick={() => item.comprovante_url && setLightboxImage(item.comprovante_url)}
                     className="text-white text-[10px] md:text-xs font-bold flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full w-full justify-center hover:bg-white/30 transition-all border border-white/20"
                   >
                     <ImageIcon className="w-4 h-4" />
@@ -141,12 +145,12 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions }) => {
                 </div>
                 <div className="absolute top-3 left-3">
                   <span className="bg-white/90 backdrop-blur-sm text-ejn-teal text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-tighter shadow-sm border border-ejn-teal/10">
-                    {item.category}
+                    {item.categoria}
                   </span>
                 </div>
               </div>
               <div className="p-4 md:p-6">
-                <h4 className="font-bold text-gray-800 text-sm mb-1 leading-tight line-clamp-1">{item.description}</h4>
+                <h4 className="font-bold text-gray-800 text-sm mb-1 leading-tight line-clamp-1">{item.descricao}</h4>
                 <div className="flex items-center gap-2 text-[10px] text-apple-text-secondary font-medium uppercase tracking-widest">
                   <Calendar className="w-3 h-3" />
                   {new Date(item.date).toLocaleDateString('pt-BR')}
@@ -185,19 +189,21 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions }) => {
               {monthlyOuts.map((out) => (
                 <tr key={out.id} className="hover:bg-apple-gray/30 transition-all group">
                   <td className="px-8 py-5">
-                    <p className="font-bold text-gray-800 text-sm md:text-base">{out.description}</p>
-                    <p className="text-[10px] md:text-xs text-apple-text-secondary mt-0.5">{out.category} • {new Date(out.date).toLocaleDateString('pt-BR')}</p>
+                    <p className="font-bold text-gray-800 text-sm md:text-base">{out.descricao}</p>
+                    <p className="text-[10px] md:text-xs text-apple-text-secondary mt-0.5">{out.categoria} • {new Date(out.date).toLocaleDateString('pt-BR')}</p>
                   </td>
                   <td className="px-8 py-5 text-right font-bold text-gray-900 text-sm md:text-base whitespace-nowrap">
-                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(out.amount)}
+                    {/* Propriedade corrigida de amount para valor */}
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(out.valor)}
                   </td>
                   <td className="px-8 py-5 text-right">
                     <span className="text-[9px] md:text-[10px] text-green-600 font-black uppercase tracking-widest bg-green-50 px-2 py-1 rounded-full whitespace-nowrap">Verificado</span>
                   </td>
                   <td className="px-8 py-5 text-right">
                     <div className="flex justify-end gap-2">
-                      {out.proofImage && (
-                        <button onClick={() => setLightboxImage(out.proofImage!)} className="p-2 text-gray-300 hover:text-ejn-teal transition-colors"><ImageIcon className="w-4 h-4" /></button>
+                      {/* Propriedade corrigida de proofImage para comprovante_url */}
+                      {out.comprovante_url && (
+                        <button onClick={() => setLightboxImage(out.comprovante_url!)} className="p-2 text-gray-300 hover:text-ejn-teal transition-colors"><ImageIcon className="w-4 h-4" /></button>
                       )}
                       <button className="p-2 text-gray-300 hover:text-ejn-teal transition-colors"><Download className="w-4 h-4" /></button>
                     </div>

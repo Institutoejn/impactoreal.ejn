@@ -9,48 +9,46 @@ export interface NavItem {
   icon: React.ElementType;
 }
 
-export interface DonorData {
-  name: string;
-  impactCount: number;
-  totalInvested: number;
-}
-
-export interface Student {
+export interface Aluno {
   id: string;
-  name: string;
-  age: number;
-  neighborhood: string;
-  course: string;
+  nome: string;
+  idade: number;
+  bairro: string;
+  curso: string;
   status: 'active' | 'pending';
-  history: string;
-  image?: string; // New field for student photo
+  observacoes: string;
+  foto_url?: string;
 }
 
-export interface Project {
+export interface Projeto {
   id: string;
-  title: string;
-  description: string;
-  goal: number;
+  nome: string;
+  descricao: string;
+  meta_financeira: number;
   status: 'active' | 'finished';
-  image?: string;
+  capa_url?: string;
 }
 
-export interface Transaction {
+export interface Transacao {
   id: string;
-  date: string;
-  description: string;
-  category: 'Educação' | 'Infraestrutura' | 'Alimentação' | 'Doação' | 'Outros';
-  type: 'in' | 'out';
-  amount: number;
-  projectId?: string;
+  date: string; // Mantido como date ou convertido para created_at se preferir, mas usando o schema solicitado
+  descricao: string;
+  categoria: 'Educação' | 'Infraestrutura' | 'Alimentação' | 'Doação' | 'Outros';
+  tipo: 'in' | 'out';
+  valor: number;
+  projeto_id?: string;
   status?: 'pending' | 'confirmed';
-  proofImage?: string; // Field for transparency evidence
+  doador_email?: string;
+  comprovante_url?: string;
 }
 
-export interface Expense {
+export interface Perfil {
   id: string;
-  category: string;
-  amount: number;
-  date: string;
-  description: string;
+  email: string;
+  nome: string;
+  foto_url: string | null;
+  bio: string;
+  cargo: UserRole;
+  linkedin: string;
+  instagram: string;
 }
