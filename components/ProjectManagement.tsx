@@ -20,13 +20,23 @@ export const ProjectManagement: React.FC<ProjectManagementProps> = ({ projects, 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // QA: Validação preventiva
+    const parsedGoal = parseFloat(formData.goal);
+    if (!formData.title.trim() || isNaN(parsedGoal) || parsedGoal <= 0) {
+      alert("⚠️ O projeto deve ter um título e uma meta financeira positiva.");
+      return;
+    }
+
     onAddProject({
-      title: formData.title,
-      description: formData.description,
-      goal: parseFloat(formData.goal),
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      goal: parsedGoal,
       status: formData.status,
-      image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800' // Default placeholder
+      image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800'
     });
+    
+    // QA: Limpeza de 'Zumbis'
     setFormData({ title: '', description: '', goal: '', status: 'active' });
     setIsModalOpen(false);
   };
@@ -35,8 +45,8 @@ export const ProjectManagement: React.FC<ProjectManagementProps> = ({ projects, 
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex justify-between items-center mb-10">
         <div>
-          <h2 className="text-2xl font-bold text-ejn-teal">Portfólio de Projetos</h2>
-          <p className="text-apple-text-secondary">Crie e acompanhe metas de impacto social.</p>
+          <h2 className="text-2xl font-bold text-ejn-teal">Portfólio de Projetos Sociais</h2>
+          <p className="text-apple-text-secondary">Crie metas de impacto para mobilizar doadores.</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
@@ -80,7 +90,7 @@ export const ProjectManagement: React.FC<ProjectManagementProps> = ({ projects, 
         {projects.length === 0 && (
           <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-200 rounded-apple-2xl">
             <Rocket className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-            <p className="text-apple-text-secondary font-medium">Nenhum projeto cadastrado. Comece criando um novo.</p>
+            <p className="text-apple-text-secondary font-medium">Nenhum projeto cadastrado no Supabase.</p>
           </div>
         )}
       </div>
@@ -96,21 +106,21 @@ export const ProjectManagement: React.FC<ProjectManagementProps> = ({ projects, 
             </div>
             <form onSubmit={handleSubmit} className="p-8 space-y-6">
               <div>
-                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Nome do Projeto</label>
-                <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal focus:ring-0 outline-none transition-all shadow-sm border" placeholder="Ex: Capacitação Fullstack 2026" />
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Nome do Projeto *</label>
+                <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all shadow-sm border" placeholder="Ex: Capacitação Fullstack 2026" />
               </div>
               <div>
                 <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Descrição Curta</label>
-                <textarea required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal focus:ring-0 outline-none transition-all shadow-sm border h-24 resize-none" placeholder="O que este projeto pretende alcançar?" />
+                <textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all shadow-sm border h-24 resize-none" placeholder="O que este projeto pretende alcançar?" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Meta (R$)</label>
-                  <input required type="number" step="0.01" value={formData.goal} onChange={e => setFormData({...formData, goal: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal focus:ring-0 outline-none transition-all shadow-sm border" placeholder="0,00" />
+                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Meta (R$) *</label>
+                  <input required type="number" step="0.01" value={formData.goal} onChange={e => setFormData({...formData, goal: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all shadow-sm border" placeholder="0,00" />
                 </div>
                 <div>
                   <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Status Inicial</label>
-                  <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value as any})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal focus:ring-0 outline-none transition-all shadow-sm border appearance-none">
+                  <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value as any})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all shadow-sm border appearance-none">
                     <option value="active">Ativo</option>
                     <option value="finished">Finalizado</option>
                   </select>

@@ -42,12 +42,19 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // QA: Validação rigorosa no frontend antes de enviar ao Supabase
+    if (!formData.name.trim() || !formData.course) {
+      alert("Por favor, preencha o nome e o curso do aluno.");
+      return;
+    }
+
     const studentData = {
-      name: formData.name,
-      age: parseInt(formData.age),
-      neighborhood: formData.neighborhood,
+      name: formData.name.trim(),
+      age: parseInt(formData.age) || 0,
+      neighborhood: formData.neighborhood.trim() || 'Não informado',
       course: formData.course,
-      history: formData.history,
+      history: formData.history.trim(),
       image: formData.image
     };
 
@@ -56,6 +63,8 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
     } else {
       onAddStudent(studentData);
     }
+    
+    // QA: Limpeza de 'Zumbis' e fechamento de modal
     resetForm();
     setIsModalOpen(false);
   };
@@ -80,9 +89,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
   };
 
   const handleDelete = (student: Student) => {
-    if (window.confirm(`Tem certeza que deseja remover ${student.name}?`)) {
-      onDeleteStudent(student.id);
-    }
+    onDeleteStudent(student.id);
     setActiveMenuId(null);
   };
 
@@ -95,6 +102,10 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("⚠️ Arquivo muito grande. Limite de 2MB para o MVP.");
+        return;
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData({ ...formData, image: reader.result as string });
@@ -206,7 +217,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
         </div>
       </div>
 
-      {/* Cadastro Modal - Mobile Optimized */}
+      {/* Cadastro Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-300 overflow-y-auto">
           <div className="absolute inset-0 bg-black/20 backdrop-blur-md fixed" onClick={() => setIsModalOpen(false)} />
@@ -236,24 +247,23 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
                   <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
                 </div>
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-3">Foto do Aluno</p>
-                {formData.image && <button type="button" onClick={(e) => { e.stopPropagation(); setFormData({...formData, image: ''}) }} className="mt-1 text-[9px] text-red-400 font-bold uppercase hover:underline">Remover Foto</button>}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Nome Completo</label>
+                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Nome Completo *</label>
                   <input required type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all shadow-sm border" placeholder="Nome do jovem" />
                 </div>
                 <div>
                   <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Idade</label>
-                  <input required type="number" value={formData.age} onChange={(e) => setFormData({...formData, age: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all shadow-sm border" placeholder="Ex: 19" />
+                  <input type="number" value={formData.age} onChange={(e) => setFormData({...formData, age: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all shadow-sm border" placeholder="Ex: 19" />
                 </div>
                 <div>
                   <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Bairro</label>
-                  <input required type="text" value={formData.neighborhood} onChange={(e) => setFormData({...formData, neighborhood: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all shadow-sm border" placeholder="Localização" />
+                  <input type="text" value={formData.neighborhood} onChange={(e) => setFormData({...formData, neighborhood: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all shadow-sm border" placeholder="Localização" />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Curso / Trilha</label>
+                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Curso / Trilha *</label>
                   <select required value={formData.course} onChange={(e) => setFormData({...formData, course: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all shadow-sm border appearance-none">
                     <option value="">Selecione um curso</option>
                     <option value="UX/UI Design">UX/UI Design</option>
@@ -276,7 +286,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
         </div>
       )}
 
-      {/* History Modal - Mobile Optimized */}
+      {/* History Modal */}
       {isHistoryModalOpen && historyStudent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm fixed" onClick={() => setIsHistoryModalOpen(false)} />

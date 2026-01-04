@@ -31,6 +31,10 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Comprovante muito pesado. Máximo 5MB.");
+        return;
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData({ ...formData, proofImage: reader.result as string });
@@ -41,9 +45,17 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // QA: Validação financeira preventiva
+    const parsedAmount = parseFloat(formData.amount);
+    if (!formData.description.trim() || isNaN(parsedAmount) || parsedAmount <= 0) {
+      alert("Por favor, informe uma descrição válida e um valor maior que zero.");
+      return;
+    }
+
     onAddTransaction({
-      description: formData.description,
-      amount: parseFloat(formData.amount),
+      description: formData.description.trim(),
+      amount: parsedAmount,
       type: formData.type,
       category: formData.category,
       projectId: formData.type === 'in' ? formData.projectId : undefined,
@@ -51,7 +63,17 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
       status: 'confirmed',
       proofImage: formData.proofImage
     });
-    setFormData({ description: '', amount: '', type: 'out', category: 'Educação', projectId: '', date: new Date().toISOString().split('T')[0], proofImage: '' });
+    
+    // QA: Limpeza de 'Zumbis' e fechamento de modal
+    setFormData({ 
+      description: '', 
+      amount: '', 
+      type: 'out', 
+      category: 'Educação', 
+      projectId: '', 
+      date: new Date().toISOString().split('T')[0], 
+      proofImage: '' 
+    });
     setIsModalOpen(false);
   };
 
@@ -63,7 +85,7 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-700"><ArrowUpRight className="w-24 h-24" /></div>
           <p className="text-teal-100 text-[11px] font-bold uppercase tracking-widest mb-2">Saldo em Conta</p>
           <h3 className="text-3xl md:text-4xl font-black">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance)}</h3>
-          <p className="mt-4 text-[10px] text-teal-100/60 font-medium">Sincronizado em tempo real</p>
+          <p className="mt-4 text-[10px] text-teal-100/60 font-medium">Sincronizado via Supabase</p>
         </div>
 
         <div className="bg-white p-8 rounded-apple-2xl shadow-sm border border-gray-50 group">
@@ -83,12 +105,12 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
         </div>
       </div>
 
-      {/* Pending Donations Row (Grid adjust) */}
+      {/* Aguardando Validação */}
       {transactions.filter(t => t.status === 'pending').length > 0 && (
          <div className="animate-in slide-in-from-left-4 duration-500">
           <div className="flex items-center gap-2 mb-6 text-ejn-gold">
             <Clock className="w-5 h-5" />
-            <h3 className="text-xl font-bold">Aguardando Validação</h3>
+            <h3 className="text-xl font-bold">Aguardando Validação Financeira</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {transactions.filter(t => t.status === 'pending').map((t) => (
@@ -107,10 +129,10 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
         </div>
       )}
 
-      {/* Main Table */}
+      {/* Tabela de Fluxo de Caixa */}
       <div className="bg-white rounded-apple-2xl shadow-sm border border-gray-50 overflow-hidden font-sans">
         <div className="p-6 md:p-8 border-b border-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
-          <h3 className="text-xl font-bold text-ejn-teal w-full md:w-auto">Fluxo de Caixa</h3>
+          <h3 className="text-xl font-bold text-ejn-teal w-full md:w-auto">Fluxo de Caixa Consolidado</h3>
           <button onClick={() => setIsModalOpen(true)} className="w-full md:w-auto bg-ejn-gold text-white px-6 py-3 rounded-apple-lg font-bold hover:bg-[#D19900] transition-all flex items-center justify-center gap-2 shadow-lg shadow-ejn-gold/20 transform active:scale-95">
             <Plus className="w-5 h-5" />
             Novo Registro
@@ -143,7 +165,7 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
                   <td className="px-8 py-5 text-right">
                     {t.proofImage ? (
                       <div className="flex justify-end">
-                        <div className="w-8 h-8 rounded-lg overflow-hidden border border-gray-100 shadow-sm" title="Ver Comprovante">
+                        <div className="w-8 h-8 rounded-lg overflow-hidden border border-gray-100 shadow-sm">
                           <img src={t.proofImage} alt="Comprovante" className="w-full h-full object-cover" />
                         </div>
                       </div>
@@ -161,7 +183,7 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
         </div>
       </div>
 
-      {/* Movement Modal - Responsive */}
+      {/* Modal Nova Movimentação */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-300 overflow-y-auto">
           <div className="absolute inset-0 bg-black/20 backdrop-blur-md fixed" onClick={() => setIsModalOpen(false)} />
@@ -178,16 +200,16 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
               </div>
 
               <div className="space-y-4">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest px-1">Descrição</label>
+                <div>
+                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest px-1">Descrição *</label>
                   <input required type="text" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all shadow-sm border text-sm" placeholder="Ex: Material para Turma UX" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest px-1">Valor (R$)</label>
+                  <div>
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest px-1">Valor (R$) *</label>
                     <input required type="number" step="0.01" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all shadow-sm border text-sm" placeholder="0,00" />
                   </div>
-                  <div className="space-y-1">
+                  <div>
                     <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest px-1">Categoria</label>
                     <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value as any})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all shadow-sm border appearance-none text-sm">
                       {formData.type === 'in' ? <option value="Doação">Doação</option> : <><option value="Educação">Educação</option><option value="Infraestrutura">Infraestrutura</option><option value="Alimentação">Alimentação</option><option value="Outros">Outros</option></>}
@@ -197,7 +219,7 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
               </div>
 
               <div className="space-y-3">
-                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block px-1">Comprovante / Nota Fiscal</label>
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block px-1">Comprovante Digitalizado</label>
                 <div 
                   onClick={() => fileInputRef.current?.click()}
                   className="border-2 border-dashed border-gray-200 rounded-apple-lg p-6 flex flex-col items-center justify-center text-center hover:bg-apple-gray/50 transition-all cursor-pointer group bg-apple-gray/30 min-h-[140px]"
@@ -214,13 +236,11 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
                       <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                         <Upload className="w-6 h-6 text-gray-400 group-hover:text-ejn-teal transition-colors" />
                       </div>
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Selecione o arquivo</p>
-                      <p className="text-[10px] text-gray-300 mt-1">PNG, JPG ou PDF</p>
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Clique para enviar</p>
                     </>
                   )}
                 </div>
                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
-                {formData.proofImage && <button type="button" onClick={() => setFormData({...formData, proofImage: ''})} className="text-[10px] font-bold text-red-400 hover:text-red-500 uppercase flex items-center gap-1 mx-auto"><Trash2 className="w-3 h-3" />Limpar Seleção</button>}
               </div>
               
               <button type="submit" className="w-full bg-ejn-teal text-white py-4 rounded-apple-xl font-black text-lg shadow-xl hover:bg-[#004d45] transition-all transform active:scale-95 shadow-ejn-teal/20">Registrar Movimentação</button>

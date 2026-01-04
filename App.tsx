@@ -16,7 +16,7 @@ import { MyInvestments } from './components/MyInvestments';
 import { Projects } from './components/Projects';
 import { Transparency } from './components/Transparency';
 import { Profile } from './components/Profile';
-import { Bell, Search, Heart, Menu, Loader2, WifiOff } from 'lucide-react';
+import { Bell, Search, Heart, Menu, Loader2, WifiOff, CheckCircle2 } from 'lucide-react';
 import { UserRole, Student, Transaction, Project } from './types';
 import { supabase } from './supabase';
 
@@ -31,6 +31,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [connectionError, setConnectionError] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
   // App Data States
   const [students, setStudents] = useState<Student[]>([]);
@@ -41,14 +42,33 @@ const App: React.FC = () => {
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [userName, setUserName] = useState("Carregando...");
 
-  // 1. Verificação de Conexão e Busca de Dados
+  // Auxiliar: Mapeamento amigável de erros do Supabase/PostgreSQL
+  const handleSupabaseError = (error: any, context: string) => {
+    console.error(`Erro em ${context}:`, error);
+    if (error.code === '42501') {
+      alert(`⚠️ Acesso Negado: Você não tem permissão para ${context}. Apenas gestores autorizados podem realizar esta ação.`);
+    } else if (error.code === '23505') {
+      alert(`⚠️ Registro Duplicado: Este item já existe no banco de dados.`);
+    } else {
+      alert(`❌ Erro no Supabase: ${error.message || 'Falha na comunicação com o servidor.'}`);
+    }
+  };
+
+  const showSuccessFeedback = (msg: string) => {
+    setSuccessMessage(msg);
+    setTimeout(() => setSuccessMessage(null), 3000);
+  };
+
+  // 1. Verificação de Conexão Silenciosa e Busca de Dados
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     setConnectionError(false);
     try {
-      // Validar conexão básica
-      const { error: connCheck } = await supabase.from('projects').select('id').limit(1);
+      // Handshake inicial silencioso
+      const { data: test, error: connCheck } = await supabase.from('projects').select('id').limit(1);
       if (connCheck) throw connCheck;
+      
+      console.log("%c✓ Conexão estável com 'Impacto Real' (Supabase)", "color: #005F55; font-weight: bold;");
 
       const [stRes, trRes, prRes] = await Promise.all([
         supabase.from('students').select('*').order('name'),
@@ -60,7 +80,6 @@ const App: React.FC = () => {
       if (trRes.error) throw trRes.error;
       if (prRes.error) throw prRes.error;
 
-      // Mapeamento de Snake Case para Camel Case
       setStudents(stRes.data.map(s => ({
         id: s.id,
         name: s.name,
@@ -94,7 +113,7 @@ const App: React.FC = () => {
       })));
 
     } catch (err) {
-      console.error("Erro de sincronização Supabase:", err);
+      handleSupabaseError(err, "carregamento inicial");
       setConnectionError(true);
     } finally {
       setIsLoading(false);
@@ -108,17 +127,21 @@ const App: React.FC = () => {
   // 2. Sync Profile
   useEffect(() => {
     const fetchProfile = async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('role', role)
-        .maybeSingle();
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('role', role)
+          .maybeSingle();
 
-      if (data) {
-        setUserName(data.name || (role === 'manager' ? "Paulo Presidente" : "Carlos Eduardo"));
-        setProfilePhoto(data.profile_photo);
-      } else {
-        setUserName(role === 'manager' ? "Paulo Presidente" : "Carlos Eduardo");
+        if (data) {
+          setUserName(data.name || (role === 'manager' ? "Paulo Presidente" : "Carlos Eduardo"));
+          setProfilePhoto(data.profile_photo);
+        } else {
+          setUserName(role === 'manager' ? "Paulo Presidente" : "Carlos Eduardo");
+        }
+      } catch (err) {
+        console.warn("Aviso: Perfil não pôde ser carregado do Supabase.");
       }
     };
 
@@ -130,12 +153,16 @@ const App: React.FC = () => {
     setActiveTab('overview');
   };
 
-  // 3. Handlers de Dados (Supabase CRUD)
+  // 3. Handlers de Dados com Blindagem de QA
   
   const handleAddStudent = async (newStudent: Omit<Student, 'id' | 'status'>) => {
+    if (!newStudent.name || !newStudent.course) {
+      alert("⚠️ Campos obrigatórios ausentes: Nome e Curso.");
+      return;
+    }
     setIsSyncing(true);
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('students')
         .insert([{ 
           name: newStudent.name,
@@ -145,14 +172,13 @@ const App: React.FC = () => {
           history: newStudent.history,
           image: newStudent.image,
           status: 'active' 
-        }])
-        .select()
-        .single();
+        }]);
 
       if (error) throw error;
-      fetchData(); // Atualiza lista
+      showSuccessFeedback("Aluno cadastrado com sucesso!");
+      fetchData();
     } catch (err) {
-      alert("Erro ao salvar aluno. Verifique sua conexão.");
+      handleSupabaseError(err, "cadastrar aluno");
     } finally {
       setIsSyncing(false);
     }
@@ -175,32 +201,38 @@ const App: React.FC = () => {
         .eq('id', updatedStudent.id);
 
       if (error) throw error;
+      showSuccessFeedback("Dados do aluno atualizados.");
       fetchData();
     } catch (err) {
-      alert("Erro ao atualizar aluno.");
+      handleSupabaseError(err, "atualizar aluno");
     } finally {
       setIsSyncing(false);
     }
   };
 
   const handleDeleteStudent = async (id: string) => {
-    if (!window.confirm("Deseja realmente excluir este registro?")) return;
+    if (!window.confirm("Deseja realmente excluir este registro? Esta ação é irreversível no Supabase.")) return;
     setIsSyncing(true);
     try {
       const { error } = await supabase.from('students').delete().eq('id', id);
       if (error) throw error;
+      showSuccessFeedback("Aluno removido.");
       setStudents(prev => prev.filter(s => s.id !== id));
     } catch (err) {
-      alert("Não foi possível excluir o aluno.");
+      handleSupabaseError(err, "excluir aluno");
     } finally {
       setIsSyncing(false);
     }
   };
 
   const handleAddTransaction = async (newTr: Omit<Transaction, 'id'>) => {
+    if (!newTr.description || !newTr.amount) {
+      alert("⚠️ Dados financeiros incompletos.");
+      return;
+    }
     setIsSyncing(true);
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('transactions')
         .insert([{
           description: newTr.description,
@@ -211,14 +243,13 @@ const App: React.FC = () => {
           date: newTr.date,
           status: newTr.status || 'confirmed',
           proof_image: newTr.proofImage
-        }])
-        .select()
-        .single();
+        }]);
 
       if (error) throw error;
-      fetchData(); // Atualiza para recalcular progresso dos projetos
+      showSuccessFeedback("Transação registrada!");
+      fetchData();
     } catch (err) {
-      alert("Erro ao registrar transação financeira.");
+      handleSupabaseError(err, "registrar transação");
     } finally {
       setIsSyncing(false);
     }
@@ -229,9 +260,10 @@ const App: React.FC = () => {
     try {
       const { error } = await supabase.from('transactions').update({ status }).eq('id', id);
       if (error) throw error;
+      showSuccessFeedback("Status da doação atualizado.");
       fetchData();
     } catch (err) {
-      alert("Erro ao alterar status da transação.");
+      handleSupabaseError(err, "aprovar doação");
     } finally {
       setIsSyncing(false);
     }
@@ -242,15 +274,20 @@ const App: React.FC = () => {
     try {
       const { error } = await supabase.from('transactions').delete().eq('id', id);
       if (error) throw error;
+      showSuccessFeedback("Registro financeiro removido.");
       fetchData();
     } catch (err) {
-      alert("Erro ao excluir transação.");
+      handleSupabaseError(err, "excluir transação");
     } finally {
       setIsSyncing(false);
     }
   };
 
   const handleAddProject = async (newProj: Omit<Project, 'id'>) => {
+    if (!newProj.title || !newProj.goal) {
+      alert("⚠️ O projeto precisa de um título e uma meta financeira.");
+      return;
+    }
     setIsSyncing(true);
     try {
       const { error } = await supabase.from('projects').insert([{
@@ -261,23 +298,25 @@ const App: React.FC = () => {
         image: newProj.image
       }]);
       if (error) throw error;
+      showSuccessFeedback("Novo projeto lançado!");
       fetchData();
     } catch (err) {
-      alert("Erro ao criar projeto.");
+      handleSupabaseError(err, "criar projeto");
     } finally {
       setIsSyncing(false);
     }
   };
 
   const handleDeleteProject = async (id: string) => {
-    if (!window.confirm("Isso afetará os registros financeiros vinculados. Confirmar?")) return;
+    if (!window.confirm("Atenção: A exclusão de um projeto deixará as transações vinculadas sem referência. Confirmar?")) return;
     setIsSyncing(true);
     try {
       const { error } = await supabase.from('projects').delete().eq('id', id);
       if (error) throw error;
+      showSuccessFeedback("Projeto arquivado.");
       fetchData();
     } catch (err) {
-      alert("Erro ao excluir projeto.");
+      handleSupabaseError(err, "excluir projeto");
     } finally {
       setIsSyncing(false);
     }
@@ -314,10 +353,10 @@ const App: React.FC = () => {
   if (connectionError) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-apple-gray p-8 text-center">
-        <div className="bg-white p-12 rounded-apple-2xl shadow-xl max-w-md">
+        <div className="bg-white p-12 rounded-apple-2xl shadow-xl max-w-md animate-in zoom-in-95 duration-300">
           <WifiOff className="w-16 h-16 text-red-400 mx-auto mb-6" />
           <h2 className="text-2xl font-bold text-ejn-teal mb-4">Falha na Sincronização</h2>
-          <p className="text-apple-text-secondary mb-8">Não conseguimos conectar ao banco de dados do Instituto. Verifique sua conexão com a internet.</p>
+          <p className="text-apple-text-secondary mb-8">Não conseguimos conectar ao banco de dados do Instituto. Verifique sua conexão com a internet ou as chaves do Supabase.</p>
           <button onClick={fetchData} className="w-full bg-ejn-teal text-white py-4 rounded-apple-lg font-bold hover:bg-[#004d45] transition-all">Tentar Novamente</button>
         </div>
       </div>
@@ -338,12 +377,21 @@ const App: React.FC = () => {
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
       )}
 
-      {isSyncing && (
-        <div className="fixed top-6 right-6 z-[100] bg-white px-4 py-2 rounded-full shadow-lg border border-ejn-teal/10 flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
-          <Loader2 className="w-4 h-4 text-ejn-teal animate-spin" />
-          <span className="text-[10px] font-black text-ejn-teal uppercase tracking-widest">Sincronizando...</span>
-        </div>
-      )}
+      {/* Feedback de Sincronização e Sucesso */}
+      <div className="fixed top-6 right-6 z-[100] flex flex-col items-end gap-3 pointer-events-none">
+        {isSyncing && (
+          <div className="bg-white px-5 py-3 rounded-full shadow-2xl border border-ejn-teal/10 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-auto">
+            <Loader2 className="w-4 h-4 text-ejn-teal animate-spin" />
+            <span className="text-[10px] font-black text-ejn-teal uppercase tracking-widest">Gravando no Supabase...</span>
+          </div>
+        )}
+        {successMessage && (
+          <div className="bg-ejn-teal text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-auto">
+            <CheckCircle2 className="w-5 h-5 text-ejn-gold" />
+            <span className="text-xs font-bold uppercase tracking-tight">{successMessage}</span>
+          </div>
+        )}
+      </div>
 
       <Sidebar 
         activeId={activeTab} 
@@ -359,7 +407,7 @@ const App: React.FC = () => {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-[60vh] text-ejn-teal">
             <Loader2 className="w-12 h-12 animate-spin mb-4" />
-            <p className="font-black uppercase tracking-widest text-[10px]">Acessando Servidores EJN...</p>
+            <p className="font-black uppercase tracking-widest text-[10px]">Protegendo sua conexão...</p>
           </div>
         ) : (
           <>
