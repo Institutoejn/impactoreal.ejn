@@ -6,9 +6,9 @@ export const Footer: React.FC = () => {
     <footer className="bg-white border-t border-gray-100 py-16">
       <div className="max-w-6xl mx-auto px-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-3">
-            <span className="text-xl font-bold tracking-tighter font-poppins">
-              <span className="text-ejn-gold">Impacto Real</span> <span className="text-ejn-teal">IEJN</span>
+          <div className="flex items-center">
+            <span className="logo-text">
+              <span className="text-ejn-gold">Impacto Real</span> <span className="text-gray-900">IEJN</span>
             </span>
           </div>
           
@@ -21,13 +21,13 @@ export const Footer: React.FC = () => {
 
           <div className="flex gap-4">
             <button className="p-2 bg-apple-gray rounded-full text-gray-400 hover:text-ejn-teal transition-all">
-              <Instagram className="w-5 h-5" />
+              <Instagram className="w-4 h-4" />
             </button>
             <button className="p-2 bg-apple-gray rounded-full text-gray-400 hover:text-ejn-teal transition-all">
-              <Linkedin className="w-5 h-5" />
+              <Linkedin className="w-4 h-4" />
             </button>
             <button className="p-2 bg-apple-gray rounded-full text-gray-400 hover:text-ejn-teal transition-all">
-              <Globe className="w-5 h-5" />
+              <Globe className="w-4 h-4" />
             </button>
           </div>
         </div>

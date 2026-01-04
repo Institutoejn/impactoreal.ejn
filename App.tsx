@@ -146,7 +146,7 @@ const App: React.FC = () => {
     }
   };
 
-  if (isAppLoading) return <div className="min-h-screen bg-white flex items-center justify-center"><Loader2 className="w-12 h-12 text-ejn-teal animate-spin" /></div>;
+  if (isAppLoading) return <div className="min-h-screen bg-white flex items-center justify-center"><Loader2 className="w-10 h-10 text-ejn-teal animate-spin" /></div>;
 
   if (!session) return <><LandingPage onStart={() => setShowLogin(true)} />{showLogin && <LoginForm onClose={() => setShowLogin(false)} />}</>;
 
@@ -173,24 +173,24 @@ const App: React.FC = () => {
         onLogout={handleLogout} 
       />
 
-      <main className="flex-1 min-w-0 lg:ml-72 p-6 md:p-16 overflow-y-auto">
-        <header className="flex flex-col md:flex-row md:justify-between md:items-start mb-12 gap-6">
-          <div className="lg:hidden"><button onClick={() => setIsSidebarOpen(true)} className="p-3 text-ejn-teal bg-white rounded-xl shadow-sm"><Menu /></button></div>
+      <main className="flex-1 min-w-0 lg:ml-72 p-6 md:p-20 overflow-y-auto">
+        <header className="flex flex-col md:flex-row md:justify-between md:items-start mb-16 gap-6">
+          <div className="lg:hidden"><button onClick={() => setIsSidebarOpen(true)} className="p-2.5 text-ejn-teal bg-white rounded-lg shadow-sm"><Menu /></button></div>
           <div className="flex-1">
-            <h1 className="text-4xl md:text-5xl font-black text-ejn-teal font-poppins tracking-tighter">
+            <h1 className="text-2xl md:text-3xl font-bold text-ejn-teal font-poppins tracking-tight">
               {role === 'gestor' ? `Gestão estratégica.` : `Seu impacto, ${profileData.nome?.split(' ')[0]}.`}
             </h1>
-            <p className="text-apple-text-secondary font-extralight tracking-wide text-lg mt-2 opacity-70">
+            <p className="text-apple-text-secondary font-extralight tracking-wide text-base mt-1.5 opacity-70">
               {role === 'gestor' ? "A ética da execução." : "Mudando amanhãs, hoje."}
             </p>
           </div>
         </header>
 
-        <div className="max-w-6xl mx-auto pb-32">
+        <div className="max-w-5xl mx-auto pb-32">
           {activeTab === 'overview' && role === 'doador' && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
               <ImpactHero impactCount={impactCount} totalInvested={totalInvested} />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
                 <TransparencyCard transactions={transacoes} onNavigate={setActiveTab} />
                 <FeaturedProject 
                   projects={projetos} 
@@ -249,5 +249,4 @@ const App: React.FC = () => {
   );
 };
 
-// Fix: Adicionando export default para o componente App para resolver erro de importação no index.tsx
 export default App;
