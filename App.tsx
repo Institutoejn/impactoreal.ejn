@@ -16,7 +16,7 @@ import { MyInvestments } from './components/MyInvestments';
 import { Projects } from './components/Projects';
 import { Transparency } from './components/Transparency';
 import { Profile } from './components/Profile';
-import { Menu, Loader2, CheckCircle2, CloudLightning, LogOut } from 'lucide-react';
+import { Menu, Loader2 } from 'lucide-react';
 import { UserRole, Aluno, Transacao, Projeto } from './types';
 import { supabase } from './supabase';
 
@@ -32,7 +32,6 @@ const App: React.FC = () => {
   
   const [isLoading, setIsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [transacoes, setTransacoes] = useState<Transacao[]>([]);
@@ -41,17 +40,10 @@ const App: React.FC = () => {
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [userName, setUserName] = useState("Membro EJN");
 
-  const showSuccessFeedback = (msg: string) => {
-    setSuccessMessage(msg);
-    setTimeout(() => setSuccessMessage(null), 4000);
-  };
-
   const syncMasterRole = async (userId: string) => {
     try {
-      // Força a atualização do cargo no banco para garantir que o RLS funcione
       const { data, error } = await supabase.from('perfis').select('cargo').eq('id', userId).single();
       if (error && error.code === 'PGRST116') {
-        // Se o perfil não existe, cria como gestor (já que é o e-mail mestre)
         await supabase.from('perfis').insert([{ 
           id: userId, 
           email: MASTER_MANAGER_EMAIL, 
@@ -62,7 +54,7 @@ const App: React.FC = () => {
         await supabase.from('perfis').update({ cargo: 'gestor' }).eq('id', userId);
       }
     } catch (e) {
-      console.error("Erro Crítico no Sync do Cargo:", e);
+      console.error("Erro no Sync do Cargo:", e);
     }
   };
 
@@ -146,10 +138,9 @@ const App: React.FC = () => {
         status: 'active' 
       }]);
       if (error) throw error;
-      showSuccessFeedback("Aluno cadastrado!");
       fetchData(true);
     } catch (err: any) {
-      alert(`Erro Supabase: ${err.message}`);
+      alert(`Erro no Cadastro: ${err.message}`);
     } finally {
       setIsSyncing(false);
     }
@@ -167,10 +158,9 @@ const App: React.FC = () => {
         capa_url: p.capa_url
       }]);
       if (error) throw error;
-      showSuccessFeedback("Projeto social lançado!");
       fetchData(true);
     } catch (err: any) {
-      alert(`Erro Supabase: ${err.message}`);
+      alert(`Erro no Projeto: ${err.message}`);
     } finally {
       setIsSyncing(false);
     }
@@ -184,24 +174,24 @@ const App: React.FC = () => {
         valor: newTr.valor,
         tipo: newTr.tipo,
         categoria: newTr.categoria,
-        projeto_id: newTr.projeto_id,
-        status: newTr.status || 'confirmed',
-        comprovante_url: newTr.comprovante_url,
-        doador_email: session.user.email
+        projeto_id: newTr.projeto_id || null,
+        status: newTr.status,
+        doador_email: session.user.email,
+        comprovante_url: newTr.comprovante_url || null
       }]);
       
       if (error) {
         if (error.code === '42501') {
-          const userType = role === 'gestor' ? 'Presidente (Gestor)' : 'Doador';
-          throw new Error(`Permissão Negada: O banco de dados bloqueou a gravação para o perfil '${userType}'. Isso ocorre quando o SQL de segurança (RLS) no Supabase não reconhece seu cargo ou está incompleto. Verifique o painel SQL do Supabase.`);
+          throw new Error("Erro de Permissão (RLS): O banco de dados bloqueou a gravação. Verifique se o SQL de segurança para Gestores foi aplicado corretamente no Supabase.");
         }
         throw error;
       }
-      showSuccessFeedback("Fluxo registrado com sucesso!");
+      
+      alert('Movimentação registrada com sucesso no Instituto EJN!');
       fetchData(true);
       return true;
     } catch (err: any) {
-      alert(`Erro Crítico de Segurança: ${err.message}`);
+      alert(`Falha no Registro Financeiro: ${err.message}`);
       return false;
     } finally {
       setIsSyncing(false);
@@ -213,7 +203,7 @@ const App: React.FC = () => {
     setIsSyncing(true);
     const { error } = await supabase.from('transacoes').update({ status }).eq('id', id);
     if (error) alert(`Erro: ${error.message}`);
-    else { showSuccessFeedback("Status validado!"); fetchData(true); }
+    else fetchData(true);
   };
 
   if (isAppLoading) return <div className="min-h-screen bg-white flex items-center justify-center"><Loader2 className="w-12 h-12 text-ejn-teal animate-spin" /></div>;
