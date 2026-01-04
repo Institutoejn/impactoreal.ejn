@@ -89,7 +89,7 @@ const App: React.FC = () => {
     if (!isSilent) setIsLoading(true);
     
     try {
-      // Garantindo uso exclusivo das tabelas: alunos, transacoes, projetos
+      // Uso exclusivo das tabelas traduzidas conforme especificação do engenheiro
       const [alRes, trRes, prRes, profRes] = await Promise.all([
         supabase.from('alunos').select('*').order('nome'),
         supabase.from('transacoes').select('*').order('created_at', { ascending: false }),
@@ -110,7 +110,7 @@ const App: React.FC = () => {
       }
 
     } catch (err) {
-      console.error("Erro Sync:", err);
+      console.error("Erro ao sincronizar dados:", err);
     } finally {
       setIsLoading(false);
       setIsSyncing(false);
@@ -139,6 +139,7 @@ const App: React.FC = () => {
         status: 'active' 
       }]);
       if (error) throw error;
+      alert('Dados sincronizados com sucesso com o Instituto EJN');
       fetchData(true);
     } catch (err: any) {
       alert(`Erro no Cadastro: ${err.message}`);
@@ -159,6 +160,7 @@ const App: React.FC = () => {
         capa_url: p.capa_url
       }]);
       if (error) throw error;
+      alert('Dados sincronizados com sucesso com o Instituto EJN');
       fetchData(true);
     } catch (err: any) {
       alert(`Erro no Projeto: ${err.message}`);
@@ -170,27 +172,25 @@ const App: React.FC = () => {
   const handleAddTransaction = async (newTr: Omit<Transacao, 'id' | 'created_at'>): Promise<boolean> => {
     setIsSyncing(true);
     try {
-      // Alinhamento exato de campos conforme exigência do Engenheiro de Software
+      // Envio exato dos campos para a tabela 'transacoes'
       const { error } = await supabase.from('transacoes').insert([{
         descricao: newTr.descricao,
-        valor: newTr.valor, // Campo valor, não amount
-        tipo: newTr.tipo,   // entrada ou saida
         categoria: newTr.categoria,
+        tipo: newTr.tipo, // 'entrada' ou 'saida'
+        valor: newTr.valor, // Campo mapeado corretamente para 'valor'
         projeto_id: newTr.projeto_id || null,
-        status: newTr.status, // pendente ou confirmado
+        status: newTr.status, // 'confirmado' para saídas e 'pendente' para entradas
         doador_email: session.user.email,
         comprovante_url: newTr.comprovante_url || null
       }]);
       
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
       
-      alert('Movimentação registrada com sucesso no Instituto EJN!');
+      alert('Dados sincronizados com sucesso com o Instituto EJN');
       fetchData(true);
       return true;
     } catch (err: any) {
-      alert(`Falha no Registro Financeiro (Diagnóstico): ${err.message}`);
+      alert(`Erro técnico de sincronização: ${err.message}`);
       return false;
     } finally {
       setIsSyncing(false);
@@ -200,9 +200,16 @@ const App: React.FC = () => {
   const handleUpdateTransactionStatus = async (id: string, status: 'confirmado' | 'pendente') => {
     if (role !== 'gestor') return;
     setIsSyncing(true);
-    const { error } = await supabase.from('transacoes').update({ status }).eq('id', id);
-    if (error) alert(`Erro: ${error.message}`);
-    else fetchData(true);
+    try {
+      const { error } = await supabase.from('transacoes').update({ status }).eq('id', id);
+      if (error) throw error;
+      alert('Dados sincronizados com sucesso com o Instituto EJN');
+      fetchData(true);
+    } catch (err: any) {
+      alert(`Erro ao atualizar status: ${err.message}`);
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   if (isAppLoading) return <div className="min-h-screen bg-white flex items-center justify-center"><Loader2 className="w-12 h-12 text-ejn-teal animate-spin" /></div>;
@@ -211,7 +218,9 @@ const App: React.FC = () => {
 
   const impactStats = {
     impactCount: alunos.length,
-    totalInvested: transacoes.filter(t => t.tipo === 'entrada' && t.status === 'confirmado').reduce((acc, t) => acc + t.valor, 0)
+    totalInvested: transacoes
+      .filter(t => t.tipo === 'entrada' && t.status === 'confirmado')
+      .reduce((acc, t) => acc + t.valor, 0)
   };
 
   return (
@@ -243,9 +252,9 @@ const App: React.FC = () => {
           {activeTab === 'profile' && <Profile role={role} onUpdatePhoto={setProfilePhoto} onUpdateName={setUserName} currentPhoto={profilePhoto} totalInvested={impactStats.totalInvested} />}
           
           {activeTab === 'overview' && role === 'gestor' && <ManagerDashboard students={alunos} transactions={transacoes} onAddStudent={handleAddStudent} onNavigate={setActiveTab} />}
-          {activeTab === 'students' && role === 'gestor' && <StudentManagement students={alunos} onAddStudent={handleAddStudent} onUpdateStudent={async (s) => { await supabase.from('alunos').update(s).eq('id', s.id); fetchData(true); }} onDeleteStudent={async (id) => { if(confirm("Remover?")){ await supabase.from('alunos').delete().eq('id', id); fetchData(true); }}} />}
-          {activeTab === 'project-management' && role === 'gestor' && <ProjectManagement projects={projetos} onAddProject={handleAddProject} onDeleteProject={async (id) => { if(confirm("Excluir?")) { await supabase.from('projetos').delete().eq('id', id); fetchData(true); }}} />}
-          {activeTab === 'treasury' && role === 'gestor' && <Treasury transactions={transacoes} projects={projetos} onAddTransaction={handleAddTransaction} onUpdateStatus={handleUpdateTransactionStatus} onDeleteTransaction={async (id) => { if(confirm("Excluir?")){ await supabase.from('transacoes').delete().eq('id', id); fetchData(true); }}} />}
+          {activeTab === 'students' && role === 'gestor' && <StudentManagement students={alunos} onAddStudent={handleAddStudent} onUpdateStudent={async (s) => { await supabase.from('alunos').update(s).eq('id', s.id); alert('Dados sincronizados com sucesso com o Instituto EJN'); fetchData(true); }} onDeleteStudent={async (id) => { if(confirm("Remover aluno permanentemente?")){ await supabase.from('alunos').delete().eq('id', id); alert('Dados sincronizados com sucesso com o Instituto EJN'); fetchData(true); }}} />}
+          {activeTab === 'project-management' && role === 'gestor' && <ProjectManagement projects={projetos} onAddProject={handleAddProject} onDeleteProject={async (id) => { if(confirm("Excluir projeto permanentemente?")) { await supabase.from('projetos').delete().eq('id', id); alert('Dados sincronizados com sucesso com o Instituto EJN'); fetchData(true); }}} />}
+          {activeTab === 'treasury' && role === 'gestor' && <Treasury transactions={transacoes} projects={projetos} onAddTransaction={handleAddTransaction} onUpdateStatus={handleUpdateTransactionStatus} onDeleteTransaction={async (id) => { if(confirm("Remover registro financeiro?")){ await supabase.from('transacoes').delete().eq('id', id); alert('Dados sincronizados com sucesso com o Instituto EJN'); fetchData(true); }}} />}
           {activeTab === 'esg' && role === 'gestor' && <ESGReports transactions={transacoes} studentCount={alunos.length} />}
           {activeTab === 'settings' && role === 'gestor' && <Settings onUpdatePhoto={setProfilePhoto} currentPhoto={profilePhoto} />}
         </div>

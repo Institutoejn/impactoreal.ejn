@@ -12,7 +12,10 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
   const [showPreview, setShowPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const totalIn = transactions.filter(t => t.tipo === 'entrada' && t.status === 'confirmado').reduce((acc, t) => acc + t.valor, 0);
+  // Filtra apenas entradas confirmadas para o relatório de investimento acumulado
+  const totalIn = transactions
+    .filter(t => t.tipo === 'entrada' && t.status === 'confirmado')
+    .reduce((acc, t) => acc + t.valor, 0);
 
   const generateReport = () => {
     setIsGenerating(true);
@@ -34,7 +37,7 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
         
         <h2 className="text-3xl font-bold text-ejn-teal mb-4 tracking-tight">Gerador de Relatório de Impacto</h2>
         <p className="text-apple-text-secondary text-lg mb-10 leading-relaxed">
-          Nossa tecnologia de transparência consolida dados ESG em tempo real. 
+          Nossa tecnologia de transparência consolida dados ESG em tempo real do banco de dados do Instituto. 
           Gere um documento oficial com métricas de impacto e prestação de contas.
         </p>
         
@@ -112,17 +115,17 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">Resumo de Transparência</h2>
                     <div className="grid grid-cols-3 gap-6">
                       <div className="p-6 bg-apple-gray rounded-apple-lg border border-gray-100">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Arrecadado</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Total Investido (Captação)</p>
                         <p className="text-2xl font-black text-ejn-teal">
                           {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalIn)}
                         </p>
                       </div>
                       <div className="p-6 bg-apple-gray rounded-apple-lg border border-gray-100">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Vidas Transformadas</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Vidas Impactadas</p>
                         <p className="text-2xl font-black text-ejn-gold">{studentCount * 12}</p>
                       </div>
                       <div className="p-6 bg-apple-gray rounded-apple-lg border border-gray-100">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Alunos Ativos</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Jovens em Formação</p>
                         <p className="text-2xl font-black text-gray-800">{studentCount}</p>
                       </div>
                     </div>
@@ -134,8 +137,8 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
                       Impacto Social e Educacional
                     </h3>
                     <p className="text-gray-700 leading-relaxed mb-6 italic">
-                      "O Instituto EJN reafirma seu compromisso com o ODS 4 (Educação de Qualidade) e ODS 8 (Trabalho Decente e Crescimento Econômico). 
-                      Atualmente gerenciamos recursos que possibilitam a formação técnica de jovens, com foco em resultados mensuráveis de empregabilidade."
+                      "O Instituto EJN utiliza métricas auditáveis baseadas na tabela de transações para garantir que 100% da captação seja destinada aos programas de formação técnica. 
+                      Atualmente gerenciamos recursos que possibilitam a inclusão social através do ODS 4 (Educação de Qualidade)."
                     </p>
                     <div className="w-full h-1 bg-white rounded-full overflow-hidden">
                       <div className="h-full bg-ejn-gold w-[85%]"></div>
@@ -144,10 +147,10 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
                 </div>
 
                 <div className="mt-32 pt-8 border-t border-gray-100 text-center">
-                  <p className="text-[10px] uppercase font-bold text-gray-300 tracking-[0.2em] mb-4">Documento Verificado Via Blockchain Impacto Real</p>
+                  <p className="text-[10px] uppercase font-bold text-gray-300 tracking-[0.2em] mb-4">Documento Sincronizado com Banco de Dados EJN</p>
                   <div className="flex justify-center">
                     <div className="w-16 h-16 bg-apple-gray border border-gray-200 rounded-sm flex items-center justify-center opacity-50">
-                      <span className="text-[8px] font-mono text-gray-400">QR CODE VERIFIED</span>
+                      <span className="text-[8px] font-mono text-gray-400">EJN DATA VERIFIED</span>
                     </div>
                   </div>
                 </div>

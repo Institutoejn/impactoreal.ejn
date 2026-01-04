@@ -31,7 +31,9 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Regra de Negócio: Entradas de Pix são 'pendente', Saídas diretas são 'confirmado'
+    // Regra de Negócio solicitada:
+    // Saídas diretas da tesouraria são 'confirmado'
+    // Entradas via formulário são 'pendente' para conferência de Pix/Doc
     const defaultStatus = formData.tipo === 'entrada' ? 'pendente' : 'confirmado';
 
     const success = await onAddTransaction({
@@ -46,7 +48,15 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
 
     if (success) {
       setIsModalOpen(false);
-      setFormData({ descricao: '', valor: '', tipo: 'saida', categoria: 'Educação', projeto_id: '', comprovante_url: '' });
+      // Limpeza do formulário após sucesso conforme especificação
+      setFormData({ 
+        descricao: '', 
+        valor: '', 
+        tipo: 'saida', 
+        categoria: 'Educação', 
+        projeto_id: '', 
+        comprovante_url: '' 
+      });
     }
   };
 
