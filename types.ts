@@ -31,13 +31,13 @@ export interface Projeto {
 
 export interface Transacao {
   id: string;
-  created_at: string; // Alinhado com a coluna real do Supabase
+  created_at: string;
   descricao: string;
   categoria: 'Educação' | 'Infraestrutura' | 'Alimentação' | 'Doação' | 'Outros';
-  tipo: 'in' | 'out';
+  tipo: 'entrada' | 'saida';
   valor: number;
   projeto_id?: string;
-  status?: 'pending' | 'confirmed';
+  status?: 'pendente' | 'confirmado';
   doador_email?: string;
   comprovante_url?: string;
 }

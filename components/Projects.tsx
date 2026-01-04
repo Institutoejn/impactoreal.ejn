@@ -9,7 +9,7 @@ import QRious from 'qrious';
 interface ProjectsProps {
   projects: Projeto[];
   transactions: Transacao[];
-  onDonate: (projectId: string, amount: number) => Promise<boolean>; // Mudou para Promise
+  onDonate: (projectId: string, amount: number) => Promise<boolean>;
 }
 
 // --- UTILITÁRIOS PIX ---
@@ -75,8 +75,8 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
   const getProgressForProject = (project: Projeto) => {
     const reached = transactions
       .filter(t => 
-        t.tipo === 'in' && 
-        t.status !== 'pending' &&
+        t.tipo === 'entrada' && 
+        t.status === 'confirmado' &&
         (t.projeto_id === project.id || t.descricao.toLowerCase().includes(project.nome.toLowerCase()))
       )
       .reduce((acc, t) => acc + t.valor, 0);
@@ -87,8 +87,8 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
   const getAmountReached = (project: Projeto) => {
     return transactions
       .filter(t => 
-        t.tipo === 'in' && 
-        t.status !== 'pending' &&
+        t.tipo === 'entrada' && 
+        t.status === 'confirmado' &&
         (t.projeto_id === project.id || t.descricao.toLowerCase().includes(project.nome.toLowerCase()))
       )
       .reduce((acc, t) => acc + t.valor, 0);
@@ -175,7 +175,7 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
                   <div className="mt-auto space-y-4">
                     <div className="flex justify-between items-end">
                       <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Status da Meta</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Impacto Verificado</p>
                         <p className="font-bold text-ejn-teal text-base md:text-lg">
                           {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(reachedAmount)}
                         </p>
@@ -211,7 +211,6 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
         </div>
       )}
 
-      {/* Donation Modal */}
       {selectedProject && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-white/40 backdrop-blur-xl fixed" onClick={() => !showSuccess && !isSubmitting && setSelectedProject(null)} />

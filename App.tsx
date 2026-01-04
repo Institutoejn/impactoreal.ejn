@@ -89,6 +89,7 @@ const App: React.FC = () => {
     if (!isSilent) setIsLoading(true);
     
     try {
+      // Garantindo uso exclusivo das tabelas: alunos, transacoes, projetos
       const [alRes, trRes, prRes, profRes] = await Promise.all([
         supabase.from('alunos').select('*').order('nome'),
         supabase.from('transacoes').select('*').order('created_at', { ascending: false }),
@@ -169,21 +170,19 @@ const App: React.FC = () => {
   const handleAddTransaction = async (newTr: Omit<Transacao, 'id' | 'created_at'>): Promise<boolean> => {
     setIsSyncing(true);
     try {
+      // Alinhamento exato de campos conforme exigência do Engenheiro de Software
       const { error } = await supabase.from('transacoes').insert([{
         descricao: newTr.descricao,
-        valor: newTr.valor,
-        tipo: newTr.tipo,
+        valor: newTr.valor, // Campo valor, não amount
+        tipo: newTr.tipo,   // entrada ou saida
         categoria: newTr.categoria,
         projeto_id: newTr.projeto_id || null,
-        status: newTr.status,
+        status: newTr.status, // pendente ou confirmado
         doador_email: session.user.email,
         comprovante_url: newTr.comprovante_url || null
       }]);
       
       if (error) {
-        if (error.code === '42501') {
-          throw new Error("Erro de Permissão (RLS): O banco de dados bloqueou a gravação. Verifique se o SQL de segurança para Gestores foi aplicado corretamente no Supabase.");
-        }
         throw error;
       }
       
@@ -191,14 +190,14 @@ const App: React.FC = () => {
       fetchData(true);
       return true;
     } catch (err: any) {
-      alert(`Falha no Registro Financeiro: ${err.message}`);
+      alert(`Falha no Registro Financeiro (Diagnóstico): ${err.message}`);
       return false;
     } finally {
       setIsSyncing(false);
     }
   };
 
-  const handleUpdateTransactionStatus = async (id: string, status: 'confirmed' | 'pending') => {
+  const handleUpdateTransactionStatus = async (id: string, status: 'confirmado' | 'pendente') => {
     if (role !== 'gestor') return;
     setIsSyncing(true);
     const { error } = await supabase.from('transacoes').update({ status }).eq('id', id);
@@ -212,7 +211,7 @@ const App: React.FC = () => {
 
   const impactStats = {
     impactCount: alunos.length,
-    totalInvested: transacoes.filter(t => t.tipo === 'in' && t.status === 'confirmed').reduce((acc, t) => acc + t.valor, 0)
+    totalInvested: transacoes.filter(t => t.tipo === 'entrada' && t.status === 'confirmado').reduce((acc, t) => acc + t.valor, 0)
   };
 
   return (
@@ -239,7 +238,7 @@ const App: React.FC = () => {
             </div>
           )}
           {activeTab === 'investments' && role === 'doador' && <MyInvestments transactions={transacoes} totalInvested={impactStats.totalInvested} />}
-          {activeTab === 'projects' && role === 'doador' && <Projects projects={projetos} transactions={transacoes} onDonate={(pid, amt) => handleAddTransaction({ descricao: 'Doação Realizada', valor: amt, tipo: 'in', categoria: 'Doação', projeto_id: pid, status: 'pending' })} />}
+          {activeTab === 'projects' && role === 'doador' && <Projects projects={projetos} transactions={transacoes} onDonate={(pid, amt) => handleAddTransaction({ descricao: 'Doação Realizada', valor: amt, tipo: 'entrada', categoria: 'Doação', projeto_id: pid, status: 'pendente' })} />}
           {activeTab === 'transparency' && role === 'doador' && <Transparency transactions={transacoes} />}
           {activeTab === 'profile' && <Profile role={role} onUpdatePhoto={setProfilePhoto} onUpdateName={setUserName} currentPhoto={profilePhoto} totalInvested={impactStats.totalInvested} />}
           

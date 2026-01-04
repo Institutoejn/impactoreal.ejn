@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { FileBarChart, Download, Sparkles, Heart, Globe, Printer, Share2, X } from 'lucide-react';
-// Importação corrigida para Transacao
 import { Transacao } from '../types';
 
 interface ESGReportsProps {
@@ -13,8 +12,7 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
   const [showPreview, setShowPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Corrigido: usando 'tipo' em vez de 'type' conforme definido em types.ts
-  const totalIn = transactions.filter(t => t.tipo === 'in').reduce((acc, t) => acc + t.valor, 0);
+  const totalIn = transactions.filter(t => t.tipo === 'entrada' && t.status === 'confirmado').reduce((acc, t) => acc + t.valor, 0);
 
   const generateReport = () => {
     setIsGenerating(true);
@@ -63,7 +61,6 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
         </button>
       </div>
 
-      {/* Report Preview Overlay */}
       {showPreview && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10 animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowPreview(false)} />
@@ -92,10 +89,8 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
               </div>
             </div>
 
-            {/* Document Preview Area */}
             <div className="flex-1 overflow-y-auto p-12 bg-gray-50/50">
               <div className="max-w-3xl mx-auto bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] rounded-sm p-16 min-h-[1000px] text-gray-800 font-serif">
-                {/* PDF Header */}
                 <div className="flex justify-between items-start border-b-2 border-ejn-teal pb-10 mb-12 font-sans">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-ejn-teal rounded-xl flex items-center justify-center">
@@ -112,13 +107,12 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
                   </div>
                 </div>
 
-                {/* PDF Body */}
                 <div className="space-y-12 font-sans">
                   <section>
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">Resumo de Transparência</h2>
                     <div className="grid grid-cols-3 gap-6">
                       <div className="p-6 bg-apple-gray rounded-apple-lg border border-gray-100">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Total Arrecadado</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Arrecadado</p>
                         <p className="text-2xl font-black text-ejn-teal">
                           {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalIn)}
                         </p>
@@ -147,25 +141,8 @@ export const ESGReports: React.FC<ESGReportsProps> = ({ transactions, studentCou
                       <div className="h-full bg-ejn-gold w-[85%]"></div>
                     </div>
                   </section>
-
-                  <section>
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Métricas de Transparência</h3>
-                    <div className="space-y-3">
-                      {[
-                        { item: 'Educação & Mentoria', pct: '45%' },
-                        { item: 'Infraestrutura Tecnológica', pct: '30%' },
-                        { item: 'Inclusão Digital & Auxílio', pct: '25%' }
-                      ].map((d, i) => (
-                        <div key={i} className="flex items-center justify-between py-3 border-b border-gray-100">
-                          <span className="font-medium">{d.item}</span>
-                          <span className="font-bold text-ejn-teal">{d.pct}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </section>
                 </div>
 
-                {/* PDF Footer */}
                 <div className="mt-32 pt-8 border-t border-gray-100 text-center">
                   <p className="text-[10px] uppercase font-bold text-gray-300 tracking-[0.2em] mb-4">Documento Verificado Via Blockchain Impacto Real</p>
                   <div className="flex justify-center">

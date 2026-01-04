@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { ArrowRight, Star } from 'lucide-react';
-// Importação corrigida para Transacao
 import { Transacao } from '../types';
 
 interface FeaturedProjectProps {
@@ -10,10 +9,8 @@ interface FeaturedProjectProps {
 
 export const FeaturedProject: React.FC<FeaturedProjectProps> = ({ transactions }) => {
   const goal = 50000;
-  // Corrigido: usando 'tipo' em vez de 'type' conforme definido em types.ts
   const reached = transactions
-    .filter(t => t.tipo === 'in' && (t.categoria === 'Doação' || t.descricao.includes('Líderes')))
-    // Propriedade corrigida de amount para valor
+    .filter(t => t.tipo === 'entrada' && t.status === 'confirmado' && (t.categoria === 'Doação' || t.descricao.toLowerCase().includes('líderes')))
     .reduce((acc, t) => acc + t.valor, 0);
   
   const progress = Math.min(Math.round((reached / goal) * 100), 100);
@@ -45,7 +42,7 @@ export const FeaturedProject: React.FC<FeaturedProjectProps> = ({ transactions }
             <span className="text-xs font-bold text-gray-400 uppercase">Progresso da Meta</span>
             <span className="text-xs font-bold text-ejn-gold">{progress}%</span>
           </div>
-          <div className="w-full h-2 bg-gray-100 rounded-full mb-8 overflow-hidden">
+          <div className="w-full h-2 bg-apple-gray rounded-full mb-8 overflow-hidden">
             <div className="h-full bg-ejn-gold rounded-full transition-all duration-1000" style={{ width: `${progress}%` }}></div>
           </div>
 

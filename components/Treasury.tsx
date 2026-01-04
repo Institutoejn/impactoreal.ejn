@@ -7,7 +7,7 @@ interface TreasuryProps {
   transactions: Transacao[];
   projects: Projeto[];
   onAddTransaction: (transaction: Omit<Transacao, 'id' | 'created_at'>) => Promise<boolean>;
-  onUpdateStatus: (id: string, status: 'confirmed' | 'pending') => void;
+  onUpdateStatus: (id: string, status: 'confirmado' | 'pendente') => void;
   onDeleteTransaction: (id: string) => void;
 }
 
@@ -17,23 +17,22 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
   const [formData, setFormData] = useState({
     descricao: '',
     valor: '',
-    tipo: 'out' as 'in' | 'out',
+    tipo: 'saida' as 'entrada' | 'saida',
     categoria: 'Educação' as Transacao['categoria'],
     projeto_id: '',
     comprovante_url: ''
   });
 
-  const confirmedTransactions = transactions.filter(t => t.status !== 'pending');
-  const totalIn = confirmedTransactions.filter(t => t.tipo === 'in').reduce((acc, t) => acc + t.valor, 0);
-  const totalOut = confirmedTransactions.filter(t => t.tipo === 'out').reduce((acc, t) => acc + t.valor, 0);
+  const confirmedTransactions = transactions.filter(t => t.status === 'confirmado');
+  const totalIn = confirmedTransactions.filter(t => t.tipo === 'entrada').reduce((acc, t) => acc + t.valor, 0);
+  const totalOut = confirmedTransactions.filter(t => t.tipo === 'saida').reduce((acc, t) => acc + t.valor, 0);
   const balance = totalIn - totalOut;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Regra de Negócio: Entradas de Pix via Dashboard são 'pending' para conferência.
-    // Saídas diretas da tesouraria são 'confirmed'.
-    const defaultStatus = formData.tipo === 'in' ? 'pending' : 'confirmed';
+    // Regra de Negócio: Entradas de Pix são 'pendente', Saídas diretas são 'confirmado'
+    const defaultStatus = formData.tipo === 'entrada' ? 'pendente' : 'confirmado';
 
     const success = await onAddTransaction({
       descricao: formData.descricao,
@@ -47,7 +46,7 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
 
     if (success) {
       setIsModalOpen(false);
-      setFormData({ descricao: '', valor: '', tipo: 'out', categoria: 'Educação', projeto_id: '', comprovante_url: '' });
+      setFormData({ descricao: '', valor: '', tipo: 'saida', categoria: 'Educação', projeto_id: '', comprovante_url: '' });
     }
   };
 
@@ -112,23 +111,26 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
                   <td className="px-8 py-5">
                     <p className="font-bold text-gray-900">{t.descricao}</p>
                     <p className="text-[10px] text-apple-text-secondary uppercase">{new Date(t.created_at).toLocaleDateString('pt-BR')}</p>
+                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${t.status === 'pendente' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
+                      {t.status}
+                    </span>
                   </td>
                   <td className="px-8 py-5">
                     <span className="bg-gray-100 text-gray-600 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">
                       {t.categoria}
                     </span>
                   </td>
-                  <td className={`px-8 py-5 text-right font-bold text-lg ${t.tipo === 'in' ? 'text-green-600' : 'text-red-500'}`}>
-                    {t.tipo === 'in' ? '+' : '-'} {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(t.valor)}
+                  <td className={`px-8 py-5 text-right font-bold text-lg ${t.tipo === 'entrada' ? 'text-green-600' : 'text-red-500'}`}>
+                    {t.tipo === 'entrada' ? '+' : '-'} {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(t.valor)}
                   </td>
                   <td className="px-8 py-5 text-right">
                     <div className="flex justify-end gap-3">
-                      {t.status === 'pending' && (
-                        <button onClick={() => onUpdateStatus(t.id, 'confirmed')} className="p-2 text-ejn-gold bg-ejn-gold/10 rounded-lg hover:bg-ejn-gold/20 transition-colors shadow-sm" title="Confirmar Recebimento">
+                      {t.status === 'pendente' && (
+                        <button onClick={() => onUpdateStatus(t.id, 'confirmado')} className="p-2 text-ejn-gold bg-ejn-gold/10 rounded-lg hover:bg-ejn-gold/20 transition-colors shadow-sm" title="Confirmar">
                           <CheckCircle2 className="w-5 h-5" />
                         </button>
                       )}
-                      <button onClick={() => onDeleteTransaction(t.id)} className="p-2 text-gray-300 hover:text-red-500 transition-colors" title="Excluir Registro">
+                      <button onClick={() => onDeleteTransaction(t.id)} className="p-2 text-gray-300 hover:text-red-500 transition-colors" title="Excluir">
                         <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
@@ -156,8 +158,8 @@ export const Treasury: React.FC<TreasuryProps> = ({ transactions, projects, onAd
             <h2 className="text-2xl font-bold text-ejn-teal mb-8">Novo Registro Financeiro</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
-                <button type="button" onClick={() => setFormData({...formData, tipo: 'in', categoria: 'Doação'})} className={`py-4 rounded-apple-lg border-2 font-black uppercase text-xs tracking-widest transition-all ${formData.tipo === 'in' ? 'bg-green-50 border-green-500 text-green-700 shadow-inner' : 'bg-apple-gray border-transparent text-gray-400 hover:bg-gray-200'}`}>Entrada</button>
-                <button type="button" onClick={() => setFormData({...formData, tipo: 'out', categoria: 'Educação'})} className={`py-4 rounded-apple-lg border-2 font-black uppercase text-xs tracking-widest transition-all ${formData.tipo === 'out' ? 'bg-red-50 border-red-500 text-red-700 shadow-inner' : 'bg-apple-gray border-transparent text-gray-400 hover:bg-gray-200'}`}>Saída</button>
+                <button type="button" onClick={() => setFormData({...formData, tipo: 'entrada', categoria: 'Doação'})} className={`py-4 rounded-apple-lg border-2 font-black uppercase text-xs tracking-widest transition-all ${formData.tipo === 'entrada' ? 'bg-green-50 border-green-500 text-green-700 shadow-inner' : 'bg-apple-gray border-transparent text-gray-400 hover:bg-gray-200'}`}>Entrada</button>
+                <button type="button" onClick={() => setFormData({...formData, tipo: 'saida', categoria: 'Educação'})} className={`py-4 rounded-apple-lg border-2 font-black uppercase text-xs tracking-widest transition-all ${formData.tipo === 'saida' ? 'bg-red-50 border-red-500 text-red-700 shadow-inner' : 'bg-apple-gray border-transparent text-gray-400 hover:bg-gray-200'}`}>Saída</button>
               </div>
 
               <div className="space-y-4">

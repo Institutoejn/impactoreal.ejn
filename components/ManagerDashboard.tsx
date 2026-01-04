@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Wallet, Users, AlertCircle, FileUp, UserCheck, PlusCircle, X, Clock, ArrowRight } from 'lucide-react';
-// Importações corrigidas para Aluno e Transacao
 import { Aluno, Transacao } from '../types';
 
 interface ManagerDashboardProps {
@@ -14,12 +13,11 @@ interface ManagerDashboardProps {
 export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ students, transactions, onAddStudent, onNavigate }) => {
   const [formData, setFormData] = useState({ name: '', course: '', history: '' });
   
-  const confirmedTransactions = transactions.filter(t => t.status !== 'pending');
-  const pendingTransactions = transactions.filter(t => t.status === 'pending');
+  const confirmedTransactions = transactions.filter(t => t.status === 'confirmado');
+  const pendingTransactions = transactions.filter(t => t.status === 'pendente');
 
-  // Corrigido: usando 'tipo' em vez de 'type' conforme definido em types.ts
-  const totalIn = confirmedTransactions.filter(t => t.tipo === 'in').reduce((acc, t) => acc + t.valor, 0);
-  const totalOut = confirmedTransactions.filter(t => t.tipo === 'out').reduce((acc, t) => acc + t.valor, 0);
+  const totalIn = confirmedTransactions.filter(t => t.tipo === 'entrada').reduce((acc, t) => acc + t.valor, 0);
+  const totalOut = confirmedTransactions.filter(t => t.tipo === 'saida').reduce((acc, t) => acc + t.valor, 0);
   const balance = totalIn - totalOut;
 
   const handleQuickRegister = (e: React.FormEvent) => {
@@ -121,7 +119,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ students, tr
                 <div className="flex items-center gap-3">
                   <Clock className="w-5 h-5 text-ejn-gold" />
                   <div>
-                    <span className="text-sm font-bold text-ejn-gold block">{pendingTransactions.length} Doações Pendentes</span>
+                    <span className="text-sm font-bold text-ejn-gold block">{pendingTransactions.length} Movimentações Pendentes</span>
                     <span className="text-[10px] text-ejn-gold/70 font-bold uppercase">Validar no financeiro</span>
                   </div>
                 </div>
@@ -130,7 +128,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ students, tr
             )}
 
             <div className="flex items-center justify-between p-4 bg-red-50 rounded-apple-lg border border-red-100 group cursor-pointer hover:bg-red-100 transition-colors">
-              <div className="flex items-center gap-3"><FileUp className="w-5 h-5 text-red-500" /><span className="text-sm font-semibold text-red-900">4 Comprovantes Pendentes</span></div>
+              <div className="flex items-center gap-3"><FileUp className="w-5 h-5 text-red-500" /><span className="text-sm font-semibold text-red-900">Documentos em Auditoria</span></div>
             </div>
             
             {pendingTransactions.length === 0 && (

@@ -9,7 +9,7 @@ interface MyInvestmentsProps {
 }
 
 export const MyInvestments: React.FC<MyInvestmentsProps> = ({ transactions, totalInvested }) => {
-  const myInvestments = transactions.filter(t => t.tipo === 'in');
+  const myInvestments = transactions.filter(t => t.tipo === 'entrada');
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -38,7 +38,7 @@ export const MyInvestments: React.FC<MyInvestmentsProps> = ({ transactions, tota
           <table className="w-full text-left">
             <thead className="bg-apple-gray">
               <tr>
-                <th className="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Data</th>
+                <th className="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Data / Status</th>
                 <th className="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Destinação</th>
                 <th className="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-right">Valor</th>
                 <th className="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-right">Doc</th>
@@ -48,9 +48,14 @@ export const MyInvestments: React.FC<MyInvestmentsProps> = ({ transactions, tota
               {myInvestments.map((inv) => (
                 <tr key={inv.id} className="hover:bg-apple-gray/20 transition-colors group">
                   <td className="px-8 py-5">
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <Calendar className="w-4 h-4 text-gray-300" />
-                      {new Date(inv.created_at).toLocaleDateString('pt-BR')}
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <Calendar className="w-4 h-4 text-gray-300" />
+                        {new Date(inv.created_at).toLocaleDateString('pt-BR')}
+                      </div>
+                      <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full w-fit ${inv.status === 'pendente' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
+                        {inv.status}
+                      </span>
                     </div>
                   </td>
                   <td className="px-8 py-5">

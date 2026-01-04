@@ -16,7 +16,7 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions }) => {
 
   const monthlyOuts = transactions.filter(t => {
     const d = new Date(t.created_at);
-    return t.tipo === 'out' && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    return t.tipo === 'saida' && t.status === 'confirmado' && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
   });
 
   const totalMonthlyOut = monthlyOuts.reduce((acc, t) => acc + t.valor, 0);
@@ -29,7 +29,7 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions }) => {
   });
 
   const verifiedTransactions = transactions
-    .filter(t => t.tipo === 'out' && t.status === 'confirmed')
+    .filter(t => t.tipo === 'saida' && t.status === 'confirmado')
     .slice(0, 8); 
 
   return (
@@ -88,7 +88,7 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions }) => {
                 </div>
               </div>
               <div className="p-5">
-                <h4 className="font-bold text-gray-800 text-sm mb-1">{item.descricao}</h4>
+                <h4 className="font-bold text-gray-800 text-sm mb-1 line-clamp-1">{item.descricao}</h4>
                 <div className="flex items-center gap-2 text-[10px] text-apple-text-secondary font-bold uppercase">
                   <Calendar className="w-3 h-3" />
                   {new Date(item.created_at).toLocaleDateString('pt-BR')}

@@ -9,9 +9,9 @@ interface TransparencyCardProps {
 }
 
 export const TransparencyCard: React.FC<TransparencyCardProps> = ({ transactions, onNavigate }) => {
-  const lastOut = transactions.filter(t => t.tipo === 'out')[0];
+  const lastOut = transactions.filter(t => t.tipo === 'saida')[0];
   const monthlyOut = transactions
-    .filter(t => t.tipo === 'out')
+    .filter(t => t.tipo === 'saida' && t.status === 'confirmado')
     .reduce((acc, t) => acc + t.valor, 0);
 
   return (
@@ -32,10 +32,10 @@ export const TransparencyCard: React.FC<TransparencyCardProps> = ({ transactions
             </div>
             <div className="flex-1">
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Última Destinação</p>
-              <p className="font-semibold text-gray-800 text-lg">{lastOut.descricao}</p>
+              <p className="font-semibold text-gray-800 text-lg line-clamp-1">{lastOut.descricao}</p>
               <p className="text-apple-text-secondary text-sm">{lastOut.categoria}</p>
             </div>
-            <div className="text-right">
+            <div className="text-right shrink-0">
               <p className="text-xl font-bold text-ejn-teal">
                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lastOut.valor)}
               </p>
