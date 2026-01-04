@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   LayoutDashboard, 
@@ -49,14 +48,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, pr
 
   return (
     <aside className={`fixed left-0 top-0 h-screen w-72 bg-white border-r border-gray-100 flex flex-col z-50 transition-transform duration-300 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-      {/* Brand Header */}
       <div className="p-8 pb-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-ejn-teal rounded-xl flex items-center justify-center shadow-lg shadow-ejn-teal/10">
             <Heart className="text-white w-6 h-6" fill="white" />
           </div>
-          <h1 className="text-2xl font-bold text-ejn-teal tracking-tight">
-            Instituto <span className="font-extrabold">EJN</span>
+          <h1 className="text-2xl font-bold text-ejn-teal tracking-tight font-poppins">
+            Instituto <span className="font-bold">EJN</span>
           </h1>
         </div>
         <button 
@@ -70,13 +68,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, pr
       <div className="px-8 py-4 mb-4">
         <div className="px-4 py-2 bg-ejn-teal/5 rounded-full inline-flex items-center gap-2">
           <div className={`w-2 h-2 rounded-full ${role === 'gestor' ? 'bg-ejn-gold' : 'bg-green-500 animate-pulse'}`} />
-          <span className="text-[10px] font-black text-ejn-teal uppercase tracking-widest">
+          <span className="text-[10px] font-bold text-ejn-teal uppercase tracking-widest font-poppins">
             Acesso: {role === 'gestor' ? 'Presidente' : 'Doador'}
           </span>
         </div>
       </div>
 
-      {/* Navigation Menu */}
       <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
         {items.map((item) => (
           <button
@@ -91,12 +88,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, pr
             <item.icon className={`w-5 h-5 transition-colors ${
               activeId === item.id ? 'text-ejn-teal' : 'text-gray-400 group-hover:text-ejn-teal'
             }`} />
-            <span className="font-medium text-[15px]">{item.label}</span>
+            <span className="font-bold text-[15px] tracking-tight">{item.label}</span>
           </button>
         ))}
       </nav>
 
-      {/* Footer Actions */}
       <div className="p-6 mt-auto space-y-2 border-t border-gray-50">
         <button 
           onClick={() => onNavigate('profile')}
@@ -113,7 +109,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, pr
               <User className="w-5 h-5 text-ejn-teal" />
             )}
           </div>
-          <span className="font-medium text-[15px] truncate">Meu Perfil</span>
+          <span className="font-bold text-[15px] truncate">Meu Perfil</span>
         </button>
 
         <button 
@@ -121,7 +117,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, pr
           className="w-full flex items-center gap-4 px-6 py-4 text-red-500 rounded-apple-lg hover:bg-red-50 transition-all duration-300 group"
         >
           <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          <span className="font-medium text-[15px]">Sair do App</span>
+          <span className="font-bold text-[15px]">Sair do App</span>
         </button>
       </div>
     </aside>

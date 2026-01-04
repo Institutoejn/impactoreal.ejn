@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200&family=Poppins:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -17,11 +16,11 @@
                         'ejn-teal': '#005F55',
                         'ejn-gold': '#E8AB00',
                         'apple-gray': '#F5F5F7',
-                        'apple-text-secondary': '#86868b'
+                        'apple-text-secondary': '#4B5563' // Cinza mais escuro para contraste com peso 200
                     },
                     fontFamily: {
-                        sans: ['Montserrat', 'sans-serif'], // Montserrat como padrão para corpo
-                        poppins: ['Poppins', 'sans-serif'], // Poppins para títulos e destaques
+                        sans: ['Poppins', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif'],
                     },
                     borderRadius: {
                         'apple-lg': '1.25rem',
@@ -37,37 +36,46 @@
             background-color: #F5F5F7;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Poppins', sans-serif;
             font-weight: 200;
-            letter-spacing: 0.5px;
-            color: #1F2937;
+            line-height: 1.6;
+            color: #111827; /* Texto principal em cinza quase preto para máximo contraste */
         }
 
-        /* Aplicação Global da Poppins Bold em Títulos e Botões */
+        /* Aplicação de Poppins Bold (700) */
         h1, h2, h3, h4, h5, h6, 
         button, 
-        .font-poppins, 
-        .title-highlight {
+        .font-bold,
+        .font-black,
+        .sidebar-item,
+        .card-title,
+        label {
             font-family: 'Poppins', sans-serif !important;
             font-weight: 700 !important;
         }
 
-        /* Ajuste de Montserrat em inputs e parágrafos */
-        p, span, input, textarea, select, td, th {
-            font-family: 'Montserrat', sans-serif;
+        /* Aplicação de Poppins ExtraLight (200) */
+        p, span, input, textarea, select, td, th, .font-light, .font-extralight {
+            font-family: 'Poppins', sans-serif;
             font-weight: 200;
-            letter-spacing: 0.5px;
+            line-height: 1.6;
         }
 
-        /* Custom scrollbar for a cleaner Apple-like look */
+        /* Placeholder weight 200 */
+        ::placeholder {
+            font-weight: 200 !important;
+            opacity: 0.7;
+        }
+
+        /* Custom scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 10px; border: 2px solid #F5F5F7; }
         ::-webkit-scrollbar-thumb:hover { background: #8e8e93; }
 
-        /* Melhoria de contraste para Montserrat Thin */
-        .text-apple-text-secondary {
-            color: #636366; /* Um pouco mais escuro para legibilidade com peso 200 */
+        /* Smooth text rendering for thin weights */
+        .font-extralight {
+            text-rendering: optimizeLegibility;
         }
     </style>
 <script type="importmap">

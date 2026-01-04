@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TrendingUp, Sparkles } from 'lucide-react';
 
@@ -17,7 +16,7 @@ export const ImpactHero: React.FC<ImpactHeroProps> = ({ impactCount, totalInvest
       <div className="relative z-10">
         <div className="flex items-center gap-2 mb-6">
           <TrendingUp className="w-5 h-5 text-ejn-teal" />
-          <h2 className="font-poppins text-lg font-bold text-gray-400 uppercase tracking-widest text-[11px] md:text-[13px]">
+          <h2 className="font-poppins text-lg font-bold text-ejn-teal uppercase tracking-widest text-[11px] md:text-[13px]">
             Meu Impacto Total
           </h2>
         </div>
@@ -28,16 +27,16 @@ export const ImpactHero: React.FC<ImpactHeroProps> = ({ impactCount, totalInvest
               {impactCount}
               <span className="text-xl md:text-2xl font-bold text-ejn-teal uppercase tracking-tight">Jovens</span>
             </div>
-            <p className="text-xl md:text-2xl font-light text-ejn-teal opacity-90 leading-tight">
+            <p className="text-xl md:text-2xl font-extralight text-ejn-teal opacity-90 leading-tight">
               Capacitados em tecnologia e liderança
             </p>
           </div>
           
           <div className="md:border-l border-gray-100 md:pl-8 mt-6 md:mt-0 flex flex-col justify-end pb-2">
-            <p className="text-apple-text-secondary text-xs md:text-sm font-light mb-1">
+            <p className="text-apple-text-secondary text-xs md:text-sm font-extralight mb-1 tracking-wide">
               Investimento em educação este ano
             </p>
-            <p className="text-2xl md:text-3xl font-bold text-gray-800 font-poppins">
+            <p className="text-2xl md:text-3xl font-bold text-gray-900 font-poppins">
               {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalInvested)}
             </p>
           </div>

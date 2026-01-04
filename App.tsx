@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ImpactHero } from './components/ImpactHero';
@@ -34,7 +33,6 @@ const App: React.FC = () => {
   const [transacoes, setTransacoes] = useState<Transacao[]>([]);
   const [projetos, setProjetos] = useState<Projeto[]>([]);
   
-  // Estado Unificado do Perfil
   const [profileData, setProfileData] = useState<Partial<Perfil>>({});
 
   const syncProfile = async (userId: string, email: string) => {
@@ -43,7 +41,6 @@ const App: React.FC = () => {
       const { data, error } = await supabase.from('perfis').select('*').eq('id', userId).single();
       
       if (error && error.code === 'PGRST116') {
-        // Criar perfil se não existir
         const newProfile = {
           id: userId,
           email: email,
@@ -54,7 +51,6 @@ const App: React.FC = () => {
         await supabase.from('perfis').insert([newProfile]);
         setProfileData(newProfile);
       } else if (data) {
-        // Se for Master mas o nome estiver genérico, forçar "Paulo Ricardo"
         if (isMaster && (data.nome === 'Novo Usuário' || !data.nome)) {
           const update = { nome: 'Paulo Ricardo', cargo: 'gestor' };
           await supabase.from('perfis').update(update).eq('id', userId);
@@ -110,7 +106,6 @@ const App: React.FC = () => {
       if (trRes.data) setTransacoes(trRes.data.map(t => ({ ...t, valor: Number(t.valor) })));
       if (prRes.data) setProjetos(prRes.data.map(p => ({ ...p, meta_financeira: Number(p.meta_financeira) })));
       
-      // Re-sincroniza perfil para garantir consistência entre abas
       const { data: profData } = await supabase.from('perfis').select('*').eq('id', session.user.id).single();
       if (profData) setProfileData(profData);
 
@@ -179,7 +174,7 @@ const App: React.FC = () => {
             <h1 className="text-3xl font-bold text-ejn-teal font-poppins">
               {role === 'gestor' ? `Painel do Presidente` : `Olá, ${profileData.nome?.split(' ')[0]}`}
             </h1>
-            <p className="text-apple-text-secondary font-light">{role === 'gestor' ? "Gestão estratégica do Instituto EJN." : "Seu investimento social transformando vidas."}</p>
+            <p className="text-apple-text-secondary font-extralight tracking-wide">{role === 'gestor' ? "Gestão estratégica do Instituto EJN." : "Seu investimento social transformando vidas."}</p>
           </div>
         </header>
 
