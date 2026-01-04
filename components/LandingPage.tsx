@@ -29,24 +29,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
       {/* Hero Section */}
       <section className="pt-40 pb-24 px-8">
-        <div className="max-w-5xl mx-auto text-center animate-in fade-in slide-in-from-bottom-8 duration-1000">
-          <h1 className="text-6xl md:text-7xl font-black text-ejn-teal mb-6 tracking-tight leading-[1.1]">
-            O futuro não se espera,<br />
-            <span className="text-ejn-gold">se constrói.</span>
+        <div className="max-w-6xl mx-auto text-center animate-in fade-in slide-in-from-bottom-8 duration-1000">
+          <h1 className="text-5xl md:text-7xl font-black text-ejn-teal mb-6 tracking-tight leading-[1.1]">
+            O futuro não se espera, se constrói.<br />
+            <span className="text-ejn-gold">O laboratório de liderança de Rio Preto.</span>
           </h1>
-          <p className="text-xl md:text-2xl text-apple-text-secondary max-w-3xl mx-auto mb-12 leading-relaxed font-extralight">
-            Invista nos novos líderes de Rio Preto. Aceleramos o potencial de jovens talentos através de tecnologia, liderança e transparência absoluta.
+          <p className="text-xl md:text-2xl text-apple-text-secondary max-w-4xl mx-auto mb-12 leading-relaxed font-extralight">
+            Desenvolvemos o capital humano que ditará o ritmo da inovação regional. Investimento social com foco em protagonismo e cultura de entrega.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
               onClick={onStart}
               className="bg-ejn-gold text-white px-10 py-5 rounded-apple-xl font-black text-lg hover:bg-[#D19900] transition-all transform active:scale-95 shadow-xl shadow-ejn-gold/20 flex items-center justify-center gap-2"
             >
-              Começar minha Jornada
+              Iniciar Investimento Social
               <ArrowRight className="w-5 h-5" />
             </button>
             <button className="bg-white text-ejn-teal border border-gray-200 px-10 py-5 rounded-apple-xl font-bold text-lg hover:bg-apple-gray transition-all shadow-sm">
-              Conhecer o Instituto
+              Conhecer a Tese do Instituto
             </button>
           </div>
         </div>
@@ -60,9 +60,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               <div className="w-14 h-14 bg-ejn-teal/5 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-ejn-teal transition-colors">
                 <ShieldCheck className="w-7 h-7 text-ejn-teal group-hover:text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-ejn-teal mb-4">Transparência Radical</h3>
+              <h3 className="text-2xl font-bold text-ejn-teal mb-4">Ética da Execução</h3>
               <p className="text-apple-text-secondary leading-relaxed font-extralight">
-                Onde cada centavo encontra um sonho. Rastreamento em tempo real de cada destinação estratégica.
+                Transparência absoluta. Cada aporte é transformado em competência real através de uma trilha auditada de formação.
               </p>
             </div>
 
@@ -70,9 +70,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               <div className="w-14 h-14 bg-ejn-gold/5 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-ejn-gold transition-colors">
                 <GraduationCap className="w-7 h-7 text-ejn-gold group-hover:text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-ejn-teal mb-4">Desenvolvimento Real</h3>
+              <h3 className="text-2xl font-bold text-ejn-teal mb-4">Protagonismo Jovem</h3>
               <p className="text-apple-text-secondary leading-relaxed font-extralight">
-                Foco em habilidades de elite: Design, Negócios e Liderança de Impacto Social para o mundo real.
+                Não apenas assistência. Criamos as condições para que jovens talentos assumam o comando de suas trajetórias profissionais.
               </p>
             </div>
 
@@ -80,9 +80,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               <div className="w-14 h-14 bg-ejn-teal/5 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-ejn-teal transition-colors">
                 <Coins className="w-7 h-7 text-ejn-teal group-hover:text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-ejn-teal mb-4">Investimento em Vidas</h3>
+              <h3 className="text-2xl font-bold text-ejn-teal mb-4">Capital Humano</h3>
               <p className="text-apple-text-secondary leading-relaxed font-extralight">
-                Acreditamos no ROI social. Cada investimento gera resultados tangíveis na economia e no futuro de comunidades.
+                O maior ativo de São José do Rio Preto. O investimento em liderança gera o maior ROI social e econômico da nossa região.
               </p>
             </div>
           </div>

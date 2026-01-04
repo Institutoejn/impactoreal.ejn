@@ -57,7 +57,7 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
       
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text('Transparência Radical: Onde cada centavo encontra um sonho', 20, 28);
+      doc.text('Prestação de Contas: A Ética da Execução', 20, 28);
 
       doc.setDrawColor(ejnGold[0], ejnGold[1], ejnGold[2]);
       doc.setLineWidth(0.5);
@@ -71,27 +71,22 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
       doc.setTextColor(ejnDark[0], ejnDark[1], ejnDark[2]);
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
-      doc.text('Panorama de Transformação', 20, 55);
+      doc.text('A Ética da Execução: Panorama de Impacto', 20, 55);
 
       const summaryY = 65;
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text('Líderes Despertados no Ciclo:', 20, summaryY);
+      doc.text('Líderes em Formação no Ciclo:', 20, summaryY);
       doc.setFont('helvetica', 'bold');
       doc.text(`${impactCount} Talentos`, 85, summaryY);
 
       doc.setFont('helvetica', 'normal');
-      doc.text('Capital Estratégico Investido:', 20, summaryY + 8);
+      doc.text('Capital Social Investido:', 20, summaryY + 8);
       doc.setFont('helvetica', 'bold');
       doc.text(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalInvested), 85, summaryY + 8);
 
-      doc.setFont('helvetica', 'normal');
-      doc.text('Data de Extração:', 20, summaryY + 16);
-      doc.setFont('helvetica', 'bold');
-      doc.text(new Date().toLocaleDateString('pt-BR'), 85, summaryY + 16);
-
       doc.setFontSize(14);
-      doc.text('Evidências de Destinação de Recursos', 20, summaryY + 35);
+      doc.text('Rastreabilidade: Destinação de Recursos', 20, summaryY + 35);
 
       const tableData = confirmedOuts.map(t => [
         new Date(t.created_at).toLocaleDateString('pt-BR'),
@@ -107,7 +102,7 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
       } else {
         autoTable(doc, {
           startY: summaryY + 40,
-          head: [['Data', 'Descrição', 'Categoria', 'Valor']],
+          head: [['Data', 'Descrição da Entrega', 'Eixo de Atuação', 'Valor']],
           body: tableData,
           theme: 'striped',
           headStyles: { 
@@ -126,36 +121,10 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
         });
       }
 
-      const finalY = (doc as any).lastAutoTable.finalY || 150;
-      doc.setFontSize(14);
-      doc.text('Distribuição por Eixo de Impacto (Mês Atual)', 20, finalY + 20);
-
-      catData.forEach((d, i) => {
-        const itemY = finalY + 30 + (i * 8);
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(d.label, 25, itemY);
-        doc.text(`${d.pct}%`, 80, itemY);
-        
-        doc.setFillColor(240, 240, 240);
-        doc.rect(95, itemY - 3, 50, 2, 'F');
-        doc.setFillColor(ejnTeal[0], ejnTeal[1], ejnTeal[2]);
-        doc.rect(95, itemY - 3, d.pct / 2, 2, 'F');
-      });
-
-      const pageCount = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(150, 150, 150);
-        doc.text('Instituto EJN - Transparência Radical e Legado Sincronizado', 105, 285, { align: 'center' });
-        doc.text(`Folha ${i} de ${pageCount}`, 190, 285, { align: 'right' });
-      }
-
-      doc.save(`Transparencia_Radical_EJN_${new Date().toISOString().split('T')[0]}.pdf`);
+      doc.save(`Prestacao_Contas_EJN_${new Date().toISOString().split('T')[0]}.pdf`);
     } catch (error) {
       console.error('Falha técnica:', error);
-      alert('Houve uma falha técnica ao processar as evidências. Tente novamente.');
+      alert('Não foi possível processar o relatório de prestação de contas no momento.');
     } finally {
       setIsGenerating(false);
     }
@@ -177,7 +146,7 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
             })}
           </svg>
           <div className="absolute text-center">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Mês Atual</span>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Execução Mensal</span>
             <p className="text-xl font-black text-ejn-teal">{new Intl.NumberFormat('pt-BR', { notation: 'compact' }).format(totalMonthlyOut)}</p>
           </div>
         </div>
@@ -185,8 +154,8 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
         <div className="flex-1 space-y-8">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="text-2xl font-bold text-ejn-teal flex items-center gap-2"><PieChart className="w-6 h-6" />Transparência Radical</h3>
-              <p className="text-apple-text-secondary font-extralight">Onde cada centavo encontra um sonho de futuro.</p>
+              <h3 className="text-2xl font-bold text-ejn-teal flex items-center gap-2"><PieChart className="w-6 h-6" />Prestação de Contas</h3>
+              <p className="text-apple-text-secondary font-extralight">A ética da execução: transformando capital social em competência.</p>
             </div>
             <button 
               onClick={handleGeneratePDF}
@@ -196,12 +165,12 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
               {isGenerating ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Gerando Documento...
+                  Consolidando...
                 </>
               ) : (
                 <>
                   <Download className="w-4 h-4" />
-                  Evidência Completa (PDF)
+                  Documento Oficial (PDF)
                 </>
               )}
             </button>
@@ -218,7 +187,7 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
       </div>
 
       <div className="space-y-6">
-        <h3 className="text-xl font-bold text-ejn-teal flex items-center gap-3"><ShieldCheck className="w-6 h-6" />Linha do Tempo de Evidências</h3>
+        <h3 className="text-xl font-bold text-ejn-teal flex items-center gap-3"><ShieldCheck className="w-6 h-6" />Rastreabilidade de Entregas</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {verifiedTransactions.map((item) => (
             <div key={item.id} className="bg-white rounded-apple-2xl shadow-sm border border-gray-50 overflow-hidden group">
@@ -251,8 +220,8 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
             <img src={lightboxImage} alt="Doc" className="w-full h-auto max-h-[80vh] object-contain" />
             <div className="p-8 border-t flex justify-between items-center">
               <div>
-                <h3 className="text-lg font-bold text-ejn-teal">Comprovação Fiscal de Impacto</h3>
-                <p className="text-xs text-apple-text-secondary">Evidência validada pelo conselho estratégico do Instituto.</p>
+                <h3 className="text-lg font-bold text-ejn-teal">Comprovação Fiscal de Execução</h3>
+                <p className="text-xs text-apple-text-secondary">Evidência validada pelo comitê estratégico do Instituto EJN.</p>
               </div>
               <button onClick={() => setLightboxImage(null)} className="p-4 bg-apple-gray rounded-full"><X /></button>
             </div>

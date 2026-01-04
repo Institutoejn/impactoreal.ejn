@@ -28,10 +28,10 @@ interface SidebarProps {
 }
 
 const donorNavItems: NavItem[] = [
-  { id: 'overview', label: 'Panorama de Impacto', icon: LayoutDashboard },
+  { id: 'overview', label: 'Painel de Impacto', icon: LayoutDashboard },
   { id: 'investments', label: 'Causas que Impulsiono', icon: Coins },
-  { id: 'projects', label: 'Projetos Visionários', icon: Target },
-  { id: 'transparency', label: 'Transparência Radical', icon: FileText },
+  { id: 'projects', label: 'Escolher uma Causa', icon: Target },
+  { id: 'transparency', label: 'Prestação de Contas', icon: FileText },
 ];
 
 const managerNavItems: NavItem[] = [

@@ -46,7 +46,7 @@ const App: React.FC = () => {
           email: email,
           nome: isMaster ? 'Paulo Ricardo' : 'Novo Impulsionador',
           cargo: isMaster ? 'gestor' : 'doador',
-          bio: isMaster ? 'Presidente do Instituto Escola Jovens de Negócios.' : 'Acreditando no poder da educação transformadora.'
+          bio: isMaster ? 'Presidente do Instituto Escola Jovens de Negócios.' : 'Protagonista da transformação social através do investimento em capital humano.'
         };
         await supabase.from('perfis').insert([newProfile]);
         setProfileData(newProfile);
@@ -137,11 +137,11 @@ const App: React.FC = () => {
         comprovante_url: newTr.comprovante_url || null
       }]);
       if (error) throw error;
-      alert('Sua intenção de investimento foi registrada com sucesso.');
+      alert('Sua alocação de capital social foi registrada. Nossa equipe validará a execução.');
       fetchData(true);
       return true;
     } catch (err: any) {
-      alert(`Falha técnica no registro: ${err.message}`);
+      alert(`Erro na sincronização de dados: ${err.message}`);
       return false;
     }
   };
@@ -178,10 +178,10 @@ const App: React.FC = () => {
           <div className="lg:hidden"><button onClick={() => setIsSidebarOpen(true)} className="p-2 text-ejn-teal bg-white rounded-lg shadow-sm"><Menu /></button></div>
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-ejn-teal font-poppins">
-              {role === 'gestor' ? `Painel de Comando: Liderando a Transformação` : `Bem-vindo, ${profileData.nome?.split(' ')[0]}`}
+              {role === 'gestor' ? `Painel de Comando: Liderando a Transformação` : `Painel de Impacto: Olá, ${profileData.nome?.split(' ')[0]}`}
             </h1>
             <p className="text-apple-text-secondary font-extralight tracking-wide">
-              {role === 'gestor' ? "Estratégia e legado em movimento para o Instituto EJN." : "Seu capital social transformando o amanhã hoje."}
+              {role === 'gestor' ? "A ética da execução em favor do protagonismo regional." : "Monitorando o capital humano despertado em nossa região."}
             </p>
           </div>
         </header>

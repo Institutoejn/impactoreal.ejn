@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Rocket, Plus, X, Edit2, Trash2, Target } from 'lucide-react';
 import { Projeto } from '../types';
@@ -35,12 +34,12 @@ export const ProjectManagement: React.FC<ProjectManagementProps> = ({ projects, 
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex justify-between items-center mb-10">
         <div>
-          <h2 className="text-2xl font-bold text-ejn-teal">Projetos de Impacto</h2>
-          <p className="text-apple-text-secondary">Metas financeiras para mobilizar o Instituto.</p>
+          <h2 className="text-2xl font-bold text-ejn-teal">Projetos Visionários</h2>
+          <p className="text-apple-text-secondary">Alvos de investimento social para mobilizar nossa região.</p>
         </div>
         <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 bg-ejn-gold text-white px-6 py-3 rounded-apple-lg font-bold shadow-lg">
           <Plus className="w-5 h-5" />
-          Novo Projeto
+          Nova Causa
         </button>
       </div>
 
@@ -56,9 +55,9 @@ export const ProjectManagement: React.FC<ProjectManagementProps> = ({ projects, 
               </div>
             </div>
             <h3 className="text-xl font-bold text-ejn-teal mb-2">{p.nome}</h3>
-            <p className="text-sm text-apple-text-secondary mb-6 line-clamp-2">{p.descricao}</p>
+            <p className="text-sm text-apple-text-secondary mb-6 line-clamp-2 font-extralight">{p.descricao}</p>
             <div className="mt-auto pt-6 border-t border-gray-50">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Meta Financeira</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Alvo de Investimento</p>
               <p className="text-2xl font-black text-ejn-teal">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.meta_financeira)}</p>
             </div>
           </div>
@@ -69,20 +68,32 @@ export const ProjectManagement: React.FC<ProjectManagementProps> = ({ projects, 
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/20 backdrop-blur-md">
           <div className="bg-white w-full max-w-lg rounded-apple-2xl shadow-2xl overflow-hidden">
             <div className="p-8 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-ejn-teal">Novo Projeto Social</h2>
+              <h2 className="text-2xl font-bold text-ejn-teal">Nova Missão Estratégica</h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-apple-gray rounded-full"><X className="w-6 h-6 text-gray-400" /></button>
             </div>
             <form onSubmit={handleSubmit} className="p-8 space-y-6">
-              <input required type="text" value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg outline-none border focus:border-ejn-teal" placeholder="Nome do Projeto" />
-              <textarea value={formData.descricao} onChange={e => setFormData({...formData, descricao: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg outline-none border focus:border-ejn-teal h-24 resize-none" placeholder="Descrição Curta" />
-              <div className="grid grid-cols-2 gap-4">
-                <input required type="number" step="0.01" value={formData.meta_financeira} onChange={e => setFormData({...formData, meta_financeira: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg outline-none border focus:border-ejn-teal" placeholder="Meta R$" />
-                <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value as any})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border">
-                  <option value="active">Ativo</option>
-                  <option value="finished">Finalizado</option>
-                </select>
+              <div>
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Título do Projeto</label>
+                <input required type="text" value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg outline-none border focus:border-ejn-teal font-bold" placeholder="Nome da Causa" />
               </div>
-              <button type="submit" className="w-full bg-ejn-teal text-white py-4 rounded-apple-xl font-black shadow-lg">Lançar Projeto</button>
+              <div>
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Tese de Impacto</label>
+                <textarea value={formData.descricao} onChange={e => setFormData({...formData, descricao: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg outline-none border focus:border-ejn-teal h-24 resize-none font-extralight" placeholder="Descrição da visão e resultados esperados..." />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Alvo de Investimento</label>
+                  <input required type="number" step="0.01" value={formData.meta_financeira} onChange={e => setFormData({...formData, meta_financeira: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg outline-none border focus:border-ejn-teal font-bold" placeholder="R$ 0,00" />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Status</label>
+                  <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value as any})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border font-bold">
+                    <option value="active">Em Captação</option>
+                    <option value="finished">Concluído</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" className="w-full bg-ejn-teal text-white py-4 rounded-apple-xl font-black shadow-lg uppercase tracking-widest text-sm">Lançar Missão</button>
             </form>
           </div>
         </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { X, Search, MoreHorizontal, GraduationCap, MapPin, UserPlus, Edit2, Trash2, History, Camera, User } from 'lucide-react';
 import { Aluno } from '../types';
@@ -86,7 +85,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input 
             type="text" 
-            placeholder="Buscar aluno..." 
+            placeholder="Localizar líder em formação..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-12 pr-4 py-3 bg-white rounded-apple-lg outline-none shadow-sm text-sm"
@@ -97,7 +96,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
           className="flex items-center justify-center gap-2 bg-ejn-teal text-white px-6 py-4 rounded-apple-lg font-bold shadow-md"
         >
           <UserPlus className="w-5 h-5" />
-          Novo Aluno
+          Registrar Novo Talento
         </button>
       </div>
 
@@ -106,9 +105,9 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
           <table className="w-full text-left">
             <thead className="bg-apple-gray">
               <tr>
-                <th className="px-8 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Aluno</th>
-                <th className="px-8 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Curso</th>
-                <th className="px-8 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Bairro</th>
+                <th className="px-8 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Talento</th>
+                <th className="px-8 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Trilha Estratégica</th>
+                <th className="px-8 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Região</th>
                 <th className="px-8 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-right">Ações</th>
               </tr>
             </thead>
@@ -122,18 +121,18 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
                       </div>
                       <div>
                         <p className="font-bold text-ejn-teal">{s.nome}</p>
-                        <p className="text-xs text-apple-text-secondary">{s.idade} anos</p>
+                        <p className="text-xs text-apple-text-secondary font-extralight">{s.idade} anos</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-8 py-5">
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                    <div className="flex items-center gap-2 text-sm text-gray-700 font-bold">
                       <GraduationCap className="w-4 h-4 text-gray-300" />
                       {s.curso}
                     </div>
                   </td>
                   <td className="px-8 py-5">
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <div className="flex items-center gap-2 text-sm text-gray-500 font-extralight">
                       <MapPin className="w-4 h-4 text-gray-300" />
                       {s.bairro}
                     </div>
@@ -142,9 +141,9 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
                     <button onClick={() => setActiveMenuId(activeMenuId === s.id ? null : s.id)} className="p-2 text-gray-300 hover:text-ejn-teal"><MoreHorizontal className="w-5 h-5" /></button>
                     {activeMenuId === s.id && (
                       <div className="absolute right-8 top-12 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-30">
-                        <button onClick={() => { setHistoryStudent(s); setIsHistoryModalOpen(true); setActiveMenuId(null); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-apple-gray"><History className="w-4 h-4 text-ejn-teal" />Observações</button>
-                        <button onClick={() => handleEdit(s)} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-apple-gray"><Edit2 className="w-4 h-4 text-ejn-gold" />Editar</button>
-                        <button onClick={() => onDeleteStudent(s.id)} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50"><Trash2 className="w-4 h-4" />Excluir</button>
+                        <button onClick={() => { setHistoryStudent(s); setIsHistoryModalOpen(true); setActiveMenuId(null); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-600 hover:bg-apple-gray"><History className="w-4 h-4 text-ejn-teal" />Trajetória</button>
+                        <button onClick={() => handleEdit(s)} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-600 hover:bg-apple-gray"><Edit2 className="w-4 h-4 text-ejn-gold" />Editar</button>
+                        <button onClick={() => onDeleteStudent(s.id)} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50"><Trash2 className="w-4 h-4" />Remover</button>
                       </div>
                     )}
                   </td>
@@ -159,7 +158,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-md">
           <div className="bg-white w-full max-w-2xl rounded-apple-2xl shadow-2xl overflow-hidden">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-ejn-teal">{editingStudent ? 'Editar Aluno' : 'Novo Aluno'}</h2>
+              <h2 className="text-xl font-bold text-ejn-teal">{editingStudent ? 'Atualizar Talento' : 'Novo Talento'}</h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-apple-gray rounded-full"><X className="w-6 h-6 text-gray-400" /></button>
             </div>
             <form onSubmit={handleSubmit} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
@@ -170,32 +169,32 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
                   </div>
                   <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
                 </div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mt-2">Foto do Aluno</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase mt-2 tracking-widest">Identidade Visual</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1">Nome Completo *</label>
-                  <input required type="text" value={formData.nome} onChange={(e) => setFormData({...formData, nome: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border shadow-sm outline-none focus:border-ejn-teal" placeholder="Nome do jovem" />
+                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1 tracking-widest">Nome do Protagonista *</label>
+                  <input required type="text" value={formData.nome} onChange={(e) => setFormData({...formData, nome: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border shadow-sm outline-none focus:border-ejn-teal font-bold" placeholder="Nome Completo" />
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1">Idade</label>
-                  <input type="number" value={formData.idade} onChange={(e) => setFormData({...formData, idade: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border shadow-sm outline-none focus:border-ejn-teal" placeholder="Ex: 19" />
+                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1 tracking-widest">Idade</label>
+                  <input type="number" value={formData.idade} onChange={(e) => setFormData({...formData, idade: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border shadow-sm outline-none focus:border-ejn-teal font-bold" placeholder="Ex: 19" />
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1">Bairro</label>
-                  <input type="text" value={formData.bairro} onChange={(e) => setFormData({...formData, bairro: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border shadow-sm outline-none focus:border-ejn-teal" placeholder="Localização" />
+                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1 tracking-widest">Bairro de Rio Preto</label>
+                  <input type="text" value={formData.bairro} onChange={(e) => setFormData({...formData, bairro: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border shadow-sm outline-none focus:border-ejn-teal font-bold" placeholder="Localização regional" />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1">Curso / Trilha *</label>
-                  <input required type="text" value={formData.curso} onChange={(e) => setFormData({...formData, curso: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border shadow-sm outline-none focus:border-ejn-teal" placeholder="Ex: UX/UI Design" />
+                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1 tracking-widest">Trilha Estratégica *</label>
+                  <input required type="text" value={formData.curso} onChange={(e) => setFormData({...formData, curso: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border shadow-sm outline-none focus:border-ejn-teal font-bold" placeholder="Ex: UX Design e Negócios" />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1">Observações / Histórico</label>
-                  <textarea value={formData.observacoes} onChange={(e) => setFormData({...formData, observacoes: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border shadow-sm outline-none focus:border-ejn-teal h-24 resize-none" placeholder="Contexto social..." />
+                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1 tracking-widest">Sua trajetória até o Instituto</label>
+                  <textarea value={formData.observacoes} onChange={(e) => setFormData({...formData, observacoes: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border shadow-sm outline-none focus:border-ejn-teal h-24 resize-none font-extralight" placeholder="Contexto, motivação e potencial de impacto..." />
                 </div>
               </div>
-              <button type="submit" className="w-full bg-ejn-teal text-white py-4 rounded-apple-lg font-bold shadow-lg hover:bg-[#004d45]">Salvar Cadastro</button>
+              <button type="submit" className="w-full bg-ejn-teal text-white py-4 rounded-apple-lg font-bold shadow-lg hover:bg-[#004d45] uppercase tracking-widest text-sm">Validar Registro de Liderança</button>
             </form>
           </div>
         </div>
@@ -204,9 +203,9 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
       {isHistoryModalOpen && historyStudent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white w-full max-w-lg rounded-apple-2xl shadow-2xl p-8">
-            <h2 className="text-2xl font-bold text-ejn-teal mb-6">Observações: {historyStudent.nome}</h2>
-            <div className="bg-apple-gray p-6 rounded-apple-xl italic text-gray-700 leading-relaxed mb-8">
-              "{historyStudent.observacoes || 'Sem observações registradas.'}"
+            <h2 className="text-2xl font-bold text-ejn-teal mb-6">Trajetória: {historyStudent.nome}</h2>
+            <div className="bg-apple-gray p-6 rounded-apple-xl italic text-gray-700 leading-relaxed mb-8 font-extralight">
+              "{historyStudent.observacoes || 'Sem trajetória registrada.'}"
             </div>
             <button onClick={() => setIsHistoryModalOpen(false)} className="w-full bg-ejn-teal text-white py-4 rounded-apple-lg font-bold">Fechar</button>
           </div>
