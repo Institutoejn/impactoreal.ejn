@@ -23,11 +23,11 @@ export const ImpactHero: React.FC<ImpactHeroProps> = ({ impactCount, totalInvest
         
         <div className="flex flex-col md:flex-row md:items-end gap-10 md:gap-16">
           <div className="flex-1">
-            <div className="text-4xl md:text-5xl font-bold text-ejn-gold mb-2 flex items-baseline gap-3 flex-wrap font-poppins tracking-tighter">
+            <div className="text-3xl md:text-4xl font-bold text-ejn-gold mb-2 flex items-baseline gap-3 flex-wrap font-poppins tracking-tighter">
               {impactCount}
               <span className="text-xl md:text-2xl font-bold text-ejn-teal uppercase tracking-tight">Líderes formados</span>
             </div>
-            <p className="text-lg md:text-2xl font-extralight text-ejn-teal opacity-80 leading-tight">
+            <p className="text-lg md:text-xl font-extralight text-ejn-teal opacity-80 leading-tight">
               Amanhãs despertados hoje.
             </p>
           </div>

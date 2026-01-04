@@ -64,7 +64,7 @@ export const FeaturedProject: React.FC<FeaturedProjectProps> = ({ projects, tran
         <div className="mt-auto">
           <div className="flex justify-between items-center mb-3">
             <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Evolução</span>
-            <span className="text-xs font-bold text-ejn-gold">{progress}%</span>
+            <span className="text-base font-bold text-ejn-gold">{progress}%</span>
           </div>
           <div className="w-full h-1.5 bg-apple-gray rounded-full mb-10 overflow-hidden">
             <div 
@@ -75,7 +75,7 @@ export const FeaturedProject: React.FC<FeaturedProjectProps> = ({ projects, tran
 
           <button 
             onClick={() => onNavigate('projects')}
-            className="w-full bg-ejn-teal text-white font-bold py-4 rounded-apple-lg hover:bg-[#004d45] transition-all transform active:scale-[0.98] shadow-lg shadow-ejn-teal/10 flex items-center justify-center gap-2 text-sm"
+            className="w-full bg-ejn-teal text-white font-bold py-4 rounded-apple-lg hover:bg-[#004d45] transition-all transform active:scale-[0.98] shadow-lg shadow-ejn-teal/10 flex items-center justify-center gap-2 text-[13.6px]"
           >
             Impulsionar
             <ArrowRight className="w-5 h-5" />
