@@ -141,49 +141,49 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       {projects.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
           {projects.map((project) => {
             const progress = getProgressForProject(project);
             const reachedAmount = getAmountReached(project);
             
             return (
-              <div key={project.id} className="bg-white rounded-apple-2xl shadow-sm border border-gray-50 overflow-hidden flex flex-col group hover:shadow-xl transition-all duration-500">
-                <div className="relative h-48 md:h-56 overflow-hidden">
+              <div key={project.id} className="bg-white rounded-apple-2xl shadow-sm border border-gray-50 overflow-hidden flex flex-col group hover:shadow-2xl transition-all duration-500">
+                <div className="relative h-56 md:h-64 overflow-hidden">
                   <img 
                     src={project.capa_url || 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800'} 
                     alt={project.nome} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                   />
-                  <div className="absolute top-4 left-4">
-                    <div className="bg-white/90 backdrop-blur-sm p-3 rounded-xl shadow-lg">
-                      <Target className="w-5 h-5 text-ejn-teal" />
+                  <div className="absolute top-6 left-6">
+                    <div className="bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl">
+                      <Target className="w-6 h-6 text-ejn-teal" />
                     </div>
                   </div>
                 </div>
 
-                <div className="p-6 md:p-8 flex flex-col flex-1">
-                  <div className="flex justify-between items-start mb-3 gap-2">
-                    <h3 className="text-lg md:text-xl font-bold text-ejn-teal line-clamp-2 leading-tight">{project.nome}</h3>
-                    <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter shrink-0 ${project.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
-                      {project.status === 'active' ? 'Ativo' : 'Concluído'}
+                <div className="p-10 flex flex-col flex-1">
+                  <div className="flex justify-between items-start mb-4 gap-3">
+                    <h3 className="text-xl md:text-2xl font-bold text-ejn-teal line-clamp-2 leading-tight tracking-tighter">{project.nome}</h3>
+                    <span className={`text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shrink-0 ${project.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
+                      {project.status === 'active' ? 'Ativo' : 'Finalizado'}
                     </span>
                   </div>
-                  <p className="text-apple-text-secondary text-sm mb-6 md:mb-8 leading-relaxed line-clamp-3">
+                  <p className="text-apple-text-secondary text-base mb-10 leading-relaxed line-clamp-3 font-extralight">
                     {project.descricao}
                   </p>
 
-                  <div className="mt-auto space-y-4">
+                  <div className="mt-auto space-y-6">
                     <div className="flex justify-between items-end">
                       <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Impacto Verificado</p>
-                        <p className="font-bold text-ejn-teal text-base md:text-lg">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Impacto alcançado</p>
+                        <p className="font-bold text-ejn-teal text-xl">
                           {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(reachedAmount)}
                         </p>
                       </div>
-                      <span className="text-xl font-black text-ejn-gold">{progress}%</span>
+                      <span className="text-2xl font-black text-ejn-gold">{progress}%</span>
                     </div>
                     
-                    <div className="w-full h-2 bg-apple-gray rounded-full overflow-hidden">
+                    <div className="w-full h-2.5 bg-apple-gray rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-ejn-gold rounded-full transition-all duration-1000 ease-out"
                         style={{ width: `${progress}%` }}
@@ -192,10 +192,10 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
 
                     <button 
                       onClick={() => setSelectedProject(project)}
-                      className="w-full mt-4 bg-ejn-teal text-white py-4 rounded-apple-xl font-bold hover:bg-[#004d45] transition-all transform active:scale-[0.98] shadow-lg shadow-ejn-teal/10 flex items-center justify-center gap-2"
+                      className="w-full mt-6 bg-ejn-teal text-white py-5 rounded-apple-xl font-bold text-lg hover:bg-[#004d45] transition-all transform active:scale-[0.98] shadow-2xl shadow-ejn-teal/10 flex items-center justify-center gap-3"
                     >
-                      Apoiar este Projeto
-                      <ArrowRight className="w-5 h-5" />
+                      Mudar uma vida
+                      <ArrowRight className="w-6 h-6" />
                     </button>
                   </div>
                 </div>
@@ -204,83 +204,83 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
           })}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-24 text-center p-6">
-          <Target className="w-16 h-16 text-gray-200 mb-4" />
-          <h3 className="text-xl font-bold text-gray-400">Nenhum projeto ativo no momento.</h3>
-          <p className="text-apple-text-secondary">O Instituto está planejando novas trilhas de impacto.</p>
+        <div className="flex flex-col items-center justify-center py-32 text-center p-8">
+          <Target className="w-20 h-20 text-gray-100 mb-6" />
+          <h3 className="text-2xl font-bold text-gray-300 tracking-tight">Novos amanhãs em breve.</h3>
+          <p className="text-apple-text-secondary text-lg font-extralight">O Instituto EJN está desenhando as próximas trilhas de liderança.</p>
         </div>
       )}
 
       {selectedProject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-white/40 backdrop-blur-xl fixed" onClick={() => !showSuccess && !isSubmitting && setSelectedProject(null)} />
           
           <div className="relative bg-white w-full max-w-md rounded-apple-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500 my-auto">
             {showSuccess ? (
-              <div className="p-10 md:p-12 text-center flex flex-col items-center">
-                <div className="w-16 h-16 md:w-20 md:h-20 bg-green-50 rounded-full flex items-center justify-center mb-6">
-                  <CheckCircle2 className="w-10 h-10 md:w-12 md:h-12 text-green-500" />
+              <div className="p-12 text-center flex flex-col items-center bg-white">
+                <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mb-8">
+                  <CheckCircle2 className="w-14 h-14 text-green-500" />
                 </div>
-                <h3 className="text-xl md:text-2xl font-bold text-ejn-teal mb-2">Impacto Registrado!</h3>
-                <p className="text-sm md:text-base text-apple-text-secondary">Seu investimento foi enviado para validação do Instituto. Em breve ele aparecerá no seu histórico.</p>
+                <h3 className="text-3xl font-bold text-ejn-teal mb-3 tracking-tighter">Destino real.</h3>
+                <p className="text-lg text-apple-text-secondary font-extralight">Seu investimento social foi enviado para validação. Em instantes ele fará parte do seu legado.</p>
               </div>
             ) : (
               <>
-                <div className="p-6 md:p-8 border-b border-gray-100 flex items-center justify-between">
+                <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-white">
                   <div className="min-w-0">
-                    <h3 className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Investimento Social via Pix</h3>
-                    <h2 className="text-lg md:text-xl font-bold text-ejn-teal truncate">{selectedProject.nome}</h2>
+                    <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Impacto via Pix</h3>
+                    <h2 className="text-xl font-bold text-ejn-teal truncate tracking-tight">{selectedProject.nome}</h2>
                   </div>
-                  <button onClick={() => !isSubmitting && setSelectedProject(null)} className="p-2 hover:bg-apple-gray rounded-full transition-colors shrink-0">
+                  <button onClick={() => !isSubmitting && setSelectedProject(null)} className="p-3 hover:bg-apple-gray rounded-full transition-colors shrink-0">
                     <X className="w-6 h-6 text-gray-300" />
                   </button>
                 </div>
 
-                <div className="p-6 md:p-8 space-y-6 md:space-y-8 max-h-[75vh] overflow-y-auto">
+                <div className="p-10 space-y-10 max-h-[75vh] overflow-y-auto bg-white">
                   
                   <div>
-                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2 px-1">Quanto você deseja investir?</label>
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-4 px-1">Valor do investimento</label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-ejn-teal text-sm">R$</span>
+                      <span className="absolute left-6 top-1/2 -translate-y-1/2 font-bold text-ejn-teal text-xl">R$</span>
                       <input 
                         type="number" 
                         step="0.01"
                         value={donationAmount}
                         onChange={(e) => setDonationAmount(e.target.value)}
                         disabled={isSubmitting}
-                        className="w-full pl-10 pr-4 py-4 bg-apple-gray rounded-apple-lg border-transparent focus:bg-white focus:border-ejn-teal outline-none transition-all border text-lg font-bold text-ejn-teal disabled:opacity-50"
+                        className="w-full pl-16 pr-6 py-5 bg-apple-gray rounded-apple-xl outline-none focus:bg-white border-transparent focus:border-ejn-teal border transition-all text-2xl font-black text-ejn-teal disabled:opacity-50"
                         placeholder="0,00"
                       />
                     </div>
                   </div>
 
                   <div className="flex flex-col items-center text-center">
-                    <div className="p-4 bg-white rounded-apple-xl mb-4 border-2 border-ejn-teal/5 shadow-sm">
+                    <div className="p-6 bg-white rounded-apple-2xl mb-6 border-2 border-ejn-teal/5 shadow-xl">
                       <canvas ref={canvasRef} className="max-w-full" />
                     </div>
-                    <p className="text-[10px] md:text-xs text-apple-text-secondary font-medium px-4">
-                      Escaneie o QR Code acima com o aplicativo do seu banco para transferir diretamente para o Instituto EJN.
+                    <p className="text-xs text-apple-text-secondary font-medium px-6 leading-relaxed">
+                      Escaneie com o app do seu banco. 100% do valor é convertido em formação para líderes de Rio Preto.
                     </p>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <button 
                       onClick={handleCopyPix}
                       disabled={isSubmitting}
-                      className={`w-full flex items-center justify-center gap-2 py-4 rounded-apple-xl font-bold text-sm transition-all border-2 ${
+                      className={`w-full flex items-center justify-center gap-3 py-5 rounded-apple-xl font-bold text-base transition-all border-2 ${
                         isCopied 
                           ? 'bg-green-50 border-green-500 text-green-700' 
                           : 'bg-ejn-gold/5 border-ejn-gold/10 text-ejn-gold hover:bg-ejn-gold/10'
                       }`}
                     >
-                      {isCopied ? <CheckCircle2 className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-                      {isCopied ? 'Código Copiado!' : 'Copiar Chave Pix'}
+                      {isCopied ? <CheckCircle2 className="w-6 h-6" /> : <Copy className="w-6 h-6" />}
+                      {isCopied ? 'Copiado!' : 'Copiar código Pix'}
                     </button>
 
                     <button 
                       onClick={handleDonateSubmit}
                       disabled={isSubmitting}
-                      className="w-full bg-ejn-teal text-white py-5 rounded-apple-xl font-black text-lg shadow-xl shadow-ejn-teal/20 hover:bg-[#004d45] transition-all transform active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-70"
+                      className="w-full bg-ejn-teal text-white py-6 rounded-apple-xl font-bold text-xl shadow-2xl shadow-ejn-teal/20 hover:bg-[#004d45] transition-all transform active:scale-[0.98] flex items-center justify-center gap-4 disabled:opacity-70"
                     >
                       {isSubmitting ? (
                         <>
@@ -288,7 +288,7 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, transactions, onDo
                           Processando...
                         </>
                       ) : (
-                        'Já realizei a transferência'
+                        'Confirmar envio'
                       )}
                     </button>
                   </div>

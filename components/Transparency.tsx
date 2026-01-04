@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { PieChart, FileText, ShieldCheck, Download, Calendar, Image as ImageIcon, Camera, X, Loader2 } from 'lucide-react';
 import { Transacao } from '../types';
@@ -57,7 +58,7 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
       
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text('Prestação de Contas: A Ética da Execução', 20, 28);
+      doc.text('Destino real: Transparência Absoluta', 20, 28);
 
       doc.setDrawColor(ejnGold[0], ejnGold[1], ejnGold[2]);
       doc.setLineWidth(0.5);
@@ -71,22 +72,22 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
       doc.setTextColor(ejnDark[0], ejnDark[1], ejnDark[2]);
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
-      doc.text('A Ética da Execução: Panorama de Impacto', 20, 55);
+      doc.text('Destino real: Panorama de Impacto', 20, 55);
 
       const summaryY = 65;
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text('Líderes em Formação no Ciclo:', 20, summaryY);
+      doc.text('Líderes formados no Ciclo:', 20, summaryY);
       doc.setFont('helvetica', 'bold');
-      doc.text(`${impactCount} Talentos`, 85, summaryY);
+      doc.text(`${impactCount} Líderes`, 85, summaryY);
 
       doc.setFont('helvetica', 'normal');
-      doc.text('Capital Social Investido:', 20, summaryY + 8);
+      doc.text('Impacto Social Investido:', 20, summaryY + 8);
       doc.setFont('helvetica', 'bold');
       doc.text(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalInvested), 85, summaryY + 8);
 
       doc.setFontSize(14);
-      doc.text('Rastreabilidade: Destinação de Recursos', 20, summaryY + 35);
+      doc.text('Rastreabilidade: Fluxo Real', 20, summaryY + 35);
 
       const tableData = confirmedOuts.map(t => [
         new Date(t.created_at).toLocaleDateString('pt-BR'),
@@ -98,11 +99,11 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
       if (tableData.length === 0) {
         doc.setFontSize(10);
         doc.setFont('helvetica', 'italic');
-        doc.text('Nenhuma evidência confirmada registrada no período.', 20, summaryY + 45);
+        doc.text('Nenhuma evidência registrada no período.', 20, summaryY + 45);
       } else {
         autoTable(doc, {
           startY: summaryY + 40,
-          head: [['Data', 'Descrição da Entrega', 'Eixo de Atuação', 'Valor']],
+          head: [['Data', 'Descrição', 'Eixo', 'Valor']],
           body: tableData,
           theme: 'striped',
           headStyles: { 
@@ -121,19 +122,19 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
         });
       }
 
-      doc.save(`Prestacao_Contas_EJN_${new Date().toISOString().split('T')[0]}.pdf`);
+      doc.save(`Destino_Real_EJN_${new Date().toISOString().split('T')[0]}.pdf`);
     } catch (error) {
       console.error('Falha técnica:', error);
-      alert('Não foi possível processar o relatório de prestação de contas no momento.');
+      alert('Tente novamente em instantes.');
     } finally {
       setIsGenerating(false);
     }
   };
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-10">
-      <div className="bg-white p-10 rounded-apple-2xl shadow-sm border border-gray-50 flex flex-col lg:flex-row items-center gap-12">
-        <div className="w-48 h-48 relative flex items-center justify-center">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-12">
+      <div className="bg-white p-12 rounded-apple-2xl shadow-sm border border-gray-50 flex flex-col lg:flex-row items-center gap-16">
+        <div className="w-56 h-56 relative flex items-center justify-center">
           <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
             {catData.map((d, i) => {
               let offset = 0;
@@ -146,64 +147,64 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
             })}
           </svg>
           <div className="absolute text-center">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Execução Mensal</span>
-            <p className="text-xl font-black text-ejn-teal">{new Intl.NumberFormat('pt-BR', { notation: 'compact' }).format(totalMonthlyOut)}</p>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Este mês</span>
+            <p className="text-2xl font-black text-ejn-teal">{new Intl.NumberFormat('pt-BR', { notation: 'compact' }).format(totalMonthlyOut)}</p>
           </div>
         </div>
 
-        <div className="flex-1 space-y-8">
+        <div className="flex-1 space-y-10">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="text-2xl font-bold text-ejn-teal flex items-center gap-2"><PieChart className="w-6 h-6" />Prestação de Contas</h3>
-              <p className="text-apple-text-secondary font-extralight">A ética da execução: transformando capital social em competência.</p>
+              <h3 className="text-3xl font-bold text-ejn-teal flex items-center gap-3 tracking-tighter"><PieChart className="w-8 h-8" />Destino real</h3>
+              <p className="text-apple-text-secondary font-extralight text-lg">Transparência absoluta em cada movimento.</p>
             </div>
             <button 
               onClick={handleGeneratePDF}
               disabled={isGenerating}
-              className={`bg-ejn-gold text-white px-6 py-3 rounded-apple-lg font-bold shadow-md shadow-ejn-gold/10 flex items-center gap-2 transition-all ${isGenerating ? 'opacity-70 cursor-wait' : 'hover:bg-[#D19900]'}`}
+              className={`bg-ejn-gold text-white px-8 py-4 rounded-apple-xl font-bold shadow-xl shadow-ejn-gold/20 flex items-center gap-3 transition-all ${isGenerating ? 'opacity-70 cursor-wait' : 'hover:bg-[#D19900] active:scale-95'}`}
             >
               {isGenerating ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Consolidando...
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Sincronizando...
                 </>
               ) : (
                 <>
-                  <Download className="w-4 h-4" />
-                  Documento Oficial (PDF)
+                  <Download className="w-5 h-5" />
+                  Relatório PDF
                 </>
               )}
             </button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {catData.map((item, i) => (
-              <div key={i} className="p-4 bg-apple-gray rounded-apple-lg border border-gray-100">
-                <span className="text-[10px] font-bold text-gray-400 uppercase block mb-1">{item.label}</span>
-                <p className="text-lg font-black text-ejn-teal">{item.pct}%</p>
+              <div key={i} className="p-6 bg-apple-gray/50 rounded-apple-xl border border-gray-100">
+                <span className="text-[10px] font-bold text-gray-400 uppercase block mb-2 tracking-widest">{item.label}</span>
+                <p className="text-2xl font-black text-ejn-teal">{item.pct}%</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="space-y-6">
-        <h3 className="text-xl font-bold text-ejn-teal flex items-center gap-3"><ShieldCheck className="w-6 h-6" />Rastreabilidade de Entregas</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="space-y-8">
+        <h3 className="text-2xl font-bold text-ejn-teal flex items-center gap-3 tracking-tighter"><ShieldCheck className="w-8 h-8" />Transparência</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {verifiedTransactions.map((item) => (
-            <div key={item.id} className="bg-white rounded-apple-2xl shadow-sm border border-gray-50 overflow-hidden group">
-              <div className="relative h-40 bg-gray-100">
+            <div key={item.id} className="bg-white rounded-apple-2xl shadow-sm border border-gray-50 overflow-hidden group hover:shadow-xl transition-all duration-500">
+              <div className="relative h-48 bg-gray-100">
                 {item.comprovante_url ? (
                   <img src={item.comprovante_url} alt={item.descricao} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center"><FileText className="w-10 h-10 text-gray-300" /></div>
+                  <div className="w-full h-full flex items-center justify-center"><FileText className="w-12 h-12 text-gray-200" /></div>
                 )}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
-                  <button onClick={() => item.comprovante_url && setLightboxImage(item.comprovante_url)} className="text-white text-xs font-bold bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">Ver Evidência</button>
+                  <button onClick={() => item.comprovante_url && setLightboxImage(item.comprovante_url)} className="text-white text-xs font-bold bg-white/20 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/20">Ver recibo</button>
                 </div>
               </div>
-              <div className="p-5">
-                <h4 className="font-bold text-gray-800 text-sm mb-1 line-clamp-1">{item.descricao}</h4>
-                <div className="flex items-center gap-2 text-[10px] text-apple-text-secondary font-bold uppercase">
+              <div className="p-6">
+                <h4 className="font-bold text-gray-800 text-sm mb-2 line-clamp-1">{item.descricao}</h4>
+                <div className="flex items-center gap-2 text-[10px] text-apple-text-secondary font-bold uppercase tracking-widest">
                   <Calendar className="w-3 h-3" />
                   {new Date(item.created_at).toLocaleDateString('pt-BR')}
                 </div>
@@ -214,16 +215,16 @@ export const Transparency: React.FC<TransparencyProps> = ({ transactions, impact
       </div>
 
       {lightboxImage && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-12 animate-in fade-in">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-8 animate-in fade-in">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setLightboxImage(null)} />
           <div className="relative max-w-4xl bg-white rounded-apple-2xl overflow-hidden shadow-2xl animate-in zoom-in-95">
             <img src={lightboxImage} alt="Doc" className="w-full h-auto max-h-[80vh] object-contain" />
-            <div className="p-8 border-t flex justify-between items-center">
+            <div className="p-10 border-t flex justify-between items-center bg-white">
               <div>
-                <h3 className="text-lg font-bold text-ejn-teal">Comprovação Fiscal de Execução</h3>
-                <p className="text-xs text-apple-text-secondary">Evidência validada pelo comitê estratégico do Instituto EJN.</p>
+                <h3 className="text-xl font-bold text-ejn-teal">Comprovação Fiscal</h3>
+                <p className="text-sm text-apple-text-secondary font-extralight">Auditado pelo Instituto EJN.</p>
               </div>
-              <button onClick={() => setLightboxImage(null)} className="p-4 bg-apple-gray rounded-full"><X /></button>
+              <button onClick={() => setLightboxImage(null)} className="p-4 bg-apple-gray rounded-full hover:bg-gray-200 transition-colors"><X className="w-6 h-6 text-gray-400" /></button>
             </div>
           </div>
         </div>

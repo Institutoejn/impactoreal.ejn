@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ArrowRight, Star, Target } from 'lucide-react';
 import { Projeto, Transacao } from '../types';
@@ -20,9 +21,9 @@ export const FeaturedProject: React.FC<FeaturedProjectProps> = ({ projects, tran
         <div className="w-16 h-16 bg-apple-gray rounded-full flex items-center justify-center mb-6">
           <Target className="w-8 h-8 text-gray-300" />
         </div>
-        <h3 className="text-xl font-bold text-ejn-teal mb-2">Estamos preparando novos sonhos.</h3>
-        <p className="text-apple-text-secondary font-extralight max-w-xs">
-          Fique atento! Novas frentes de impacto social serão lançadas em breve por nossa presidência.
+        <h3 className="text-xl font-bold text-ejn-teal mb-2 tracking-tight">Despertando novos amanhãs.</h3>
+        <p className="text-apple-text-secondary font-extralight max-w-xs leading-snug">
+          Estamos preparando novas trilhas de impacto para a nossa região.
         </p>
       </div>
     );
@@ -52,23 +53,23 @@ export const FeaturedProject: React.FC<FeaturedProjectProps> = ({ projects, tran
         <div className="absolute top-4 left-4">
           <span className="bg-ejn-gold text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-lg shadow-ejn-gold/30">
             <Star className="w-3 h-3 fill-white" />
-            Foco Estratégico
+            Foco Real
           </span>
         </div>
       </div>
       
-      <div className="p-8 flex flex-col flex-1">
-        <h3 className="text-xl font-bold text-ejn-teal mb-3">{project.nome}</h3>
-        <p className="text-apple-text-secondary text-sm mb-8 leading-relaxed font-extralight line-clamp-3">
+      <div className="p-10 flex flex-col flex-1">
+        <h3 className="text-2xl font-bold text-ejn-teal mb-3 tracking-tighter">{project.nome}</h3>
+        <p className="text-apple-text-secondary text-sm mb-10 leading-relaxed font-extralight line-clamp-3">
           {project.descricao}
         </p>
         
         <div className="mt-auto">
           <div className="flex justify-between items-center mb-4">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Aceleração Real</span>
-            <span className="text-xs font-bold text-ejn-gold">{progress}% concluído</span>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Evolução</span>
+            <span className="text-sm font-bold text-ejn-gold">{progress}% concluído</span>
           </div>
-          <div className="w-full h-2 bg-apple-gray rounded-full mb-8 overflow-hidden">
+          <div className="w-full h-2 bg-apple-gray rounded-full mb-10 overflow-hidden">
             <div 
               className="h-full bg-ejn-gold rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(232,171,0,0.4)]" 
               style={{ width: `${progress}%` }}
@@ -77,10 +78,10 @@ export const FeaturedProject: React.FC<FeaturedProjectProps> = ({ projects, tran
 
           <button 
             onClick={() => onNavigate('projects')}
-            className="w-full bg-ejn-gold text-white font-bold py-4 rounded-apple-lg hover:bg-[#D19900] transition-all transform active:scale-[0.98] shadow-lg shadow-ejn-gold/20 flex items-center justify-center gap-2"
+            className="w-full bg-ejn-teal text-white font-bold py-5 rounded-apple-xl hover:bg-[#004d45] transition-all transform active:scale-[0.98] shadow-2xl shadow-ejn-teal/10 flex items-center justify-center gap-3 text-lg"
           >
-            Impulsionar este Legado
-            <ArrowRight className="w-5 h-5" />
+            Impulsionar
+            <ArrowRight className="w-6 h-6" />
           </button>
         </div>
       </div>

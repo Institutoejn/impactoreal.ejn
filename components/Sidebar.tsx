@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   LayoutDashboard, 
@@ -28,19 +29,19 @@ interface SidebarProps {
 }
 
 const donorNavItems: NavItem[] = [
-  { id: 'overview', label: 'Painel de Impacto', icon: LayoutDashboard },
-  { id: 'investments', label: 'Causas que Impulsiono', icon: Coins },
-  { id: 'projects', label: 'Escolher uma Causa', icon: Target },
-  { id: 'transparency', label: 'Prestação de Contas', icon: FileText },
+  { id: 'overview', label: 'Seu impacto', icon: LayoutDashboard },
+  { id: 'investments', label: 'Meu legado', icon: Coins },
+  { id: 'projects', label: 'Impulsionar', icon: Target },
+  { id: 'transparency', label: 'Destino real', icon: FileText },
 ];
 
 const managerNavItems: NavItem[] = [
-  { id: 'overview', label: 'Panorama Geral', icon: LayoutDashboard },
-  { id: 'students', label: 'Gestão de Líderes', icon: Users },
-  { id: 'project-management', label: 'Aceleração de Projetos', icon: Rocket },
-  { id: 'treasury', label: 'Tesouraria Estratégica', icon: Wallet },
-  { id: 'esg', label: 'Inteligência ESG', icon: BarChart3 },
-  { id: 'settings', label: 'Configurações', icon: Settings },
+  { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'students', label: 'Líderes', icon: Users },
+  { id: 'project-management', label: 'Projetos', icon: Rocket },
+  { id: 'treasury', label: 'Tesouraria', icon: Wallet },
+  { id: 'esg', label: 'ESG', icon: BarChart3 },
+  { id: 'settings', label: 'Ajustes', icon: Settings },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, profilePhoto, isOpen, onClose, onLogout }) => {
@@ -69,7 +70,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, pr
         <div className="px-4 py-2 bg-ejn-teal/5 rounded-full inline-flex items-center gap-2">
           <div className={`w-2 h-2 rounded-full ${role === 'gestor' ? 'bg-ejn-gold' : 'bg-green-500 animate-pulse'}`} />
           <span className="text-[10px] font-bold text-ejn-teal uppercase tracking-widest font-poppins">
-            Acesso: {role === 'gestor' ? 'Presidente' : 'Impulsionador'}
+            {role === 'gestor' ? 'Gestão' : 'Investidor'}
           </span>
         </div>
       </div>
@@ -109,7 +110,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, pr
               <User className="w-5 h-5 text-ejn-teal" />
             )}
           </div>
-          <span className="font-bold text-[15px] truncate">Perfil & Legado</span>
+          <span className="font-bold text-[15px] truncate">Perfil</span>
         </button>
 
         <button 
@@ -117,7 +118,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, pr
           className="w-full flex items-center gap-4 px-6 py-4 text-red-500 rounded-apple-lg hover:bg-red-50 transition-all duration-300 group"
         >
           <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          <span className="font-bold text-[15px]">Encerrar Sessão</span>
+          <span className="font-bold text-[15px]">Sair</span>
         </button>
       </div>
     </aside>

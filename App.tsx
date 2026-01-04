@@ -44,14 +44,14 @@ const App: React.FC = () => {
         const newProfile = {
           id: userId,
           email: email,
-          nome: isMaster ? 'Paulo Ricardo' : 'Novo Impulsionador',
+          nome: isMaster ? 'Paulo Ricardo' : 'Impulsionador',
           cargo: isMaster ? 'gestor' : 'doador',
-          bio: isMaster ? 'Presidente do Instituto Escola Jovens de Negócios.' : 'Protagonista da transformação social através do investimento em capital humano.'
+          bio: isMaster ? 'Presidente do Instituto Escola Jovens de Negócios.' : 'Construindo novos amanhãs.'
         };
         await supabase.from('perfis').insert([newProfile]);
         setProfileData(newProfile);
       } else if (data) {
-        if (isMaster && (data.nome === 'Novo Impulsionador' || !data.nome)) {
+        if (isMaster && (data.nome === 'Impulsionador' || !data.nome)) {
           const update = { nome: 'Paulo Ricardo', cargo: 'gestor' };
           await supabase.from('perfis').update(update).eq('id', userId);
           setProfileData({ ...data, ...update });
@@ -137,11 +137,11 @@ const App: React.FC = () => {
         comprovante_url: newTr.comprovante_url || null
       }]);
       if (error) throw error;
-      alert('Sua alocação de capital social foi registrada. Nossa equipe validará a execução.');
+      alert('Seu impulsionamento foi registrado.');
       fetchData(true);
       return true;
     } catch (err: any) {
-      alert(`Erro na sincronização de dados: ${err.message}`);
+      alert(`Falha técnica: ${err.message}`);
       return false;
     }
   };
@@ -173,24 +173,24 @@ const App: React.FC = () => {
         onLogout={handleLogout} 
       />
 
-      <main className="flex-1 min-w-0 lg:ml-72 p-6 md:p-12 overflow-y-auto">
-        <header className="flex flex-col md:flex-row md:justify-between md:items-start mb-8 gap-6">
-          <div className="lg:hidden"><button onClick={() => setIsSidebarOpen(true)} className="p-2 text-ejn-teal bg-white rounded-lg shadow-sm"><Menu /></button></div>
+      <main className="flex-1 min-w-0 lg:ml-72 p-6 md:p-16 overflow-y-auto">
+        <header className="flex flex-col md:flex-row md:justify-between md:items-start mb-12 gap-6">
+          <div className="lg:hidden"><button onClick={() => setIsSidebarOpen(true)} className="p-3 text-ejn-teal bg-white rounded-xl shadow-sm"><Menu /></button></div>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-ejn-teal font-poppins">
-              {role === 'gestor' ? `Painel de Comando: Liderando a Transformação` : `Painel de Impacto: Olá, ${profileData.nome?.split(' ')[0]}`}
+            <h1 className="text-4xl md:text-5xl font-black text-ejn-teal font-poppins tracking-tighter">
+              {role === 'gestor' ? `Gestão estratégica.` : `Seu impacto, ${profileData.nome?.split(' ')[0]}.`}
             </h1>
-            <p className="text-apple-text-secondary font-extralight tracking-wide">
-              {role === 'gestor' ? "A ética da execução em favor do protagonismo regional." : "Monitorando o capital humano despertado em nossa região."}
+            <p className="text-apple-text-secondary font-extralight tracking-wide text-lg mt-2 opacity-70">
+              {role === 'gestor' ? "A ética da execução." : "Mudando amanhãs, hoje."}
             </p>
           </div>
         </header>
 
-        <div className="max-w-6xl mx-auto pb-20">
+        <div className="max-w-6xl mx-auto pb-32">
           {activeTab === 'overview' && role === 'doador' && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
               <ImpactHero impactCount={impactCount} totalInvested={totalInvested} />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 <TransparencyCard transactions={transacoes} onNavigate={setActiveTab} />
                 <FeaturedProject 
                   projects={projetos} 
@@ -212,7 +212,7 @@ const App: React.FC = () => {
               projects={projetos} 
               transactions={transacoes} 
               onDonate={(pid, amt) => handleAddTransaction({ 
-                descricao: 'Investimento em Futuro Líder', 
+                descricao: 'Impulsionar amanhã', 
                 valor: amt, 
                 tipo: 'entrada', 
                 categoria: 'Doação', 
@@ -249,4 +249,5 @@ const App: React.FC = () => {
   );
 };
 
+// Fix: Adicionando export default para o componente App para resolver erro de importação no index.tsx
 export default App;

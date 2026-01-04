@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { X, Search, MoreHorizontal, GraduationCap, MapPin, UserPlus, Edit2, Trash2, History, Camera, User } from 'lucide-react';
 import { Aluno } from '../types';
@@ -80,23 +81,23 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
           <input 
             type="text" 
-            placeholder="Localizar líder em formação..." 
+            placeholder="Localizar líder..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white rounded-apple-lg outline-none shadow-sm text-sm"
+            className="w-full pl-14 pr-6 py-4 bg-white rounded-apple-xl outline-none shadow-sm border-transparent focus:border-ejn-teal border transition-all"
           />
         </div>
         <button 
           onClick={() => { resetForm(); setIsModalOpen(true); }}
-          className="flex items-center justify-center gap-2 bg-ejn-teal text-white px-6 py-4 rounded-apple-lg font-bold shadow-md"
+          className="flex items-center justify-center gap-3 bg-ejn-teal text-white px-8 py-4 rounded-apple-xl font-bold shadow-lg shadow-ejn-teal/10 hover:bg-[#004d45] transition-all"
         >
           <UserPlus className="w-5 h-5" />
-          Registrar Novo Talento
+          Registrar líder
         </button>
       </div>
 
@@ -105,45 +106,45 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
           <table className="w-full text-left">
             <thead className="bg-apple-gray">
               <tr>
-                <th className="px-8 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Talento</th>
-                <th className="px-8 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Trilha Estratégica</th>
-                <th className="px-8 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Região</th>
-                <th className="px-8 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-right">Ações</th>
+                <th className="px-10 py-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Líder</th>
+                <th className="px-10 py-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Trilha</th>
+                <th className="px-10 py-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Região</th>
+                <th className="px-10 py-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {filtered.map((s) => (
-                <tr key={s.id} className="hover:bg-apple-gray/30 transition-colors group">
-                  <td className="px-8 py-5">
+                <tr key={s.id} className="hover:bg-apple-gray/20 transition-colors group">
+                  <td className="px-10 py-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-ejn-teal/5 rounded-full overflow-hidden border border-gray-100 flex items-center justify-center text-ejn-teal font-bold">
+                      <div className="w-12 h-12 bg-ejn-teal/5 rounded-full overflow-hidden border border-gray-100 flex items-center justify-center text-ejn-teal font-bold shadow-sm">
                         {s.foto_url ? <img src={s.foto_url} className="w-full h-full object-cover" /> : s.nome.charAt(0)}
                       </div>
                       <div>
-                        <p className="font-bold text-ejn-teal">{s.nome}</p>
-                        <p className="text-xs text-apple-text-secondary font-extralight">{s.idade} anos</p>
+                        <p className="font-bold text-ejn-teal text-lg">{s.nome}</p>
+                        <p className="text-xs text-apple-text-secondary font-extralight uppercase font-bold tracking-widest">{s.idade} anos</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-8 py-5">
+                  <td className="px-10 py-6">
                     <div className="flex items-center gap-2 text-sm text-gray-700 font-bold">
-                      <GraduationCap className="w-4 h-4 text-gray-300" />
+                      <GraduationCap className="w-4 h-4 text-ejn-gold" />
                       {s.curso}
                     </div>
                   </td>
-                  <td className="px-8 py-5">
+                  <td className="px-10 py-6">
                     <div className="flex items-center gap-2 text-sm text-gray-500 font-extralight">
                       <MapPin className="w-4 h-4 text-gray-300" />
                       {s.bairro}
                     </div>
                   </td>
-                  <td className="px-8 py-5 text-right relative">
-                    <button onClick={() => setActiveMenuId(activeMenuId === s.id ? null : s.id)} className="p-2 text-gray-300 hover:text-ejn-teal"><MoreHorizontal className="w-5 h-5" /></button>
+                  <td className="px-10 py-6 text-right relative">
+                    <button onClick={() => setActiveMenuId(activeMenuId === s.id ? null : s.id)} className="p-3 text-gray-300 hover:text-ejn-teal transition-colors"><MoreHorizontal className="w-6 h-6" /></button>
                     {activeMenuId === s.id && (
-                      <div className="absolute right-8 top-12 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-30">
-                        <button onClick={() => { setHistoryStudent(s); setIsHistoryModalOpen(true); setActiveMenuId(null); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-600 hover:bg-apple-gray"><History className="w-4 h-4 text-ejn-teal" />Trajetória</button>
-                        <button onClick={() => handleEdit(s)} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-600 hover:bg-apple-gray"><Edit2 className="w-4 h-4 text-ejn-gold" />Editar</button>
-                        <button onClick={() => onDeleteStudent(s.id)} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50"><Trash2 className="w-4 h-4" />Remover</button>
+                      <div className="absolute right-10 top-16 w-56 bg-white rounded-apple-xl shadow-2xl border border-gray-100 py-3 z-30 animate-in fade-in zoom-in-95 duration-200">
+                        <button onClick={() => { setHistoryStudent(s); setIsHistoryModalOpen(true); setActiveMenuId(null); }} className="w-full flex items-center gap-4 px-6 py-4 text-sm font-bold text-gray-600 hover:bg-apple-gray transition-colors"><History className="w-4 h-4 text-ejn-teal" />Sua Jornada</button>
+                        <button onClick={() => handleEdit(s)} className="w-full flex items-center gap-4 px-6 py-4 text-sm font-bold text-gray-600 hover:bg-apple-gray transition-colors"><Edit2 className="w-4 h-4 text-ejn-gold" />Editar</button>
+                        <button onClick={() => onDeleteStudent(s.id)} className="w-full flex items-center gap-4 px-6 py-4 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors"><Trash2 className="w-4 h-4" />Remover</button>
                       </div>
                     )}
                   </td>
@@ -155,59 +156,59 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ students, 
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-md">
-          <div className="bg-white w-full max-w-2xl rounded-apple-2xl shadow-2xl overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-ejn-teal">{editingStudent ? 'Atualizar Talento' : 'Novo Talento'}</h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-apple-gray rounded-full"><X className="w-6 h-6 text-gray-400" /></button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/10 backdrop-blur-md">
+          <div className="bg-white w-full max-w-2xl rounded-apple-2xl shadow-2xl overflow-hidden animate-in zoom-in-95">
+            <div className="flex items-center justify-between p-8 border-b border-gray-100">
+              <h2 className="text-2xl font-bold text-ejn-teal tracking-tighter">{editingStudent ? 'Atualizar líder' : 'Novo líder'}</h2>
+              <button onClick={() => setIsModalOpen(false)} className="p-3 hover:bg-apple-gray rounded-full transition-colors"><X className="w-6 h-6 text-gray-300" /></button>
             </div>
-            <form onSubmit={handleSubmit} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
+            <form onSubmit={handleSubmit} className="p-10 space-y-8 max-h-[70vh] overflow-y-auto">
               <div className="flex flex-col items-center">
                 <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                  <div className="w-24 h-24 bg-apple-gray rounded-full flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-200">
+                  <div className="w-28 h-28 bg-apple-gray rounded-full flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-200 hover:border-ejn-teal transition-colors">
                     {formData.foto_url ? <img src={formData.foto_url} className="w-full h-full object-cover" /> : <Camera className="w-10 h-10 text-gray-300" />}
                   </div>
                   <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
                 </div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mt-2 tracking-widest">Identidade Visual</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase mt-4 tracking-widest">Identidade Visual</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="md:col-span-2">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1 tracking-widest">Nome do Protagonista *</label>
-                  <input required type="text" value={formData.nome} onChange={(e) => setFormData({...formData, nome: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border shadow-sm outline-none focus:border-ejn-teal font-bold" placeholder="Nome Completo" />
+                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-3 px-1 tracking-widest">Nome completo *</label>
+                  <input required type="text" value={formData.nome} onChange={(e) => setFormData({...formData, nome: e.target.value})} className="w-full px-6 py-4 bg-apple-gray rounded-apple-xl outline-none focus:bg-white border-transparent focus:border-ejn-teal border transition-all font-bold" />
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1 tracking-widest">Idade</label>
-                  <input type="number" value={formData.idade} onChange={(e) => setFormData({...formData, idade: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border shadow-sm outline-none focus:border-ejn-teal font-bold" placeholder="Ex: 19" />
+                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-3 px-1 tracking-widest">Idade</label>
+                  <input type="number" value={formData.idade} onChange={(e) => setFormData({...formData, idade: e.target.value})} className="w-full px-6 py-4 bg-apple-gray rounded-apple-xl outline-none focus:bg-white border-transparent focus:border-ejn-teal border transition-all font-bold" />
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1 tracking-widest">Bairro de Rio Preto</label>
-                  <input type="text" value={formData.bairro} onChange={(e) => setFormData({...formData, bairro: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border shadow-sm outline-none focus:border-ejn-teal font-bold" placeholder="Localização regional" />
+                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-3 px-1 tracking-widest">Região</label>
+                  <input type="text" value={formData.bairro} onChange={(e) => setFormData({...formData, bairro: e.target.value})} className="w-full px-6 py-4 bg-apple-gray rounded-apple-xl outline-none focus:bg-white border-transparent focus:border-ejn-teal border transition-all font-bold" />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1 tracking-widest">Trilha Estratégica *</label>
-                  <input required type="text" value={formData.curso} onChange={(e) => setFormData({...formData, curso: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border shadow-sm outline-none focus:border-ejn-teal font-bold" placeholder="Ex: UX Design e Negócios" />
+                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-3 px-1 tracking-widest">Trilha estratégica *</label>
+                  <input required type="text" value={formData.curso} onChange={(e) => setFormData({...formData, curso: e.target.value})} className="w-full px-6 py-4 bg-apple-gray rounded-apple-xl outline-none focus:bg-white border-transparent focus:border-ejn-teal border transition-all font-bold" />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-2 px-1 tracking-widest">Sua trajetória até o Instituto</label>
-                  <textarea value={formData.observacoes} onChange={(e) => setFormData({...formData, observacoes: e.target.value})} className="w-full px-5 py-3 bg-apple-gray rounded-apple-lg border shadow-sm outline-none focus:border-ejn-teal h-24 resize-none font-extralight" placeholder="Contexto, motivação e potencial de impacto..." />
+                  <label className="text-[11px] font-bold text-gray-400 uppercase block mb-3 px-1 tracking-widest">Sua Jornada</label>
+                  <textarea value={formData.observacoes} onChange={(e) => setFormData({...formData, observacoes: e.target.value})} className="w-full px-6 py-4 bg-apple-gray rounded-apple-xl outline-none focus:bg-white border-transparent focus:border-ejn-teal border transition-all h-32 resize-none font-extralight text-lg" placeholder="Como o Instituto mudou seu amanhã..." />
                 </div>
               </div>
-              <button type="submit" className="w-full bg-ejn-teal text-white py-4 rounded-apple-lg font-bold shadow-lg hover:bg-[#004d45] uppercase tracking-widest text-sm">Validar Registro de Liderança</button>
+              <button type="submit" className="w-full bg-ejn-teal text-white py-5 rounded-apple-xl font-bold shadow-xl shadow-ejn-teal/10 hover:bg-[#004d45] uppercase tracking-widest text-sm transition-all active:scale-[0.98]">Confirmar registro</button>
             </form>
           </div>
         </div>
       )}
 
       {isHistoryModalOpen && historyStudent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-lg rounded-apple-2xl shadow-2xl p-8">
-            <h2 className="text-2xl font-bold text-ejn-teal mb-6">Trajetória: {historyStudent.nome}</h2>
-            <div className="bg-apple-gray p-6 rounded-apple-xl italic text-gray-700 leading-relaxed mb-8 font-extralight">
-              "{historyStudent.observacoes || 'Sem trajetória registrada.'}"
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/10 backdrop-blur-md animate-in fade-in">
+          <div className="bg-white w-full max-w-xl rounded-apple-2xl shadow-2xl p-12 animate-in zoom-in-95">
+            <h2 className="text-3xl font-bold text-ejn-teal mb-8 tracking-tighter">Sua Jornada: {historyStudent.nome}</h2>
+            <div className="bg-apple-gray/50 p-8 rounded-apple-xl italic text-gray-700 leading-relaxed mb-10 font-extralight text-xl">
+              "{historyStudent.observacoes || 'Trajetória em construção.'}"
             </div>
-            <button onClick={() => setIsHistoryModalOpen(false)} className="w-full bg-ejn-teal text-white py-4 rounded-apple-lg font-bold">Fechar</button>
+            <button onClick={() => setIsHistoryModalOpen(false)} className="w-full bg-ejn-teal text-white py-5 rounded-apple-xl font-bold text-lg hover:bg-[#004d45] transition-all">Fechar</button>
           </div>
         </div>
       )}
