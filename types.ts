@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-export type UserRole = 'donor' | 'manager';
+export type UserRole = 'doador' | 'gestor';
 
 export interface NavItem {
   id: string;
@@ -31,7 +31,7 @@ export interface Projeto {
 
 export interface Transacao {
   id: string;
-  date: string; // Mantido como date ou convertido para created_at se preferir, mas usando o schema solicitado
+  date: string;
   descricao: string;
   categoria: 'Educação' | 'Infraestrutura' | 'Alimentação' | 'Doação' | 'Outros';
   tipo: 'in' | 'out';
@@ -49,6 +49,9 @@ export interface Perfil {
   foto_url: string | null;
   bio: string;
   cargo: UserRole;
-  linkedin: string;
-  instagram: string;
+  linkedin?: string;
+  instagram?: string;
+  razao_social?: string;
+  cnpj?: string;
+  endereco?: string;
 }

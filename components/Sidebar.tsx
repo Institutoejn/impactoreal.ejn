@@ -45,14 +45,14 @@ const managerNavItems: NavItem[] = [
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, profilePhoto, isOpen, onClose, onLogout }) => {
-  const items = role === 'donor' ? donorNavItems : managerNavItems;
+  const items = role === 'gestor' ? managerNavItems : donorNavItems;
 
   return (
     <aside className={`fixed left-0 top-0 h-screen w-72 bg-white border-r border-gray-100 flex flex-col z-50 transition-transform duration-300 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       {/* Brand Header */}
       <div className="p-8 pb-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-ejn-teal rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-ejn-teal rounded-xl flex items-center justify-center shadow-lg shadow-ejn-teal/10">
             <Heart className="text-white w-6 h-6" fill="white" />
           </div>
           <h1 className="text-2xl font-bold text-ejn-teal tracking-tight">
@@ -69,9 +69,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, pr
 
       <div className="px-8 py-4 mb-4">
         <div className="px-4 py-2 bg-ejn-teal/5 rounded-full inline-flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${role === 'manager' ? 'bg-ejn-gold' : 'bg-green-500 animate-pulse'}`} />
+          <div className={`w-2 h-2 rounded-full ${role === 'gestor' ? 'bg-ejn-gold' : 'bg-green-500 animate-pulse'}`} />
           <span className="text-[10px] font-black text-ejn-teal uppercase tracking-widest">
-            Visão {role === 'manager' ? 'Gestor' : 'Doador'}
+            Acesso: {role === 'gestor' ? 'Presidente' : 'Doador'}
           </span>
         </div>
       </div>
@@ -106,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, pr
               : 'text-apple-text-secondary hover:bg-apple-gray/50 hover:text-ejn-teal'
           }`}
         >
-          <div className="w-8 h-8 rounded-full bg-ejn-teal/10 flex items-center justify-center overflow-hidden shrink-0">
+          <div className="w-8 h-8 rounded-full bg-ejn-teal/10 flex items-center justify-center overflow-hidden shrink-0 border border-ejn-teal/5">
             {profilePhoto ? (
               <img src={profilePhoto} alt="User" className="w-full h-full object-cover" />
             ) : (
@@ -118,10 +118,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, pr
 
         <button 
           onClick={onLogout}
-          className="w-full flex items-center gap-4 px-6 py-4 text-red-500 rounded-apple-lg hover:bg-red-50 transition-all duration-300"
+          className="w-full flex items-center gap-4 px-6 py-4 text-red-500 rounded-apple-lg hover:bg-red-50 transition-all duration-300 group"
         >
-          <LogOut className="w-5 h-5" />
-          <span className="font-medium text-[15px]">Sair</span>
+          <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
+          <span className="font-medium text-[15px]">Sair do App</span>
         </button>
       </div>
     </aside>
