@@ -192,7 +192,7 @@ const App: React.FC = () => {
               {role === 'gestor' ? `Gestão estratégica.` : `Seu impacto, ${profileData.nome?.split(' ')[0]}.`}
             </h1>
             <p className="text-apple-text-secondary font-extralight tracking-wide text-base mt-1.5 opacity-70">
-              {role === 'gestor' ? "A ética da execução." : "Mudando amanhãs, hoje."}
+              {role === 'gestor' ? "A ética da execução." : "Entre ganhar dinheiro e mudar o mundo, escolhemos os dois!"}
             </p>
           </div>
         </header>
