@@ -11,9 +11,9 @@ import {
   Wallet,
   BarChart3,
   Settings,
-  ChevronDown,
   Rocket,
-  X
+  X,
+  LogOut
 } from 'lucide-react';
 import { NavItem, UserRole } from '../types';
 
@@ -25,6 +25,7 @@ interface SidebarProps {
   profilePhoto: string | null;
   isOpen?: boolean;
   onClose?: () => void;
+  onLogout: () => void;
 }
 
 const donorNavItems: NavItem[] = [
@@ -43,7 +44,7 @@ const managerNavItems: NavItem[] = [
   { id: 'settings', label: 'Configurações', icon: Settings },
 ];
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, onRoleSwitch, profilePhoto, isOpen, onClose }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, profilePhoto, isOpen, onClose, onLogout }) => {
   const items = role === 'donor' ? donorNavItems : managerNavItems;
 
   return (
@@ -66,17 +67,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, on
         </button>
       </div>
 
-      {/* Role Switcher */}
-      <div className="px-6 mb-8 mt-4">
-        <button 
-          onClick={() => onRoleSwitch(role === 'donor' ? 'manager' : 'donor')}
-          className="w-full flex items-center justify-between px-4 py-3 bg-apple-gray rounded-apple-lg text-xs font-bold text-ejn-teal group hover:bg-ejn-teal/5 transition-colors"
-        >
-          <span className="uppercase tracking-widest">
-            Visão: {role === 'donor' ? 'Doador' : 'Gestor'}
+      <div className="px-8 py-4 mb-4">
+        <div className="px-4 py-2 bg-ejn-teal/5 rounded-full inline-flex items-center gap-2">
+          <div className={`w-2 h-2 rounded-full ${role === 'manager' ? 'bg-ejn-gold' : 'bg-green-500 animate-pulse'}`} />
+          <span className="text-[10px] font-black text-ejn-teal uppercase tracking-widest">
+            Visão {role === 'manager' ? 'Gestor' : 'Doador'}
           </span>
-          <ChevronDown className="w-3 h-3 text-gray-400 group-hover:text-ejn-teal" />
-        </button>
+        </div>
       </div>
 
       {/* Navigation Menu */}
@@ -99,8 +96,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, on
         ))}
       </nav>
 
-      {/* Profile Footer */}
-      <div className="p-6 mt-auto">
+      {/* Footer Actions */}
+      <div className="p-6 mt-auto space-y-2 border-t border-gray-50">
         <button 
           onClick={() => onNavigate('profile')}
           className={`w-full flex items-center gap-4 px-6 py-4 rounded-apple-lg transition-all duration-300 ${
@@ -117,6 +114,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeId, onNavigate, role, on
             )}
           </div>
           <span className="font-medium text-[15px] truncate">Meu Perfil</span>
+        </button>
+
+        <button 
+          onClick={onLogout}
+          className="w-full flex items-center gap-4 px-6 py-4 text-red-500 rounded-apple-lg hover:bg-red-50 transition-all duration-300"
+        >
+          <LogOut className="w-5 h-5" />
+          <span className="font-medium text-[15px]">Sair</span>
         </button>
       </div>
     </aside>

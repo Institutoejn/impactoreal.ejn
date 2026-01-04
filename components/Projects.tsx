@@ -4,6 +4,14 @@ import { Target, ArrowRight, X, QrCode, Copy, CheckCircle2, Info } from 'lucide-
 import { Projeto, Transacao } from '../types';
 import QRious from 'qrious';
 
+// --- DEFINIÇÕES DE TIPOS ---
+
+interface ProjectsProps {
+  projects: Projeto[];
+  transactions: Transacao[];
+  onDonate: (projectId: string, amount: number) => void;
+}
+
 // --- UTILITÁRIOS PIX (Engenharia de Pagamentos) ---
 
 const crc16 = (str: string): string => {
