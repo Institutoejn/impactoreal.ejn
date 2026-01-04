@@ -16,7 +16,7 @@ import { MyInvestments } from './components/MyInvestments';
 import { Projects } from './components/Projects';
 import { Transparency } from './components/Transparency';
 import { Profile } from './components/Profile';
-import { Menu, Loader2, CheckCircle2, CloudLightning, LogOut } from 'lucide-react';
+import { Menu, Loader2, CheckCircle2, CloudLightning, LogOut, AlertTriangle } from 'lucide-react';
 import { UserRole, Aluno, Transacao, Projeto } from './types';
 import { supabase } from './supabase';
 
@@ -46,12 +46,26 @@ const App: React.FC = () => {
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
-  // Monitoramento de Sessão com verificação de Role Mestre
+  // Sincronização forçada de Role para o Master Email
+  const syncMasterRole = async (userId: string) => {
+    try {
+      const { data } = await supabase.from('perfis').select('cargo').eq('id', userId).single();
+      if (data && data.cargo !== 'gestor') {
+        await supabase.from('perfis').update({ cargo: 'gestor' }).eq('id', userId);
+        console.log("Cargo de Gestor sincronizado no banco de dados.");
+      }
+    } catch (e) {
+      console.error("Falha ao sincronizar role mestre:", e);
+    }
+  };
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session?.user) {
-        setRole(session.user.email === MASTER_MANAGER_EMAIL ? 'gestor' : 'doador');
+        const isMaster = session.user.email === MASTER_MANAGER_EMAIL;
+        setRole(isMaster ? 'gestor' : 'doador');
+        if (isMaster) syncMasterRole(session.user.id);
       }
       setIsAppLoading(false);
     });
@@ -59,7 +73,9 @@ const App: React.FC = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session?.user) {
-        setRole(session.user.email === MASTER_MANAGER_EMAIL ? 'gestor' : 'doador');
+        const isMaster = session.user.email === MASTER_MANAGER_EMAIL;
+        setRole(isMaster ? 'gestor' : 'doador');
+        if (isMaster) syncMasterRole(session.user.id);
       } else {
         setRole('doador');
         setActiveTab('overview');
@@ -88,7 +104,6 @@ const App: React.FC = () => {
       if (profRes.data) {
         setUserName(profRes.data.nome || "Membro EJN");
         setProfilePhoto(profRes.data.foto_url);
-        // Respeitar o cargo do banco se não for o mestre
         if (session.user.email !== MASTER_MANAGER_EMAIL) {
           setRole(profRes.data.cargo || 'doador');
         }
@@ -112,7 +127,7 @@ const App: React.FC = () => {
 
   const handleAddStudent = async (newStudent: Omit<Aluno, 'id' | 'status'>) => {
     if (role !== 'gestor') {
-      alert("Acesso negado: Área restrita ao Presidente.");
+      alert("Acesso negado: Somente o Presidente pode cadastrar alunos.");
       return;
     }
     setIsSyncing(true);
@@ -127,11 +142,16 @@ const App: React.FC = () => {
         status: 'active' 
       }]);
       
-      if (error) throw error;
+      if (error) {
+        if (error.code === '42501') {
+          throw new Error("Permissão Negada (RLS): O banco de dados não reconhece seu usuário como Gestor. Execute o script SQL de permissões no painel do Supabase.");
+        }
+        throw error;
+      }
       showSuccessFeedback("Aluno cadastrado com sucesso!");
       fetchData(true);
     } catch (err: any) {
-      alert(`Erro técnico ao salvar Aluno: ${err.message}`);
+      alert(`Erro no Supabase: ${err.message}`);
     } finally {
       setIsSyncing(false);
     }
@@ -149,11 +169,16 @@ const App: React.FC = () => {
         capa_url: p.capa_url
       }]);
       
-      if (error) throw error;
+      if (error) {
+        if (error.code === '42501') {
+          throw new Error("Permissão Negada (RLS): O banco de dados bloqueou a criação deste projeto. Verifique as políticas de segurança no Supabase.");
+        }
+        throw error;
+      }
       showSuccessFeedback("Projeto social lançado!");
       fetchData(true);
     } catch (err: any) {
-      alert(`Erro técnico ao salvar Projeto: ${err.message}`);
+      alert(`Erro no Supabase: ${err.message}`);
     } finally {
       setIsSyncing(false);
     }
@@ -178,7 +203,7 @@ const App: React.FC = () => {
       showSuccessFeedback("Movimentação registrada!");
       fetchData(true);
     } catch (err: any) {
-      alert(`Erro técnico ao salvar Transação: ${err.message}`);
+      alert(`Erro no Supabase: ${err.message}`);
     } finally {
       setIsSyncing(false);
     }
@@ -197,7 +222,7 @@ const App: React.FC = () => {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-ejn-teal animate-spin mx-auto mb-4" />
-          <p className="text-sm font-bold text-ejn-teal uppercase tracking-widest">Iniciando plataforma...</p>
+          <p className="text-sm font-bold text-ejn-teal uppercase tracking-widest">Sincronizando EJN...</p>
         </div>
       </div>
     );
@@ -224,7 +249,7 @@ const App: React.FC = () => {
       {isLoading && (
         <div className="fixed top-0 left-0 right-0 z-[100] bg-ejn-teal text-white py-2 flex items-center justify-center gap-2 shadow-md">
           <Loader2 className="w-4 h-4 animate-spin" />
-          <span className="text-[10px] font-bold uppercase tracking-widest">Sincronizando com Supabase...</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest">Atualizando Dados...</span>
         </div>
       )}
 
@@ -232,7 +257,7 @@ const App: React.FC = () => {
         {isSyncing && (
           <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-ejn-teal/10 flex items-center gap-2 animate-pulse">
             <CloudLightning className="w-4 h-4 text-ejn-teal" />
-            <span className="text-[9px] font-black text-ejn-teal uppercase tracking-widest">Gravando...</span>
+            <span className="text-[9px] font-black text-ejn-teal uppercase tracking-widest">Salvando...</span>
           </div>
         )}
         {successMessage && (
@@ -265,7 +290,7 @@ const App: React.FC = () => {
               {role === 'gestor' ? 'Painel do Presidente' : `Olá, ${userName.split(' ')[0]}`}
             </h1>
             <p className="text-apple-text-secondary text-base md:text-lg font-medium">
-              {role === 'gestor' ? "Gestão estratégica do Instituto EJN." : "Seu investimento social transformando vidas."}
+              {role === 'gestor' ? "Monitoramento estratégico do Instituto EJN." : "Seu investimento social transformando vidas."}
             </p>
           </div>
           
