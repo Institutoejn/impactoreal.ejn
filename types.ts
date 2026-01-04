@@ -31,7 +31,7 @@ export interface Projeto {
 
 export interface Transacao {
   id: string;
-  date: string;
+  created_at: string; // Alinhado com a coluna real do Supabase
   descricao: string;
   categoria: 'Educação' | 'Infraestrutura' | 'Alimentação' | 'Doação' | 'Outros';
   tipo: 'in' | 'out';

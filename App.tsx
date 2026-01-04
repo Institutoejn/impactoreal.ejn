@@ -16,7 +16,7 @@ import { MyInvestments } from './components/MyInvestments';
 import { Projects } from './components/Projects';
 import { Transparency } from './components/Transparency';
 import { Profile } from './components/Profile';
-import { Menu, Loader2, CheckCircle2, CloudLightning, LogOut, AlertTriangle } from 'lucide-react';
+import { Menu, Loader2, CheckCircle2, CloudLightning, LogOut } from 'lucide-react';
 import { UserRole, Aluno, Transacao, Projeto } from './types';
 import { supabase } from './supabase';
 
@@ -46,16 +46,14 @@ const App: React.FC = () => {
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
-  // Sincronização forçada de Role para o Master Email
   const syncMasterRole = async (userId: string) => {
     try {
       const { data } = await supabase.from('perfis').select('cargo').eq('id', userId).single();
       if (data && data.cargo !== 'gestor') {
         await supabase.from('perfis').update({ cargo: 'gestor' }).eq('id', userId);
-        console.log("Cargo de Gestor sincronizado no banco de dados.");
       }
     } catch (e) {
-      console.error("Falha ao sincronizar role mestre:", e);
+      console.error("Erro sync role:", e);
     }
   };
 
@@ -126,10 +124,7 @@ const App: React.FC = () => {
   };
 
   const handleAddStudent = async (newStudent: Omit<Aluno, 'id' | 'status'>) => {
-    if (role !== 'gestor') {
-      alert("Acesso negado: Somente o Presidente pode cadastrar alunos.");
-      return;
-    }
+    if (role !== 'gestor') return;
     setIsSyncing(true);
     try {
       const { error } = await supabase.from('alunos').insert([{ 
@@ -141,17 +136,11 @@ const App: React.FC = () => {
         foto_url: newStudent.foto_url,
         status: 'active' 
       }]);
-      
-      if (error) {
-        if (error.code === '42501') {
-          throw new Error("Permissão Negada (RLS): O banco de dados não reconhece seu usuário como Gestor. Execute o script SQL de permissões no painel do Supabase.");
-        }
-        throw error;
-      }
-      showSuccessFeedback("Aluno cadastrado com sucesso!");
+      if (error) throw error;
+      showSuccessFeedback("Aluno cadastrado!");
       fetchData(true);
     } catch (err: any) {
-      alert(`Erro no Supabase: ${err.message}`);
+      alert(`Erro Supabase: ${err.message}`);
     } finally {
       setIsSyncing(false);
     }
@@ -168,25 +157,20 @@ const App: React.FC = () => {
         status: p.status,
         capa_url: p.capa_url
       }]);
-      
-      if (error) {
-        if (error.code === '42501') {
-          throw new Error("Permissão Negada (RLS): O banco de dados bloqueou a criação deste projeto. Verifique as políticas de segurança no Supabase.");
-        }
-        throw error;
-      }
+      if (error) throw error;
       showSuccessFeedback("Projeto social lançado!");
       fetchData(true);
     } catch (err: any) {
-      alert(`Erro no Supabase: ${err.message}`);
+      alert(`Erro Supabase: ${err.message}`);
     } finally {
       setIsSyncing(false);
     }
   };
 
-  const handleAddTransaction = async (newTr: Omit<Transacao, 'id'>) => {
+  const handleAddTransaction = async (newTr: Omit<Transacao, 'id' | 'created_at'>) => {
     setIsSyncing(true);
     try {
+      // Importante: Não enviamos a coluna 'date', deixamos o Supabase usar 'created_at'
       const { error } = await supabase.from('transacoes').insert([{
         descricao: newTr.descricao,
         valor: newTr.valor,
@@ -194,16 +178,15 @@ const App: React.FC = () => {
         categoria: newTr.categoria,
         projeto_id: newTr.projeto_id,
         status: newTr.status || 'confirmed',
-        date: newTr.date,
         comprovante_url: newTr.comprovante_url,
         doador_email: session.user.email
       }]);
       
       if (error) throw error;
-      showSuccessFeedback("Movimentação registrada!");
+      showSuccessFeedback("Operação realizada!");
       fetchData(true);
     } catch (err: any) {
-      alert(`Erro no Supabase: ${err.message}`);
+      alert(`Erro Supabase: ${err.message}`);
     } finally {
       setIsSyncing(false);
     }
@@ -217,90 +200,26 @@ const App: React.FC = () => {
     else { showSuccessFeedback("Status validado!"); fetchData(true); }
   };
 
-  if (isAppLoading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 text-ejn-teal animate-spin mx-auto mb-4" />
-          <p className="text-sm font-bold text-ejn-teal uppercase tracking-widest">Sincronizando EJN...</p>
-        </div>
-      </div>
-    );
-  }
+  if (isAppLoading) return <div className="min-h-screen bg-white flex items-center justify-center"><Loader2 className="w-12 h-12 text-ejn-teal animate-spin" /></div>;
 
-  if (!session) {
-    return (
-      <>
-        <LandingPage onStart={() => setShowLogin(true)} />
-        {showLogin && <LoginForm onClose={() => setShowLogin(false)} />}
-      </>
-    );
-  }
+  if (!session) return <><LandingPage onStart={() => setShowLogin(true)} />{showLogin && <LoginForm onClose={() => setShowLogin(false)} />}</>;
 
   const impactStats = {
     impactCount: alunos.length,
-    totalInvested: transacoes
-      .filter(t => t.tipo === 'in' && t.status === 'confirmed')
-      .reduce((acc, t) => acc + t.valor, 0)
+    totalInvested: transacoes.filter(t => t.tipo === 'in' && t.status === 'confirmed').reduce((acc, t) => acc + t.valor, 0)
   };
 
   return (
     <div className="min-h-screen flex font-sans text-gray-900 bg-apple-gray">
-      {isLoading && (
-        <div className="fixed top-0 left-0 right-0 z-[100] bg-ejn-teal text-white py-2 flex items-center justify-center gap-2 shadow-md">
-          <Loader2 className="w-4 h-4 animate-spin" />
-          <span className="text-[10px] font-bold uppercase tracking-widest">Atualizando Dados...</span>
-        </div>
-      )}
+      <Sidebar activeId={activeTab} onNavigate={setActiveTab} role={role} onRoleSwitch={() => {}} profilePhoto={profilePhoto} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} onLogout={handleLogout} />
 
-      <div className="fixed top-6 right-6 z-[100] flex flex-col items-end gap-3 pointer-events-none">
-        {isSyncing && (
-          <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-ejn-teal/10 flex items-center gap-2 animate-pulse">
-            <CloudLightning className="w-4 h-4 text-ejn-teal" />
-            <span className="text-[9px] font-black text-ejn-teal uppercase tracking-widest">Salvando...</span>
-          </div>
-        )}
-        {successMessage && (
-          <div className="bg-green-600 text-white px-6 py-3 rounded-apple-lg shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-right duration-300 pointer-events-auto">
-            <CheckCircle2 className="w-5 h-5 text-ejn-gold" />
-            <span className="text-xs font-bold">{successMessage}</span>
-          </div>
-        )}
-      </div>
-
-      <Sidebar 
-        activeId={activeTab} 
-        onNavigate={setActiveTab} 
-        role={role}
-        onRoleSwitch={() => {}}
-        profilePhoto={profilePhoto}
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-        onLogout={handleLogout}
-      />
-
-      <main className={`flex-1 min-w-0 lg:ml-72 p-6 md:p-12 overflow-y-auto transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
-        <header className="flex flex-col md:flex-row md:justify-between md:items-start mb-8 md:mb-12 gap-6">
-          <div className="flex items-center justify-between w-full md:w-auto lg:hidden">
-            <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-ejn-teal bg-white rounded-apple-lg shadow-sm"><Menu className="w-6 h-6" /></button>
-          </div>
-
+      <main className="flex-1 min-w-0 lg:ml-72 p-6 md:p-12 overflow-y-auto">
+        <header className="flex flex-col md:flex-row md:justify-between md:items-start mb-8 gap-6">
+          <div className="lg:hidden"><button onClick={() => setIsSidebarOpen(true)} className="p-2 text-ejn-teal bg-white rounded-lg shadow-sm"><Menu /></button></div>
           <div className="flex-1">
-            <h1 className="text-3xl md:text-4xl font-bold text-ejn-teal mb-2 tracking-tight">
-              {role === 'gestor' ? 'Painel do Presidente' : `Olá, ${userName.split(' ')[0]}`}
-            </h1>
-            <p className="text-apple-text-secondary text-base md:text-lg font-medium">
-              {role === 'gestor' ? "Monitoramento estratégico do Instituto EJN." : "Seu investimento social transformando vidas."}
-            </p>
+            <h1 className="text-3xl font-bold text-ejn-teal">{role === 'gestor' ? 'Painel do Presidente' : `Olá, ${userName.split(' ')[0]}`}</h1>
+            <p className="text-apple-text-secondary">{role === 'gestor' ? "Gestão estratégica do Instituto EJN." : "Seu investimento social transformando vidas."}</p>
           </div>
-          
-          <button 
-            onClick={handleLogout}
-            className="hidden md:flex items-center gap-2 px-4 py-2 text-red-500 font-bold text-xs uppercase tracking-widest hover:bg-red-50 rounded-lg transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            Sair
-          </button>
         </header>
 
         <div className="max-w-6xl mx-auto pb-20">
@@ -314,28 +233,14 @@ const App: React.FC = () => {
             </div>
           )}
           {activeTab === 'investments' && role === 'doador' && <MyInvestments transactions={transacoes} totalInvested={impactStats.totalInvested} />}
-          {activeTab === 'projects' && role === 'doador' && (
-            <Projects 
-              projects={projetos} 
-              transactions={transacoes} 
-              onDonate={(pid, amt) => handleAddTransaction({ 
-                date: new Date().toISOString(),
-                descricao: 'Doação Realizada', 
-                valor: amt, 
-                tipo: 'in', 
-                categoria: 'Doação', 
-                projeto_id: pid, 
-                status: 'pending' 
-              })} 
-            />
-          )}
+          {activeTab === 'projects' && role === 'doador' && <Projects projects={projetos} transactions={transacoes} onDonate={(pid, amt) => handleAddTransaction({ descricao: 'Doação Realizada', valor: amt, tipo: 'in', categoria: 'Doação', projeto_id: pid, status: 'pending' })} />}
           {activeTab === 'transparency' && role === 'doador' && <Transparency transactions={transacoes} />}
           {activeTab === 'profile' && <Profile role={role} onUpdatePhoto={setProfilePhoto} onUpdateName={setUserName} currentPhoto={profilePhoto} totalInvested={impactStats.totalInvested} />}
           
           {activeTab === 'overview' && role === 'gestor' && <ManagerDashboard students={alunos} transactions={transacoes} onAddStudent={handleAddStudent} onNavigate={setActiveTab} />}
-          {activeTab === 'students' && role === 'gestor' && <StudentManagement students={alunos} onAddStudent={handleAddStudent} onUpdateStudent={async (s) => { await supabase.from('alunos').update(s).eq('id', s.id); fetchData(true); }} onDeleteStudent={async (id) => { if(confirm("Deseja realmente remover este registro?")){ await supabase.from('alunos').delete().eq('id', id); fetchData(true); }}} />}
-          {activeTab === 'project-management' && role === 'gestor' && <ProjectManagement projects={projetos} onAddProject={handleAddProject} onDeleteProject={async (id) => { if(confirm("Remover projeto?")) { await supabase.from('projetos').delete().eq('id', id); fetchData(true); }}} />}
-          {activeTab === 'treasury' && role === 'gestor' && <Treasury transactions={transacoes} projects={projetos} onAddTransaction={handleAddTransaction} onUpdateStatus={handleUpdateTransactionStatus} onDeleteTransaction={async (id) => { if(confirm("Excluir transação?")){ await supabase.from('transacoes').delete().eq('id', id); fetchData(true); }}} />}
+          {activeTab === 'students' && role === 'gestor' && <StudentManagement students={alunos} onAddStudent={handleAddStudent} onUpdateStudent={async (s) => { await supabase.from('alunos').update(s).eq('id', s.id); fetchData(true); }} onDeleteStudent={async (id) => { if(confirm("Remover?")){ await supabase.from('alunos').delete().eq('id', id); fetchData(true); }}} />}
+          {activeTab === 'project-management' && role === 'gestor' && <ProjectManagement projects={projetos} onAddProject={handleAddProject} onDeleteProject={async (id) => { if(confirm("Excluir?")) { await supabase.from('projetos').delete().eq('id', id); fetchData(true); }}} />}
+          {activeTab === 'treasury' && role === 'gestor' && <Treasury transactions={transacoes} projects={projetos} onAddTransaction={handleAddTransaction} onUpdateStatus={handleUpdateTransactionStatus} onDeleteTransaction={async (id) => { if(confirm("Excluir?")){ await supabase.from('transacoes').delete().eq('id', id); fetchData(true); }}} />}
           {activeTab === 'esg' && role === 'gestor' && <ESGReports transactions={transacoes} studentCount={alunos.length} />}
           {activeTab === 'settings' && role === 'gestor' && <Settings onUpdatePhoto={setProfilePhoto} currentPhoto={profilePhoto} />}
         </div>

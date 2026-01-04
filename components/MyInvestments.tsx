@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Award, Download, Calendar, ArrowUpRight } from 'lucide-react';
-// Importação corrigida para Transacao
 import { Transacao } from '../types';
 
 interface MyInvestmentsProps {
@@ -10,40 +9,31 @@ interface MyInvestmentsProps {
 }
 
 export const MyInvestments: React.FC<MyInvestmentsProps> = ({ transactions, totalInvested }) => {
-  // Mock filter for donor specific investments (In this demo, all 'in' transactions for donor)
   const myInvestments = transactions.filter(t => t.tipo === 'in');
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Summary Card */}
-      <div className="bg-white p-10 rounded-apple-2xl shadow-sm border border-gray-50 mb-10 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-12 opacity-5">
-          <Award className="w-32 h-32 text-ejn-gold" />
-        </div>
-        
-        <div className="flex items-center gap-8 relative z-10">
-          <div className="w-24 h-24 bg-ejn-gold/10 rounded-full flex items-center justify-center border-4 border-ejn-gold/20 shadow-xl shadow-ejn-gold/10">
-            <Award className="w-12 h-12 text-ejn-gold" />
+      <div className="bg-white p-10 rounded-apple-2xl shadow-sm border border-gray-50 mb-10 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="flex items-center gap-8">
+          <div className="w-20 h-20 bg-ejn-gold/10 rounded-full flex items-center justify-center border-4 border-ejn-gold/20">
+            <Award className="w-10 h-10 text-ejn-gold" />
           </div>
           <div>
             <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Status do Perfil</p>
-            <h2 className="text-3xl font-black text-ejn-teal mb-1">Investidor Social Prata</h2>
-            <p className="text-apple-text-secondary font-medium">Você já investiu <span className="text-ejn-teal font-bold">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalInvested)}</span> este ano.</p>
+            <h2 className="text-3xl font-black text-ejn-teal mb-1">Investidor Social</h2>
+            <p className="text-apple-text-secondary font-medium">Você já investiu <span className="text-ejn-teal font-bold">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalInvested)}</span></p>
           </div>
         </div>
-
-        <button className="bg-apple-gray text-ejn-teal px-8 py-4 rounded-apple-xl font-bold flex items-center gap-3 hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-gray-100 relative z-10">
+        <button className="bg-ejn-teal text-white px-8 py-4 rounded-apple-xl font-bold flex items-center gap-3 shadow-lg shadow-ejn-teal/10">
           <Download className="w-5 h-5" />
-          Baixar Comprovante Anual (PDF)
+          Baixar Extrato (PDF)
         </button>
       </div>
 
-      {/* History Table */}
       <div className="bg-white rounded-apple-2xl shadow-sm border border-gray-50 overflow-hidden">
-        <div className="p-8 border-b border-gray-50">
+        <div className="p-8 border-b border-gray-50 flex justify-between items-center">
           <h3 className="text-xl font-bold text-ejn-teal">Histórico de Contribuições</h3>
         </div>
-        
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-apple-gray">
@@ -51,7 +41,7 @@ export const MyInvestments: React.FC<MyInvestmentsProps> = ({ transactions, tota
                 <th className="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Data</th>
                 <th className="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Destinação</th>
                 <th className="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-right">Valor</th>
-                <th className="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-right">Ação</th>
+                <th className="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-right">Doc</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -60,7 +50,7 @@ export const MyInvestments: React.FC<MyInvestmentsProps> = ({ transactions, tota
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-2 text-sm text-gray-500">
                       <Calendar className="w-4 h-4 text-gray-300" />
-                      {new Date(inv.date).toLocaleDateString('pt-BR')}
+                      {new Date(inv.created_at).toLocaleDateString('pt-BR')}
                     </div>
                   </td>
                   <td className="px-8 py-5">
@@ -68,13 +58,10 @@ export const MyInvestments: React.FC<MyInvestmentsProps> = ({ transactions, tota
                     <p className="text-[10px] text-ejn-teal font-bold uppercase tracking-wider">{inv.categoria}</p>
                   </td>
                   <td className="px-8 py-5 text-right font-bold text-lg text-ejn-teal">
-                    {/* Propriedade corrigida de amount para valor */}
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(inv.valor)}
                   </td>
                   <td className="px-8 py-5 text-right">
-                    <button className="text-gray-300 group-hover:text-ejn-gold transition-colors">
-                      <ArrowUpRight className="w-5 h-5" />
-                    </button>
+                    <button className="text-gray-300 group-hover:text-ejn-gold"><ArrowUpRight className="w-5 h-5" /></button>
                   </td>
                 </tr>
               ))}
