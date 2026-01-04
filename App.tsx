@@ -192,12 +192,16 @@ const App: React.FC = () => {
               <ImpactHero impactCount={impactCount} totalInvested={totalInvested} />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <TransparencyCard transactions={transacoes} onNavigate={setActiveTab} />
-                <FeaturedProject transactions={transacoes} />
+                <FeaturedProject 
+                  projects={projetos} 
+                  transactions={transacoes} 
+                  onNavigate={setActiveTab} 
+                />
               </div>
             </div>
           )}
           {activeTab === 'investments' && role === 'doador' && (
-            <MyInvestments 
+            < MyInvestments 
               transactions={userTransactions} 
               totalInvested={totalInvested} 
               profileData={profileData}
