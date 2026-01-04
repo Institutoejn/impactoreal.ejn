@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { User, Building2, Camera, Save, Loader2, CheckCircle2, Linkedin, Instagram, MapPin, FileText } from 'lucide-react';
 import { Perfil } from '../types';
@@ -24,7 +23,6 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
     instagram: ''
   });
 
-  // Sincroniza dados vindos do banco para o estado local do formulário
   useEffect(() => {
     if (profileData) {
       setForm({
@@ -39,15 +37,14 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
     }
   }, [profileData]);
 
-  // Função para aplicar máscara de CNPJ (00.000.000/0000-00)
   const maskCNPJ = (value: string) => {
     return value
-      .replace(/\D/g, '') // Remove tudo o que não é dígito
-      .replace(/^(\d{2})(\d)/, '$1.$2') // Coloca ponto entre o segundo e o terceiro dígitos
-      .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3') // Coloca ponto entre o quinto e o sexto dígitos
-      .replace(/\.(\d{3})(\d)/, '.$1/$2') // Coloca uma barra entre o oitavo e o nono dígitos
-      .replace(/(\d{4})(\d)/, '$1-$2') // Coloca um hífen depois do décimo segundo dígito
-      .slice(0, 18); // Limita o tamanho
+      .replace(/\D/g, '')
+      .replace(/^(\d{2})(\d)/, '$1.$2')
+      .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+      .replace(/\.(\d{3})(\d)/, '.$1/$2')
+      .replace(/(\d{4})(\d)/, '$1-$2')
+      .slice(0, 18);
   };
 
   const handleCNPJChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,11 +56,10 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
     setSuccess(false);
     
     try {
-      // Captura do usuário autenticado para garantir o ID (UUID)
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Sessão expirada. Por favor, faça login novamente.");
 
-      // Lógica de Upsert contemplando os novos campos do Instituto
+      // --- CORREÇÃO DE COLUNAS: GARANTINDO LETRAS MINÚSCULAS ---
       const { error } = await supabase.from('perfis').upsert({
         id: user.id,
         email: user.email,
@@ -72,9 +68,9 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
         cargo: 'gestor',
         linkedin: form.linkedin,
         instagram: form.instagram,
-        razao_social: form.razao_social,
-        cnpj: form.cnpj,
-        endereco: form.endereco,
+        razao_social: form.razao_social, // lowercase
+        cnpj: form.cnpj,                // lowercase
+        endereco: form.endereco,        // lowercase
         foto_url: profileData.foto_url
       });
 
@@ -84,8 +80,6 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
       }
 
       setSuccess(true);
-      
-      // Força atualização global dos dados para refletir no "Meu Perfil"
       onRefresh();
       
       alert('Dados do Instituto EJN atualizados com sucesso!');
@@ -120,7 +114,6 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8 max-w-4xl pb-20">
-      {/* Seção de Perfil Pessoal */}
       <div className="bg-white p-10 rounded-apple-2xl shadow-sm border border-gray-50">
         <div className="flex items-center gap-3 mb-10">
           <User className="w-6 h-6 text-ejn-teal" />
@@ -205,7 +198,6 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
         </div>
       </div>
 
-      {/* Seção de Dados do Instituto */}
       <div className="bg-white p-10 rounded-apple-2xl shadow-sm border border-gray-50">
         <div className="flex items-center gap-3 mb-10">
           <Building2 className="w-6 h-6 text-ejn-teal" />
@@ -257,7 +249,6 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
         </div>
       </div>
 
-      {/* Ações Finais */}
       <div className="flex justify-end pt-4">
         <button 
           onClick={handleSave}
@@ -274,7 +265,6 @@ export const Settings: React.FC<SettingsProps> = ({ profileData, onRefresh }) =>
   );
 };
 
-// Componente Local auxiliar para o ícone Hash não importado
 const Hash = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="4" y1="9" x2="20" y2="9"></line>

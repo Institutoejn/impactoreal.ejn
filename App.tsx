@@ -150,9 +150,17 @@ const App: React.FC = () => {
 
   if (!session) return <><LandingPage onStart={() => setShowLogin(true)} />{showLogin && <LoginForm onClose={() => setShowLogin(false)} />}</>;
 
-  const totalInvested = transacoes
+  // --- CORREÇÃO DE PRIVACIDADE: FILTRO POR USUÁRIO ---
+  const userTransactions = transacoes.filter(t => 
+    role === 'gestor' ? true : t.doador_email === session.user.email
+  );
+
+  const totalInvested = userTransactions
     .filter(t => t.tipo === 'entrada' && t.status === 'confirmado')
     .reduce((acc, t) => acc + t.valor, 0);
+
+  // Se o doador não tem doações confirmadas, o impacto é 0
+  const impactCount = (role === 'doador' && totalInvested === 0) ? 0 : alunos.length;
 
   return (
     <div className="min-h-screen flex font-sans text-gray-900 bg-apple-gray">
@@ -181,14 +189,14 @@ const App: React.FC = () => {
         <div className="max-w-6xl mx-auto pb-20">
           {activeTab === 'overview' && role === 'doador' && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <ImpactHero impactCount={alunos.length} totalInvested={totalInvested} />
+              <ImpactHero impactCount={impactCount} totalInvested={totalInvested} />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <TransparencyCard transactions={transacoes} onNavigate={setActiveTab} />
                 <FeaturedProject transactions={transacoes} />
               </div>
             </div>
           )}
-          {activeTab === 'investments' && role === 'doador' && <MyInvestments transactions={transacoes} totalInvested={totalInvested} />}
+          {activeTab === 'investments' && role === 'doador' && <MyInvestments transactions={userTransactions} totalInvested={totalInvested} />}
           {activeTab === 'projects' && role === 'doador' && <Projects projects={projetos} transactions={transacoes} onDonate={(pid, amt) => handleAddTransaction({ descricao: 'Doação Realizada', valor: amt, tipo: 'entrada', categoria: 'Doação', projeto_id: pid, status: 'pendente' })} />}
           {activeTab === 'transparency' && role === 'doador' && <Transparency transactions={transacoes} />}
           
